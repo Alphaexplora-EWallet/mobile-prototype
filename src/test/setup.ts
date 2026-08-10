@@ -1,0 +1,43 @@
+import "@testing-library/jest-dom/vitest";
+import { afterEach, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+
+afterEach(cleanup);
+
+// Node 26 gates its own localStorage behind --localstorage-file, so
+// window.localStorage is undefined here. App.tsx reads it in a useState
+// initialiser, which throws before anything renders.
+if (!window.localStorage) {
+  const store = new Map<string, string>();
+  Object.defineProperty(window, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => void store.set(key, String(value)),
+      removeItem: (key: string) => void store.delete(key),
+      clear: () => store.clear(),
+      key: (index: number) => [...store.keys()][index] ?? null,
+      get length() {
+        return store.size;
+      },
+    },
+  });
+}
+
+// jsdom implements neither of these, and the app touches both on mount:
+// App.tsx calls matchMedia inside a useState initialiser, and navigate()
+// calls scrollTo. Without these stubs the very first render throws.
+if (!window.matchMedia) {
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: false, // pins tests to light theme, deterministically
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+}
+
+window.scrollTo = vi.fn();
