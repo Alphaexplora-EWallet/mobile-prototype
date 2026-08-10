@@ -18,28 +18,38 @@ const click = async (name: RegExp | string) => {
   await user.click(screen.getByRole("button", { name }));
 };
 
+/**
+ * Collapses asset URLs to their filename so the snapshot tracks *which* image
+ * is rendered, not where the bundler happens to serve it from. Without this,
+ * relocating a file inside src/ shows up as a diff on every screen that uses
+ * it and drowns out real changes.
+ */
+const normalize = (html: string) => html.replace(/src="[^"]*\/([^/"]+\.(?:webp|png|jpe?g|svg))"/g, 'src="asset:$1"');
+
+const snap = (container: HTMLElement, name: string) => expect(normalize(container.innerHTML)).toMatchSnapshot(name);
+
 describe("FIN-A app flow", () => {
   it("renders every screen and the full quest flow identically", async () => {
     const { container } = render(<App />);
 
     // ---- Onboarding -------------------------------------------------------
-    expect(container.innerHTML).toMatchSnapshot("01-welcome");
+    snap(container, "01-welcome");
     expect(screen.queryByRole("navigation", { name: /primary navigation/i })).toBeNull();
 
     await click(/I already have an account/i);
-    expect(container.innerHTML).toMatchSnapshot("02-sign-in");
+    snap(container, "02-sign-in");
 
     await click(/Back to welcome/i);
     await click(/Start my journey/i);
-    expect(container.innerHTML).toMatchSnapshot("03-quiz");
+    snap(container, "03-quiz");
     expect(screen.queryByRole("navigation", { name: /primary navigation/i })).toBeNull();
 
     await click(/I check my budget first/i);
     await click(/^Continue$/);
-    expect(container.innerHTML).toMatchSnapshot("04-result");
+    snap(container, "04-result");
 
     await click(/Build my plan/i);
-    expect(container.innerHTML).toMatchSnapshot("05-home");
+    snap(container, "05-home");
     expect(screen.getByRole("navigation", { name: /primary navigation/i })).toBeTruthy();
 
     // ---- Balance masking --------------------------------------------------
@@ -51,40 +61,40 @@ describe("FIN-A app flow", () => {
 
     // ---- Quest flow -------------------------------------------------------
     await click(/Continue quest/i);
-    expect(container.innerHTML).toMatchSnapshot("06-quest-available");
+    snap(container, "06-quest-available");
 
     await click(/Set ₱3,000 limit/i);
-    expect(container.innerHTML).toMatchSnapshot("07-wallet-limit-setup");
+    snap(container, "07-wallet-limit-setup");
 
     await click(/Confirm ₱3,000 limit/i);
-    expect(container.innerHTML).toMatchSnapshot("08-quest-tracking");
+    snap(container, "08-quest-tracking");
 
     await click(/Preview end-of-day result/i);
-    expect(container.innerHTML).toMatchSnapshot("09-reward");
+    snap(container, "09-reward");
 
     await click(/Use this card style/i);
-    expect(container.innerHTML).toMatchSnapshot("10-wallet-after-reward");
+    snap(container, "10-wallet-after-reward");
     expect(screen.getAllByText(/Sunset Ride/).length).toBeGreaterThan(0);
 
     // ---- Money screens ----------------------------------------------------
     await click(/Send money/i);
-    expect(container.innerHTML).toMatchSnapshot("11-transfer");
+    snap(container, "11-transfer");
 
     await click(/Back to home/i);
     const nav = screen.getByRole("navigation", { name: /primary navigation/i });
     await userEvent.setup().click(within(nav).getByRole("button", { name: /^Pay$/ }));
-    expect(container.innerHTML).toMatchSnapshot("12-payments");
+    snap(container, "12-payments");
 
     await click(/Add money/i);
-    expect(container.innerHTML).toMatchSnapshot("13-deposit");
+    snap(container, "13-deposit");
 
     // ---- Remaining tabs ---------------------------------------------------
     await click(/Back to home/i);
     await userEvent.setup().click(within(nav).getByRole("button", { name: /^Wallet$/ }));
-    expect(container.innerHTML).toMatchSnapshot("14-wallet");
+    snap(container, "14-wallet");
 
     await userEvent.setup().click(within(nav).getByRole("button", { name: /^Profile$/ }));
-    expect(container.innerHTML).toMatchSnapshot("15-profile");
+    snap(container, "15-profile");
   });
 
   it("opens and dismisses the simulated action sheet", async () => {
