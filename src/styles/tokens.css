@@ -1,0 +1,36 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-rounded, "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  color: #142126;
+  background: #ebe7de;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --ink: #142126;
+  --muted: #667074;
+  --teal: #087e79;
+  --teal-dark: #006863;
+  --teal-soft: #e5f1ed;
+  --cream: #fbf7ef;
+  --cream-deep: #f5ede0;
+  --amber: #f0aa24;
+  --coral: #ec5f43;
+  --line: #e5ded1;
+  --shadow: 0 16px 38px rgba(28, 46, 45, 0.12);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: #f2f0e8;
+  background: #0a0f0d;
+  --ink: #f2f0e8;
+  --muted: #9aa69f;
+  --teal: #3cb7aa;
+  --teal-dark: #278f86;
+  --teal-soft: #193531;
+  --cream: #101614;
+  --cream-deep: #17201d;
+  --amber: #e8b24d;
+  --coral: #ef826b;
+  --line: #2a3632;
+  --shadow: 0 16px 38px rgba(0, 4, 3, 0.5);
+}

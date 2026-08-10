@@ -1,0 +1,334 @@
+/* Money movement pages */
+.money-field {
+  margin-bottom: 22px;
+}
+.field-label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+.wallet-move-money {
+  margin-bottom: 24px;
+}
+.wallet-move-money h2 {
+  margin: 0 0 14px;
+  font-size: 20px;
+  letter-spacing: -0.4px;
+}
+
+.source-picker {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+.source-option {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 3px;
+  padding: 13px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 18px;
+  text-align: left;
+  background: rgba(255, 253, 248, 0.78);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+.source-option:hover {
+  transform: translateY(-2px);
+}
+.source-option.is-selected {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+}
+.source-option-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--teal);
+}
+.source-option-top svg {
+  width: 18px;
+  height: 18px;
+}
+.source-option-top strong {
+  color: var(--ink);
+  font-size: 13px;
+}
+.source-option small {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+.source-option b {
+  margin-top: 5px;
+  font-size: 15px;
+}
+.source-option em {
+  position: absolute;
+  right: 10px;
+  top: 11px;
+  color: var(--coral);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.amount-field {
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 253, 248, 0.78);
+}
+.amount-input {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.amount-currency {
+  color: var(--teal);
+  font-size: 30px;
+  font-weight: 800;
+}
+.amount-input input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  color: var(--ink);
+  background: transparent;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+.amount-input input::placeholder {
+  color: #c3c6bd;
+}
+.amount-available {
+  color: var(--muted);
+  font-size: 12px;
+}
+.amount-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+.amount-preset {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.amount-preset:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+.amount-preset.is-selected {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.recipient-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.recipient-row::-webkit-scrollbar {
+  display: none;
+}
+.recipient-chip {
+  flex: 0 0 106px;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  padding: 13px 8px;
+  border: 1.5px solid var(--line);
+  border-radius: 18px;
+  text-align: center;
+  background: rgba(255, 253, 248, 0.78);
+  cursor: pointer;
+}
+.recipient-chip > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  color: var(--teal);
+  background: var(--teal-soft);
+  font-size: 14px;
+  font-weight: 900;
+}
+.recipient-chip strong {
+  font-size: 12px;
+}
+.recipient-chip small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.recipient-chip.is-selected {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+}
+.recipient-chip.is-selected > span {
+  color: var(--cream);
+  background: var(--teal);
+}
+.recipient-add > span svg {
+  width: 20px;
+  height: 20px;
+}
+
+.money-note {
+  display: block;
+  margin-bottom: 22px;
+}
+
+.link-row {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 11px;
+  align-items: center;
+  width: 100%;
+  min-height: 67px;
+  padding: 9px 13px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
+}
+.link-row:last-child {
+  border-bottom: 0;
+}
+.link-row:hover {
+  background: var(--teal-soft);
+}
+.link-row.is-selected .control-icon {
+  color: var(--cream);
+  background: var(--teal);
+}
+.link-row-trailing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+.link-row-trailing small {
+  font-size: 11px;
+  white-space: nowrap;
+}
+.link-row-trailing svg {
+  width: 19px;
+  height: 19px;
+}
+.link-row.is-selected .link-row-trailing {
+  color: var(--teal);
+}
+
+.summary-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.78);
+}
+.summary-strip > svg {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  color: var(--teal);
+}
+.summary-strip span {
+  display: grid;
+  gap: 2px;
+}
+.summary-strip strong {
+  font-size: 14px;
+}
+.summary-strip small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.money-actions {
+  margin-top: 26px;
+}
+.prototype-note {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.pay-scan-card {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 18px;
+  border: 1px solid rgba(8, 126, 121, 0.35);
+  border-radius: 22px;
+  text-align: left;
+  color: var(--ink);
+  background: var(--teal-soft);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease;
+}
+.pay-scan-card:hover {
+  transform: translateY(-2px);
+}
+.pay-scan-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  color: var(--cream);
+  background: var(--teal);
+}
+.pay-scan-copy {
+  display: grid;
+  gap: 3px;
+}
+.pay-scan-copy strong {
+  font-size: 17px;
+}
+.pay-scan-copy small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.pay-scan-card > svg {
+  color: var(--teal);
+}
+

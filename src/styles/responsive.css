@@ -1,0 +1,86 @@
+@media (max-width: 540px) {
+  .app-stage {
+    display: block;
+    padding: 0;
+  }
+  .phone-shell {
+    width: 100%;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .phone-shell::after {
+    display: none;
+  }
+  .status-bar {
+    padding-top: max(8px, env(safe-area-inset-top));
+    flex-basis: calc(46px + env(safe-area-inset-top));
+  }
+  .bottom-nav {
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    flex-basis: calc(74px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 370px) {
+  .tab-page,
+  .onboarding-page {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .quiz-intro h1 {
+    font-size: 39px;
+  }
+  .answer-list legend {
+    font-size: 27px;
+  }
+  .home-balance-heading strong {
+    font-size: 30px;
+  }
+  .quest-title-block h1 {
+    font-size: 34px;
+  }
+  .reward-content h1 {
+    font-size: 34px;
+  }
+  .welcome-copy h1,
+  .sign-in-copy h1 {
+    font-size: 38px;
+  }
+  .welcome-visual {
+    min-height: 300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .home-stack-card,
+  .home-balance-heading strong.is-changing {
+    animation: none !important;
+    transition: opacity 90ms ease !important;
+  }
+  .payment-card-flipper,
+  .payment-card-flipper.is-flipped {
+    transform: none;
+  }
+  .payment-card-back {
+    transform: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .payment-card-flipper.is-flipped .payment-card-front {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .payment-card-flipper.is-flipped .payment-card-back {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

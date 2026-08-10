@@ -1,0 +1,205 @@
+/* Reward and profile */
+.reward-page {
+  display: flex;
+  flex-direction: column;
+}
+.reward-page > header {
+  padding-bottom: 14px;
+}
+.reward-content {
+  position: relative;
+  text-align: center;
+}
+.reward-content > p:not(.eyebrow) {
+  margin: 12px 0 0;
+  color: var(--muted);
+}
+.reward-content h1 {
+  font-size: 38px;
+}
+.celebration-orbit {
+  position: absolute;
+  inset: -20px 0 auto;
+  height: 130px;
+  border-top: 3px dotted rgba(8, 126, 121, 0.35);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.celebration-orbit span,
+.celebration-orbit i,
+.celebration-orbit b {
+  position: absolute;
+  color: var(--amber);
+  font-size: 26px;
+  font-style: normal;
+}
+.celebration-orbit span {
+  right: 20px;
+  top: -12px;
+}
+.celebration-orbit i {
+  left: 8px;
+  top: 74px;
+  color: var(--coral);
+}
+.celebration-orbit b {
+  right: 3px;
+  top: 88px;
+  font-size: 16px;
+}
+.xp-earned {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: end;
+  margin: 26px 0 18px;
+  color: var(--teal);
+}
+.xp-earned strong {
+  font-size: 82px;
+  line-height: 0.85;
+}
+.xp-earned b {
+  font-size: 25px;
+}
+.xp-earned span {
+  grid-column: 1 / 3;
+  color: var(--muted);
+  font-size: 18px;
+}
+.level-progress {
+  margin-bottom: 24px;
+}
+.level-progress > span {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.level-progress .progress-track {
+  height: 7px;
+}
+.unlocked-card {
+  margin: 0 auto;
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.unlocked-card .card-top,
+.unlocked-card .card-middle,
+.unlocked-card .card-number {
+  position: absolute;
+  left: 20px;
+}
+.unlocked-card .card-top {
+  top: 16px;
+  right: 18px;
+}
+.unlocked-card .card-top .brand-mark {
+  width: 88px;
+}
+.unlocked-card .card-middle {
+  top: 58px;
+}
+.unlocked-card .card-number {
+  top: 94px;
+}
+.unlocked-card-name {
+  position: absolute;
+  left: 20px;
+  bottom: 16px;
+  display: grid;
+  text-align: left;
+}
+.unlocked-card-name strong {
+  font-size: 21px;
+}
+.unlocked-card-name small {
+  margin-top: 3px;
+  color: var(--teal);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.visa {
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
+}
+.new-badge {
+  position: absolute;
+  z-index: 3;
+  right: 8px;
+  top: 7px;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  color: var(--coral);
+  background: #fff3d7;
+  border: 1px solid var(--amber);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  transform: rotate(8deg);
+}
+.reward-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 28px;
+}
+.profile-hero {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  padding: 20px 0 30px;
+}
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  color: var(--teal);
+  background: var(--teal-soft);
+}
+.profile-avatar svg {
+  width: 48px;
+  height: 48px;
+}
+.profile-hero h1 {
+  margin: 16px 0 5px;
+  font-size: 30px;
+}
+.profile-hero p {
+  margin: 0;
+  color: var(--muted);
+}
+.profile-level {
+  width: 180px;
+  height: 7px;
+  margin-top: 15px;
+  border-radius: 10px;
+  background: #dce8e3;
+}
+.profile-level span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--teal);
+}
+.profile-section {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 253, 248, 0.75);
+}
+.profile-section p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+

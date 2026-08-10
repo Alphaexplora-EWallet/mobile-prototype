@@ -1,0 +1,184 @@
+/* Dark theme */
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at 15% 12%, rgba(60, 183, 170, 0.1), transparent 30%),
+    radial-gradient(circle at 88% 82%, rgba(232, 178, 77, 0.07), transparent 25%), #0a0f0d;
+}
+:root[data-theme="dark"] .phone-shell {
+  border-color: #050807;
+  background: var(--cream);
+  box-shadow:
+    0 28px 70px rgba(0, 3, 2, 0.62),
+    inset 0 0 0 2px #313b37;
+}
+:root[data-theme="dark"] .phone-shell::after {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+:root[data-theme="dark"] .status-bar {
+  background: rgba(16, 22, 20, 0.98);
+}
+:root[data-theme="dark"] .screen {
+  background:
+    radial-gradient(circle at 82% 10%, rgba(60, 183, 170, 0.045), transparent 26%),
+    linear-gradient(rgba(16, 22, 20, 0.965), rgba(16, 22, 20, 0.965)),
+    repeating-linear-gradient(135deg, transparent, transparent 6px, rgba(193, 218, 209, 0.025) 7px);
+}
+:root[data-theme="dark"] .icon-button,
+:root[data-theme="dark"] .avatar-button,
+:root[data-theme="dark"] .theme-toggle {
+  background: #17201d;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+}
+:root[data-theme="dark"] .brand-mark-lockup {
+  filter: brightness(0) invert(1);
+}
+:root[data-theme="dark"] .welcome-copy h1,
+:root[data-theme="dark"] .sign-in-copy h1 {
+  color: var(--ink);
+}
+:root[data-theme="dark"] .welcome-copy p,
+:root[data-theme="dark"] .sign-in-copy > p:last-child {
+  color: var(--muted);
+}
+:root[data-theme="dark"] .welcome-visual-fade {
+  background: linear-gradient(var(--cream) 0%, transparent 18%, transparent 68%, var(--cream) 100%);
+}
+:root[data-theme="dark"] .welcome-actions {
+  background: linear-gradient(transparent, var(--cream) 40%);
+}
+:root[data-theme="dark"] .welcome-actions .secondary-button,
+:root[data-theme="dark"] .demo-auth .secondary-button {
+  background: rgba(20, 33, 30, 0.9);
+}
+:root[data-theme="dark"] .welcome-dots span {
+  background: #34433f;
+}
+:root[data-theme="dark"] .auth-form label {
+  color: #cbd6d2;
+}
+:root[data-theme="dark"] .input-shell,
+:root[data-theme="dark"] .answer-option,
+:root[data-theme="dark"] .style-progress,
+:root[data-theme="dark"] .transaction-list,
+:root[data-theme="dark"] .control-list,
+:root[data-theme="dark"] .source-option,
+:root[data-theme="dark"] .amount-field,
+:root[data-theme="dark"] .recipient-chip,
+:root[data-theme="dark"] .summary-strip,
+:root[data-theme="dark"] .profile-section {
+  background: #17201d;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+:root[data-theme="dark"] .source-option.is-selected,
+:root[data-theme="dark"] .recipient-chip.is-selected,
+:root[data-theme="dark"] .amount-preset.is-selected {
+  background: var(--teal-soft);
+}
+:root[data-theme="dark"] .input-shell input {
+  color: var(--ink);
+}
+:root[data-theme="dark"] .input-shell input::placeholder {
+  color: #71807c;
+}
+:root[data-theme="dark"] .amount-input input::placeholder {
+  color: #4b5a55;
+}
+:root[data-theme="dark"] .answer-icon {
+  background: #1e2a26;
+}
+:root[data-theme="dark"] .answer-option.is-selected .answer-icon {
+  background: #214740;
+}
+:root[data-theme="dark"] .progress-track,
+:root[data-theme="dark"] .profile-level {
+  background: #263934;
+}
+:root[data-theme="dark"] .sticky-action {
+  background: linear-gradient(transparent, var(--cream) 24%);
+}
+:root[data-theme="dark"] .home-stack-next {
+  border-color: var(--cream);
+}
+:root[data-theme="dark"] .home-card-actions button {
+  border: 1px solid #26332f;
+  border-radius: 18px;
+  background: #17201d;
+  box-shadow: 0 8px 18px rgba(0, 4, 3, 0.16);
+}
+:root[data-theme="dark"] .home-card-actions button:hover {
+  border-color: #355049;
+  background: #1a2622;
+  transform: translateY(-2px);
+}
+:root[data-theme="dark"] .home-card-actions button > span {
+  border-radius: 12px;
+  background: transparent;
+}
+:root[data-theme="dark"] .quest-card {
+  border-color: rgba(232, 178, 77, 0.25);
+  background: #1b201b;
+  box-shadow: 0 10px 26px rgba(0, 3, 2, 0.32);
+}
+:root[data-theme="dark"] .quest-card-scrim {
+  background: linear-gradient(90deg, rgba(16, 22, 20, 0.99) 0%, rgba(16, 22, 20, 0.9) 46%, rgba(16, 22, 20, 0.18) 78%);
+}
+:root[data-theme="dark"] .quest-icon,
+:root[data-theme="dark"] .large-quest-icon {
+  color: #f0a568;
+  background: #3b2c20;
+  border-color: #68452b;
+}
+:root[data-theme="dark"] .mini-cta {
+  color: #18201d;
+}
+:root[data-theme="dark"] .tracking-status,
+:root[data-theme="dark"] .quest-context-banner {
+  color: #c7f1eb;
+}
+:root[data-theme="dark"] .tracking-status small,
+:root[data-theme="dark"] .quest-context-banner small {
+  color: #8fb3ad;
+}
+:root[data-theme="dark"] .quest-ring {
+  background: conic-gradient(var(--teal) 0 41%, #293a36 41% 100%);
+}
+:root[data-theme="dark"] .reward-strip,
+:root[data-theme="dark"] .controls-section.is-highlighted {
+  background: #2d281d;
+}
+:root[data-theme="dark"] .xp-star {
+  background: #3b3020;
+}
+:root[data-theme="dark"] .payment-card-sunset,
+:root[data-theme="dark"] .unlocked-card {
+  color: #142126;
+}
+:root[data-theme="dark"] .bottom-nav {
+  background: rgba(16, 22, 20, 0.98);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.2);
+}
+:root[data-theme="dark"] .bottom-nav button {
+  color: #8f9e9a;
+}
+:root[data-theme="dark"] .bottom-nav button.is-active {
+  color: var(--teal);
+}
+:root[data-theme="dark"] .action-sheet {
+  background: var(--cream);
+}
+:root[data-theme="dark"] .sheet-handle {
+  background: #43514d;
+}
+
+.phone-shell,
+.status-bar,
+.screen,
+.bottom-nav,
+.action-sheet {
+  transition:
+    color 0.24s ease,
+    background-color 0.24s ease,
+    border-color 0.24s ease,
+    box-shadow 0.24s ease;
+}
+

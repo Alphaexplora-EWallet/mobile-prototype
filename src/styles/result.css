@@ -1,0 +1,154 @@
+/* Result */
+.result-page {
+  display: flex;
+  flex-direction: column;
+}
+.result-content {
+  text-align: center;
+  padding-top: 40px;
+}
+.eyebrow {
+  margin: 0 0 14px;
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+}
+.result-content h1,
+.reward-content h1 {
+  margin: 0;
+  font-size: 45px;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+.result-label {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 20px;
+}
+.wallet-character {
+  position: relative;
+  width: 230px;
+  height: 210px;
+  margin: 25px auto 18px;
+}
+.character-wallet {
+  position: absolute;
+  left: 48px;
+  top: 70px;
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 120px;
+  border: 6px double #075d59;
+  border-radius: 22px;
+  color: #022f2d;
+  background: repeating-linear-gradient(45deg, #087d77, #087d77 6px, #04716c 6px, #04716c 8px);
+  box-shadow: var(--shadow);
+  transform: rotate(-3deg);
+}
+.character-wallet::before,
+.character-wallet::after {
+  content: "•";
+  position: absolute;
+  top: 42px;
+  font-size: 25px;
+}
+.character-wallet::before {
+  left: 50px;
+}
+.character-wallet::after {
+  right: 50px;
+}
+.character-wallet span {
+  margin-top: 32px;
+  font-size: 38px;
+}
+.character-sun {
+  position: absolute;
+  left: 30px;
+  top: 6px;
+  z-index: 2;
+  color: var(--amber);
+  font-size: 74px;
+}
+.character-orbit {
+  position: absolute;
+  inset: 40px 0 0;
+  border: 2px solid var(--teal);
+  border-radius: 50%;
+  transform: rotate(-15deg);
+}
+.character-star {
+  position: absolute;
+  color: var(--coral);
+  font-size: 28px;
+}
+.character-star-one {
+  right: 8px;
+  top: 55px;
+}
+.character-star-two {
+  left: 3px;
+  bottom: 23px;
+  color: var(--amber);
+}
+.result-description {
+  max-width: 350px;
+  margin: 0 auto 26px;
+  font-size: 17px;
+  line-height: 1.55;
+}
+.trait-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0 -6px 28px;
+}
+.trait {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  border-right: 1px solid var(--line);
+}
+.trait:last-child {
+  border: 0;
+}
+.trait > span {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  color: var(--teal);
+  background: var(--teal-soft);
+}
+.trait:nth-child(1) > span {
+  color: var(--amber);
+}
+.trait:nth-child(3) > span {
+  color: var(--coral);
+}
+.trait small {
+  font-size: 13px;
+  font-weight: 700;
+}
+.palm-glyph {
+  font-size: 28px;
+  color: var(--teal);
+}
+.growth-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.growth-note span {
+  color: var(--amber);
+  font-size: 22px;
+}
+

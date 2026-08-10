@@ -1,0 +1,238 @@
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 12%, rgba(8, 126, 121, 0.12), transparent 28%),
+    radial-gradient(circle at 88% 82%, rgba(240, 170, 36, 0.13), transparent 24%), #ebe7de;
+  transition:
+    color 0.24s ease,
+    background-color 0.24s ease;
+}
+
+button,
+input {
+  font: inherit;
+}
+button {
+  color: inherit;
+}
+button:focus-visible {
+  outline: 3px solid rgba(8, 126, 121, 0.28);
+  outline-offset: 3px;
+}
+svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.app-stage {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.phone-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 430px);
+  height: min(900px, calc(100vh - 48px));
+  overflow: hidden;
+  border: 8px solid #171a1b;
+  border-radius: 54px;
+  background: var(--cream);
+  box-shadow:
+    0 28px 70px rgba(16, 28, 30, 0.25),
+    inset 0 0 0 2px #555;
+}
+
+.phone-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  border-radius: 45px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+}
+
+.status-bar {
+  position: relative;
+  z-index: 8;
+  flex: 0 0 46px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 8px 28px 0;
+  background: rgba(251, 247, 239, 0.98);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.dynamic-island {
+  width: 86px;
+  height: 26px;
+  border-radius: 20px;
+  background: #050607;
+}
+.status-icons {
+  justify-self: end;
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--teal);
+  background: rgba(251, 247, 239, 0.82);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+.theme-toggle:hover {
+  color: var(--cream);
+  background: var(--teal);
+}
+.theme-toggle:active {
+  transform: scale(0.92);
+}
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.screen {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  background:
+    linear-gradient(rgba(251, 247, 239, 0.94), rgba(251, 247, 239, 0.94)),
+    repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(92, 76, 53, 0.05) 5px);
+}
+.screen::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-page,
+.onboarding-page {
+  min-height: 100%;
+  padding: 18px 24px 28px;
+}
+.tab-page {
+  padding-bottom: 34px;
+}
+
+.brand-mark {
+  display: block;
+  width: 122px;
+  height: auto;
+  object-fit: contain;
+}
+.brand-mark-compact {
+  width: 108px;
+}
+.brand-mark-lockup {
+  width: 188px;
+}
+
+.icon-button,
+.avatar-button {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(251, 247, 239, 0.82);
+  cursor: pointer;
+}
+.icon-button svg {
+  width: 22px;
+}
+.clear-button {
+  border-color: transparent;
+  background: transparent;
+}
+.app-bar-spacer {
+  width: 44px;
+}
+.centered-app-bar,
+.split-app-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+}
+.centered-app-bar > strong {
+  font-size: 20px;
+}
+.page-app-bar {
+  margin-bottom: 18px;
+}
+
+.primary-button,
+.secondary-button,
+.text-button {
+  width: 100%;
+  min-height: 56px;
+  border-radius: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.primary-button {
+  border: 0;
+  color: white;
+  background:
+    linear-gradient(rgba(0, 110, 105, 0.96), rgba(0, 110, 105, 0.96)),
+    repeating-linear-gradient(45deg, transparent 0 5px, rgba(255, 255, 255, 0.12) 6px 7px);
+  box-shadow: 0 7px 18px rgba(0, 91, 87, 0.18);
+}
+.primary-button:hover {
+  background-color: var(--teal-dark);
+  transform: translateY(-1px);
+}
+.secondary-button {
+  border: 1.5px solid var(--teal);
+  color: var(--teal);
+  background: transparent;
+}
+.text-button {
+  min-height: 46px;
+  border: 0;
+  color: var(--teal);
+  background: transparent;
+}
+.sticky-action {
+  position: sticky;
+  bottom: -28px;
+  z-index: 5;
+  padding: 18px 0 24px;
+  background: linear-gradient(transparent, var(--cream) 24%);
+}
+

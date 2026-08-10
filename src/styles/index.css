@@ -1,0 +1,35 @@
+/*
+ * Global stylesheet, split by cascade layer and screen.
+ *
+ * Import order below IS the cascade order and must not be rearranged:
+ * dark.css and responsive.css override earlier rules at equal specificity,
+ * so they load last. Vite's postcss-import inlines these deterministically
+ * at build time, which is why this split is provably equivalent to the
+ * single file it replaced.
+ *
+ * Only tokens.css survives the React Native port; the rest is web-only
+ * styling that becomes StyleSheet objects.
+ */
+
+/* Design tokens: light palette + dark palette overrides. */
+@import "./tokens.css";
+
+/* Reset, document, and shared element defaults. */
+@import "./base.css";
+
+/* Per-screen component rules, in the order they appeared originally. */
+@import "./welcome.css";
+@import "./quiz.css";
+@import "./result.css";
+@import "./home.css";
+@import "./quest.css";
+@import "./cards.css";
+@import "./reward-profile.css";
+@import "./nav.css";
+@import "./money.css";
+
+/* Theme overrides keyed to the class names above. Must come after them. */
+@import "./dark.css";
+
+/* Breakpoints and prefers-reduced-motion. Must come last. */
+@import "./responsive.css";

@@ -1,0 +1,120 @@
+/* Quiz */
+.quiz-page {
+  display: flex;
+  flex-direction: column;
+}
+.quiz-intro {
+  padding-top: 26px;
+}
+.quiz-intro h1 {
+  margin: 0 0 20px;
+  max-width: 330px;
+  font-size: clamp(38px, 10vw, 48px);
+  line-height: 0.98;
+  letter-spacing: -2.2px;
+}
+.progress-heading {
+  color: var(--teal);
+  margin-bottom: 10px;
+}
+.progress-track {
+  display: block;
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #dfe9e4;
+}
+.progress-track > span,
+.progress-track > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--teal);
+}
+.orbit-accent {
+  position: relative;
+  height: 92px;
+  margin-right: -20px;
+}
+.orbit-accent::before {
+  content: "";
+  position: absolute;
+  right: 5px;
+  top: 24px;
+  width: 150px;
+  height: 74px;
+  border-top: 3px dotted rgba(8, 126, 121, 0.42);
+  border-radius: 50%;
+  transform: rotate(-8deg);
+}
+.orbit-accent span {
+  position: absolute;
+  right: 1px;
+  top: 48px;
+  color: var(--amber);
+  font-size: 26px;
+}
+.answer-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.answer-list legend {
+  margin: 0 0 22px;
+  padding: 0;
+  font-size: 30px;
+  line-height: 1.1;
+  font-weight: 850;
+  letter-spacing: -1.2px;
+}
+.answer-option {
+  display: grid;
+  grid-template-columns: 54px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  min-height: 82px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  text-align: left;
+  background: rgba(255, 253, 248, 0.7);
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 700;
+  cursor: pointer;
+}
+.answer-option.is-selected {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+  box-shadow: inset 0 0 0 1px rgba(8, 126, 121, 0.2);
+}
+.answer-icon,
+.answer-check {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: var(--teal);
+  background: #f3eee4;
+}
+.answer-option.is-selected .answer-icon {
+  background: #cfe3dc;
+}
+.answer-check {
+  width: 36px;
+  height: 36px;
+  color: white;
+  background: var(--teal);
+}
+.answer-check svg {
+  width: 20px;
+}
+.onboarding-action {
+  margin-top: auto;
+}
+
