@@ -1,21 +1,15 @@
 import { Icon } from "../primitives/Icon";
 import { IMAGERY } from "../assets";
+import { useQuestViewModel } from "@/core/viewmodels/useQuestViewModel";
 
-export function QuestScreen({
-  isTracking,
-  onBack,
-  onSetLimit,
-  onComplete,
-}: {
-  isTracking: boolean;
-  onBack: () => void;
-  onSetLimit: () => void;
-  onComplete: () => void;
-}) {
+export function QuestScreen() {
+  const vm = useQuestViewModel();
+  const { isTracking } = vm;
+
   return (
     <div className="tab-page quest-page">
       <header className="centered-app-bar page-app-bar">
-        <button className="icon-button" type="button" onClick={onBack} aria-label="Back to home">
+        <button className="icon-button" type="button" onClick={vm.back} aria-label="Back to home">
           <Icon name="arrow-left" />
         </button>
         <strong>Quest</strong>
@@ -38,7 +32,7 @@ export function QuestScreen({
         <div className="tracking-status">
           <Icon name="check" />
           <span>
-            <strong>₱3,000 limit active</strong>
+            <strong>{vm.trackingNote}</strong>
             <small>Your quest is now tracking today’s spending.</small>
           </span>
         </div>
@@ -47,14 +41,14 @@ export function QuestScreen({
       <section className="quest-ring-wrap" aria-label="41 percent of the daily limit used">
         <div className="quest-ring">
           <div>
-            <strong>₱1,240</strong>
+            <strong>{vm.spentLabel}</strong>
             <span>spent</span>
             <i />
-            <b>₱1,760</b>
+            <b>{vm.remainingLabel}</b>
             <span>left today</span>
           </div>
         </div>
-        <span className="ring-percent">41%</span>
+        <span className="ring-percent">{vm.progressPercent}%</span>
       </section>
 
       <section className="why-section">
@@ -72,24 +66,24 @@ export function QuestScreen({
           <Icon name="star" />
         </span>
         <span>
-          <strong>80 XP</strong>
+          <strong>{vm.xpReward} XP</strong>
           <small>Reward</small>
         </span>
         <i />
         <img src={IMAGERY.sunsetJeepney} alt="Sunset Ride card preview" />
         <span>
           <small>Unlock</small>
-          <strong className="teal-text">Sunset Ride</strong>
+          <strong className="teal-text">{vm.rewardName}</strong>
           <small>card style</small>
         </span>
       </section>
 
       <div className="quest-actions">
-        <button className="primary-button" type="button" onClick={isTracking ? onComplete : onSetLimit}>
-          {isTracking ? "Preview end-of-day result" : "Set ₱3,000 limit"}
+        <button className="primary-button" type="button" onClick={vm.pressPrimary}>
+          {vm.primaryLabel}
         </button>
-        <button className="text-button" type="button" onClick={isTracking ? onBack : onSetLimit}>
-          {isTracking ? "Back to home" : "Choose another amount"}
+        <button className="text-button" type="button" onClick={vm.pressSecondary}>
+          {vm.secondaryLabel}
         </button>
       </div>
     </div>

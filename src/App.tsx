@@ -1,13 +1,10 @@
-import { useCallback, useState } from "react";
+import type { JSX } from "react";
 
-import type { CardId } from "@/core/domain/card";
 import type { Screen } from "@/core/navigation/screens";
-import { isTabScreen } from "@/core/navigation/screens";
-import { INITIAL_FROZEN } from "@/core/data/mock/cards.mock";
-import { usePlatform } from "@/core/platform/PlatformContext";
-import { ThemeBridge } from "@/app/bridges/ThemeBridge";
+import { preferencesActions } from "@/core/stores/preferences.store";
+import { useAppShellViewModel } from "@/core/viewmodels/useAppShellViewModel";
 
-import type { Theme } from "@/ui/theme/ThemeContext";
+import { ThemeBridge } from "@/app/bridges/ThemeBridge";
 import { ThemeProvider } from "@/ui/theme/ThemeContext";
 import { StatusBar } from "@/ui/layout/StatusBar";
 import { BottomNav } from "@/ui/layout/BottomNav";
@@ -25,149 +22,40 @@ import { PaymentsScreen } from "@/ui/screens/PaymentsScreen";
 import { RewardScreen } from "@/ui/screens/RewardScreen";
 import { ProfileScreen } from "@/ui/screens/ProfileScreen";
 
+/**
+ * Where a Screen id meets a component, and the only place that mapping lives.
+ * Screens take no props: each reads its own ViewModel.
+ */
+const SCREENS: Record<Screen, () => JSX.Element> = {
+  welcome: WelcomeScreen,
+  "sign-in": SignInScreen,
+  quiz: QuizScreen,
+  result: ResultScreen,
+  home: HomeScreen,
+  wallet: WalletScreen,
+  transfer: TransferScreen,
+  deposit: DepositScreen,
+  payments: PaymentsScreen,
+  quest: QuestScreen,
+  reward: RewardScreen,
+  profile: ProfileScreen,
+};
+
 function App() {
-  const { scroll } = usePlatform();
-  // Hydrated from storage by ThemeBridge; index.html has already painted the
-  // right theme before React runs, so this default is never seen.
-  const [theme, setTheme] = useState<Theme>("light");
-  const [screen, setScreen] = useState<Screen>("welcome");
-  const [selectedAnswer, setSelectedAnswer] = useState(0);
-  const [balanceVisible, setBalanceVisible] = useState(true);
-  const [selectedCard, setSelectedCard] = useState<CardId>("main");
-  const [limitSetup, setLimitSetup] = useState(false);
-  const [limitConfirmed, setLimitConfirmed] = useState(false);
-  const [rewardUnlocked, setRewardUnlocked] = useState(false);
-  const [cardStyleApplied, setCardStyleApplied] = useState(false);
-  const [frozenCards, setFrozenCards] = useState<Record<CardId, boolean>>(INITIAL_FROZEN);
-  const [onlinePayments, setOnlinePayments] = useState(true);
-  const [atmWithdrawals, setAtmWithdrawals] = useState(true);
-  const [sheet, setSheet] = useState<string | null>(null);
-
-  const navigate = useCallback(
-    (next: Screen) => {
-      setSheet(null);
-      setScreen(next);
-      scroll.scrollToTop();
-    },
-    [scroll],
-  );
-
-  const openLimitSetup = () => {
-    setSelectedCard("main");
-    setLimitSetup(true);
-    navigate("wallet");
-  };
-
-  const confirmLimit = () => {
-    setLimitSetup(false);
-    setLimitConfirmed(true);
-    navigate("quest");
-  };
-
-  const completeQuest = () => {
-    setRewardUnlocked(true);
-    navigate("reward");
-  };
-
-  const moneyScreenProps = {
-    selectedCard,
-    onSelectCard: setSelectedCard,
-    frozenCards,
-    rewardUnlocked,
-    cardStyleApplied,
-    onBack: () => navigate("home"),
-    onSimulate: setSheet,
-  };
-
-  const renderScreen = () => {
-    switch (screen) {
-      case "welcome":
-        return <WelcomeScreen onStart={() => navigate("quiz")} onSignIn={() => navigate("sign-in")} />;
-      case "sign-in":
-        return <SignInScreen onBack={() => navigate("welcome")} onContinue={() => navigate("home")} />;
-      case "quiz":
-        return (
-          <QuizScreen selected={selectedAnswer} onSelect={setSelectedAnswer} onContinue={() => navigate("result")} />
-        );
-      case "result":
-        return <ResultScreen onContinue={() => navigate("home")} onClose={() => navigate("home")} />;
-      case "home":
-        return (
-          <HomeScreen
-            theme={theme}
-            onToggleTheme={() => setTheme((current) => (current === "light" ? "dark" : "light"))}
-            balanceVisible={balanceVisible}
-            onToggleBalance={() => setBalanceVisible((value) => !value)}
-            selectedCard={selectedCard}
-            frozenCards={frozenCards}
-            rewardUnlocked={rewardUnlocked}
-            cardStyleApplied={cardStyleApplied}
-            onSelectCard={setSelectedCard}
-            onWallet={() => navigate("wallet")}
-            onQuest={() => navigate("quest")}
-            onNavigate={navigate}
-            onAction={setSheet}
-          />
-        );
-      case "quest":
-        return (
-          <QuestScreen
-            isTracking={limitConfirmed}
-            onBack={() => navigate("home")}
-            onSetLimit={openLimitSetup}
-            onComplete={completeQuest}
-          />
-        );
-      case "wallet":
-        return (
-          <WalletScreen
-            selectedCard={selectedCard}
-            onSelectCard={setSelectedCard}
-            limitSetup={limitSetup}
-            rewardUnlocked={rewardUnlocked}
-            cardStyleApplied={cardStyleApplied}
-            frozenCards={frozenCards}
-            onlinePayments={onlinePayments}
-            atmWithdrawals={atmWithdrawals}
-            onFrozenChange={(card, value) => setFrozenCards((current) => ({ ...current, [card]: value }))}
-            onOnlineChange={setOnlinePayments}
-            onAtmChange={setAtmWithdrawals}
-            onConfirmLimit={confirmLimit}
-            onCancelLimit={() => setLimitSetup(false)}
-            onNavigate={navigate}
-          />
-        );
-      case "transfer":
-        return <TransferScreen {...moneyScreenProps} />;
-      case "deposit":
-        return <DepositScreen {...moneyScreenProps} />;
-      case "payments":
-        return <PaymentsScreen {...moneyScreenProps} onNavigate={navigate} />;
-      case "reward":
-        return (
-          <RewardScreen
-            onApply={() => {
-              setCardStyleApplied(true);
-              setSelectedCard("travel");
-              navigate("wallet");
-            }}
-            onHome={() => navigate("home")}
-          />
-        );
-      case "profile":
-        return <ProfileScreen onRestart={() => navigate("quiz")} />;
-    }
-  };
+  const { theme, screen, activeTab, sheet, selectTab, dismissSheet } = useAppShellViewModel();
+  const CurrentScreen = SCREENS[screen];
 
   return (
     <ThemeProvider value={theme}>
-      <ThemeBridge theme={theme} onThemeChange={setTheme} />
+      <ThemeBridge theme={theme} onThemeChange={preferencesActions.setTheme} />
       <main className="app-stage">
         <section className="phone-shell" aria-label="FIN-A mobile app prototype">
           <StatusBar />
-          <div className={`screen screen-${screen}`}>{renderScreen()}</div>
-          {isTabScreen(screen) && <BottomNav active={screen} onNavigate={navigate} />}
-          {sheet && <ActionSheet action={sheet} onClose={() => setSheet(null)} />}
+          <div className={`screen screen-${screen}`}>
+            <CurrentScreen />
+          </div>
+          {activeTab && <BottomNav active={activeTab} onNavigate={selectTab} />}
+          {sheet && <ActionSheet result={sheet} onClose={dismissSheet} />}
         </section>
       </main>
     </ThemeProvider>

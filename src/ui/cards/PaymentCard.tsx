@@ -1,6 +1,5 @@
 import type { CardView } from "@/core/domain/card";
 import { maskCardNumber } from "@/core/domain/card";
-import { MOCK_CARDHOLDER } from "@/core/data/mock/cards.mock";
 import { useCardPrivacy } from "@/core/viewmodels/useCardPrivacy";
 import { Icon } from "../primitives/Icon";
 import { BrandMark } from "../layout/BrandMark";
@@ -82,7 +81,7 @@ export function PaymentCard({
           <div className="card-back-meta">
             <span>
               <small>Account opened</small>
-              <strong>{MOCK_CARDHOLDER.openedLabel}</strong>
+              <strong>{card.openedLabel}</strong>
             </span>
             <span>
               <small>Expires</small>
@@ -90,12 +89,12 @@ export function PaymentCard({
             </span>
             <span>
               <small>Security code</small>
-              <strong>{revealed ? MOCK_CARDHOLDER.securityCode : "•••"}</strong>
+              <strong>{revealed ? card.securityCode : "•••"}</strong>
             </span>
           </div>
           <div className="signature-line">
             <small>Signature</small>
-            <strong>{MOCK_CARDHOLDER.name}</strong>
+            <strong>{card.holderName}</strong>
           </div>
           <div className="card-back-brand">
             <span>{card.displayLabel}</span>

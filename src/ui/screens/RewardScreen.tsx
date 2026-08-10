@@ -1,7 +1,10 @@
 import { BrandMark } from "../layout/BrandMark";
 import { IMAGERY } from "../assets";
+import { useRewardViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
-export function RewardScreen({ onApply, onHome }: { onApply: () => void; onHome: () => void }) {
+export function RewardScreen() {
+  const { apply, home } = useRewardViewModel();
+
   return (
     <div className="onboarding-page reward-page">
       <header>
@@ -56,10 +59,10 @@ export function RewardScreen({ onApply, onHome }: { onApply: () => void; onHome:
         </div>
       </section>
       <div className="reward-actions">
-        <button className="primary-button" type="button" onClick={onApply}>
+        <button className="primary-button" type="button" onClick={apply}>
           Use this card style
         </button>
-        <button className="secondary-button" type="button" onClick={onHome}>
+        <button className="secondary-button" type="button" onClick={home}>
           Back to home
         </button>
       </div>

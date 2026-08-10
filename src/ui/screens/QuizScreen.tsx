@@ -1,16 +1,10 @@
-import { MOCK_QUIZ_QUESTION } from "@/core/data/mock/quiz.mock";
 import { BrandMark } from "../layout/BrandMark";
 import { Icon } from "../primitives/Icon";
+import { useQuizViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
-export function QuizScreen({
-  selected,
-  onSelect,
-  onContinue,
-}: {
-  selected: number;
-  onSelect: (value: number) => void;
-  onContinue: () => void;
-}) {
+export function QuizScreen() {
+  const { question, progressLabel, progressPercent, selectedIndex, select, submit } = useQuizViewModel();
+
   return (
     <div className="onboarding-page quiz-page">
       <header className="centered-app-bar">
@@ -24,10 +18,10 @@ export function QuizScreen({
       <section className="quiz-intro">
         <h1>Find your money style</h1>
         <div className="progress-heading">
-          <strong>3 of 5</strong>
+          <strong>{progressLabel}</strong>
         </div>
-        <div className="progress-track" aria-label="Question 3 of 5">
-          <span style={{ width: "60%" }} />
+        <div className="progress-track" aria-label={`Question ${progressLabel}`}>
+          <span style={{ width: `${progressPercent}%` }} />
         </div>
       </section>
 
@@ -36,20 +30,20 @@ export function QuizScreen({
       </div>
 
       <fieldset className="answer-list">
-        <legend>When you want something, what usually happens?</legend>
-        {MOCK_QUIZ_QUESTION.answers.map((answer, index) => (
+        <legend>{question.prompt}</legend>
+        {question.answers.map((answer, index) => (
           <button
-            className={`answer-option ${selected === index ? "is-selected" : ""}`}
+            className={`answer-option ${selectedIndex === index ? "is-selected" : ""}`}
             key={answer.label}
             type="button"
-            aria-pressed={selected === index}
-            onClick={() => onSelect(index)}
+            aria-pressed={selectedIndex === index}
+            onClick={() => select(index)}
           >
             <span className="answer-icon">
               <Icon name={answer.icon} />
             </span>
             <span>{answer.label}</span>
-            {selected === index && (
+            {selectedIndex === index && (
               <span className="answer-check">
                 <Icon name="check" />
               </span>
@@ -59,7 +53,7 @@ export function QuizScreen({
       </fieldset>
 
       <div className="sticky-action onboarding-action">
-        <button className="primary-button" type="button" onClick={onContinue}>
+        <button className="primary-button" type="button" onClick={submit}>
           Continue
         </button>
       </div>

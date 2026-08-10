@@ -61,11 +61,9 @@ export default tseslint.config(
   {
     files: ["src/ui/**/*.{ts,tsx}"],
     rules: {
-      // Currently "warn": screens still read data directly because their
-      // ViewModels do not exist yet. Every warning here is one screen left to
-      // convert. Raise to "error" once the last use*ViewModel hook lands.
+      // Enforced: every screen now reads through a ViewModel.
       "no-restricted-imports": [
-        "warn",
+        "error",
         {
           patterns: [
             {

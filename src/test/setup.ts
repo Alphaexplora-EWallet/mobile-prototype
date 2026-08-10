@@ -1,8 +1,14 @@
 import "@testing-library/jest-dom/vitest";
 import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
+import { resetStores } from "@/core/app/resetStores";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  // Stores are module singletons, so state survives unmount and would leak
+  // into the next test.
+  resetStores();
+});
 
 // Node 26 gates its own localStorage behind --localstorage-file, so
 // window.localStorage is undefined here. App.tsx reads it in a useState

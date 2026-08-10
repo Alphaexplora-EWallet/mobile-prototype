@@ -1,8 +1,8 @@
-import type { Screen, TabScreen } from "@/core/navigation/screens";
+import type { TabScreen } from "@/core/navigation/screens";
 import { TAB_ITEMS } from "@/core/navigation/screens";
 import { Icon } from "../primitives/Icon";
 
-export function BottomNav({ active, onNavigate }: { active: TabScreen; onNavigate: (screen: Screen) => void }) {
+export function BottomNav({ active, onNavigate }: { active: TabScreen; onNavigate: (tab: TabScreen) => void }) {
   return (
     <nav className="bottom-nav" aria-label="Primary navigation">
       {TAB_ITEMS.map((item) => (

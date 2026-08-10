@@ -1,7 +1,6 @@
 import type { CardView } from "@/core/domain/card";
 import { cardTag } from "@/core/domain/card";
 import { ARTWORK } from "../assets";
-import { MOCK_CARDHOLDER } from "@/core/data/mock/cards.mock";
 import { BrandMark } from "../layout/BrandMark";
 
 export function CardFace({ card }: { card: CardView }) {
@@ -30,7 +29,7 @@ export function CardFace({ card }: { card: CardView }) {
           </span>
         </span>
         <span className="card-bottom">
-          <strong>{MOCK_CARDHOLDER.name}</strong>
+          <strong>{card.holderName}</strong>
           <b>VISA</b>
         </span>
         <span className="card-tag">{cardTag(card)}</span>

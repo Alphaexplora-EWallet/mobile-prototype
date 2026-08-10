@@ -1,13 +1,16 @@
 import { BrandMark } from "../layout/BrandMark";
 import { Icon } from "../primitives/Icon";
 import { Trait } from "../primitives/Trait";
+import { useResultViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
-export function ResultScreen({ onContinue, onClose }: { onContinue: () => void; onClose: () => void }) {
+export function ResultScreen() {
+  const { continue: proceed, close } = useResultViewModel();
+
   return (
     <div className="onboarding-page result-page">
       <header className="split-app-bar">
         <BrandMark compact />
-        <button className="icon-button" type="button" onClick={onClose} aria-label="Close result">
+        <button className="icon-button" type="button" onClick={close} aria-label="Close result">
           ×
         </button>
       </header>
@@ -43,7 +46,7 @@ export function ResultScreen({ onContinue, onClose }: { onContinue: () => void; 
       </section>
 
       <div className="sticky-action onboarding-action">
-        <button className="primary-button" type="button" onClick={onContinue}>
+        <button className="primary-button" type="button" onClick={proceed}>
           Build my plan
         </button>
       </div>

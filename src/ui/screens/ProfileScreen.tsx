@@ -1,7 +1,9 @@
-import { MOCK_CARDHOLDER } from "@/core/data/mock/cards.mock";
 import { Icon } from "../primitives/Icon";
+import { useProfileViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
-export function ProfileScreen({ onRestart }: { onRestart: () => void }) {
+export function ProfileScreen() {
+  const { name, retakeQuiz } = useProfileViewModel();
+
   return (
     <div className="tab-page profile-page">
       <header className="centered-app-bar page-app-bar">
@@ -15,7 +17,7 @@ export function ProfileScreen({ onRestart }: { onRestart: () => void }) {
         <span className="profile-avatar">
           <Icon name="user" />
         </span>
-        <h1>{MOCK_CARDHOLDER.name}</h1>
+        <h1>{name}</h1>
         <p>The Free Spirit · Level 3</p>
         <div className="profile-level">
           <span style={{ width: "75%" }} />
@@ -27,7 +29,7 @@ export function ProfileScreen({ onRestart }: { onRestart: () => void }) {
       </section>
       <section className="profile-section">
         <h2>Prototype controls</h2>
-        <button className="secondary-button" type="button" onClick={onRestart}>
+        <button className="secondary-button" type="button" onClick={retakeQuiz}>
           Retake money style quiz
         </button>
       </section>

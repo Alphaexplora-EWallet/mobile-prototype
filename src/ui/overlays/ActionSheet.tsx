@@ -1,7 +1,7 @@
-import { SIMULATED_NOTE } from "@/core/domain/simulation";
+import type { SimulatedResult } from "@/core/domain/simulation";
 import { Icon } from "../primitives/Icon";
 
-export function ActionSheet({ action, onClose }: { action: string; onClose: () => void }) {
+export function ActionSheet({ result, onClose }: { result: SimulatedResult; onClose: () => void }) {
   return (
     <div className="sheet-backdrop" role="presentation" onClick={onClose}>
       <section
@@ -15,8 +15,8 @@ export function ActionSheet({ action, onClose }: { action: string; onClose: () =
         <span className="sheet-icon">
           <Icon name="wallet" />
         </span>
-        <h2 id="sheet-title">{action}</h2>
-        <p>{SIMULATED_NOTE}</p>
+        <h2 id="sheet-title">{result.title}</h2>
+        <p>{result.body}</p>
         <button className="primary-button" type="button" onClick={onClose}>
           Got it
         </button>

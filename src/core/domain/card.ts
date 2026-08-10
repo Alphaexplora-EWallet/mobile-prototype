@@ -15,6 +15,10 @@ export type CardDefinition = {
   last4: string;
   fullNumber: string;
   expiry: string;
+  securityCode: string;
+  holderName: string;
+  /** When the account behind this card was opened. */
+  openedLabel: string;
   /**
    * Display string today (e.g. "₱24,680.50"). Becomes Money in the centavos
    * migration, which is the last step precisely because it changes output.

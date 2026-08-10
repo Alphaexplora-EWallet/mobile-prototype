@@ -1,21 +1,17 @@
-import { getCardViews } from "@/core/data/cardViews";
-import { MOCK_BILLERS, MOCK_SCHEDULED_PAYMENTS } from "@/core/data/mock/payments.mock";
-import { SIMULATED_NOTE } from "@/core/domain/simulation";
-import type { Screen } from "@/core/navigation/screens";
 import { Icon } from "../primitives/Icon";
 import { LinkRow } from "../primitives/LinkRow";
 import { PageBar } from "../layout/PageBar";
-import type { MoneyScreenProps } from "./moneyScreenProps";
+import { usePaymentsViewModel } from "@/core/viewmodels/useMoneyMovementViewModel";
 
-export function PaymentsScreen(props: MoneyScreenProps & { onNavigate: (screen: Screen) => void }) {
-  const cards = getCardViews(props.frozenCards, props.rewardUnlocked, props.cardStyleApplied);
-  const source = cards.find((card) => card.id === props.selectedCard) ?? cards[0];
+export function PaymentsScreen() {
+  const vm = usePaymentsViewModel();
+  const { source } = vm;
 
   return (
     <div className="tab-page money-page payments-page">
       <PageBar title="Pay" optionsLabel="Payment options" />
 
-      <button className="pay-scan-card" type="button" onClick={() => props.onSimulate("Pay with QR")}>
+      <button className="pay-scan-card" type="button" onClick={() => vm.simulate("Pay with QR")}>
         <span className="pay-scan-icon">
           <Icon name="qr" />
         </span>
@@ -33,13 +29,13 @@ export function PaymentsScreen(props: MoneyScreenProps & { onNavigate: (screen: 
             icon="send"
             title="Send money"
             detail={`From •••• ${source.last4}`}
-            onClick={() => props.onNavigate("transfer")}
+            onClick={() => vm.goTo("transfer")}
           />
           <LinkRow
             icon="arrow-down"
             title="Add money"
             detail="Cash in from bank, card, or counter"
-            onClick={() => props.onNavigate("deposit")}
+            onClick={() => vm.goTo("deposit")}
           />
         </div>
       </section>
@@ -47,14 +43,14 @@ export function PaymentsScreen(props: MoneyScreenProps & { onNavigate: (screen: 
       <section className="money-field">
         <span className="field-label">Pay a bill</span>
         <div className="control-list">
-          {MOCK_BILLERS.map((biller) => (
+          {vm.billers.map((biller) => (
             <LinkRow
               key={biller.id}
               icon={biller.icon}
               title={biller.name}
               detail={biller.detail}
               meta={biller.due}
-              onClick={() => props.onSimulate(`Pay ${biller.name}`)}
+              onClick={() => vm.simulate(`Pay ${biller.name}`)}
             />
           ))}
         </div>
@@ -63,12 +59,12 @@ export function PaymentsScreen(props: MoneyScreenProps & { onNavigate: (screen: 
       <section className="home-section">
         <h2>Scheduled</h2>
         <div className="transaction-list">
-          {MOCK_SCHEDULED_PAYMENTS.map((payment) => (
+          {vm.scheduled.map((payment) => (
             <button
               type="button"
               className="transaction-row"
-              key={payment.name}
-              onClick={() => props.onSimulate(payment.name)}
+              key={payment.id}
+              onClick={() => vm.simulate(payment.name)}
             >
               <span className="transaction-icon">{payment.glyph}</span>
               <span className="transaction-copy">
@@ -81,7 +77,7 @@ export function PaymentsScreen(props: MoneyScreenProps & { onNavigate: (screen: 
         </div>
       </section>
 
-      <p className="prototype-note">{SIMULATED_NOTE}</p>
+      <p className="prototype-note">{vm.simulatedNote}</p>
     </div>
   );
 }

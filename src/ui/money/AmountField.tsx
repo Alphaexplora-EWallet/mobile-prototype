@@ -1,15 +1,15 @@
-import { MOCK_AMOUNT_PRESETS } from "@/core/data/mock/payments.mock";
-
 export function AmountField({
   label,
   value,
   onChange,
   available,
+  presets,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   available: string;
+  presets: readonly string[];
 }) {
   return (
     <section className="money-field">
@@ -30,7 +30,7 @@ export function AmountField({
         <small className="amount-available">Available {available}</small>
       </div>
       <div className="amount-presets">
-        {MOCK_AMOUNT_PRESETS.map((preset) => (
+        {presets.map((preset) => (
           <button
             className={`amount-preset ${value === preset ? "is-selected" : ""}`}
             type="button"

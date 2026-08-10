@@ -1,7 +1,10 @@
 import { BrandMark } from "../layout/BrandMark";
 import { IMAGERY } from "../assets";
+import { useWelcomeViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
-export function WelcomeScreen({ onStart, onSignIn }: { onStart: () => void; onSignIn: () => void }) {
+export function WelcomeScreen() {
+  const { start, signIn } = useWelcomeViewModel();
+
   return (
     <div className="onboarding-page welcome-page">
       <header className="welcome-logo">
@@ -29,10 +32,10 @@ export function WelcomeScreen({ onStart, onSignIn }: { onStart: () => void; onSi
       </figure>
 
       <div className="welcome-actions">
-        <button className="primary-button welcome-primary" type="button" onClick={onStart}>
+        <button className="primary-button welcome-primary" type="button" onClick={start}>
           <span>✦</span> Start my journey <b>›</b>
         </button>
-        <button className="secondary-button" type="button" onClick={onSignIn}>
+        <button className="secondary-button" type="button" onClick={signIn}>
           I already have an account
         </button>
         <div className="welcome-dots" aria-label="Welcome step 1 of 3">

@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { BrandMark } from "../layout/BrandMark";
 import { Icon } from "../primitives/Icon";
+import { useSignInViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
-export function SignInScreen({ onBack, onContinue }: { onBack: () => void; onContinue: () => void }) {
+export function SignInScreen() {
+  const { back, submit } = useSignInViewModel();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -10,7 +13,7 @@ export function SignInScreen({ onBack, onContinue }: { onBack: () => void; onCon
   return (
     <div className="onboarding-page sign-in-page">
       <header className="centered-app-bar sign-in-header">
-        <button className="icon-button" type="button" onClick={onBack} aria-label="Back to welcome">
+        <button className="icon-button" type="button" onClick={back} aria-label="Back to welcome">
           <Icon name="arrow-left" />
         </button>
         <BrandMark compact />
@@ -31,7 +34,7 @@ export function SignInScreen({ onBack, onContinue }: { onBack: () => void; onCon
         className="auth-form"
         onSubmit={(event) => {
           event.preventDefault();
-          onContinue();
+          submit();
         }}
       >
         <label>
@@ -80,7 +83,7 @@ export function SignInScreen({ onBack, onContinue }: { onBack: () => void; onCon
       <div className="demo-auth">
         <span>Frontend prototype</span>
         <p>No real account or credentials are required.</p>
-        <button className="secondary-button" type="button" onClick={onContinue}>
+        <button className="secondary-button" type="button" onClick={submit}>
           Continue with demo account
         </button>
       </div>

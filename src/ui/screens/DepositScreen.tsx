@@ -1,38 +1,39 @@
-import { useState } from "react";
-import { getCardViews } from "@/core/data/cardViews";
-import { MOCK_DEPOSIT_METHODS } from "@/core/data/mock/payments.mock";
-import { SIMULATED_NOTE } from "@/core/domain/simulation";
 import { Icon } from "../primitives/Icon";
 import { LinkRow } from "../primitives/LinkRow";
 import { PageBar } from "../layout/PageBar";
 import { SourcePicker } from "../cards/SourcePicker";
 import { AmountField } from "../money/AmountField";
-import type { MoneyScreenProps } from "./moneyScreenProps";
+import { useDepositViewModel } from "@/core/viewmodels/useMoneyMovementViewModel";
 
-export function DepositScreen(props: MoneyScreenProps) {
-  const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState(MOCK_DEPOSIT_METHODS[0].id);
-  const cards = getCardViews(props.frozenCards, props.rewardUnlocked, props.cardStyleApplied);
-  const destination = cards.find((card) => card.id === props.selectedCard) ?? cards[0];
+export function DepositScreen() {
+  const vm = useDepositViewModel();
+  const { cards, amount } = vm;
+  const destination = vm.source;
 
   return (
     <div className="onboarding-page money-page deposit-page">
-      <PageBar title="Add money" onBack={props.onBack} optionsLabel="Deposit options" />
+      <PageBar title="Add money" onBack={vm.back} optionsLabel="Deposit options" />
 
-      <SourcePicker label="To" cards={cards} selected={destination.id} onSelect={props.onSelectCard} />
-      <AmountField label="Amount to add" value={amount} onChange={setAmount} available={destination.balance} />
+      <SourcePicker label="To" cards={[...cards]} selected={destination.id} onSelect={vm.selectCard} />
+      <AmountField
+        label="Amount to add"
+        value={amount}
+        onChange={vm.setAmount}
+        available={destination.balance}
+        presets={vm.amountPresets}
+      />
 
       <section className="money-field">
         <span className="field-label">Choose a method</span>
         <div className="control-list">
-          {MOCK_DEPOSIT_METHODS.map((item) => (
+          {vm.methods.map((item) => (
             <LinkRow
               key={item.id}
               icon={item.icon}
               title={item.title}
               detail={item.detail}
-              selected={method === item.id}
-              onClick={() => setMethod(item.id)}
+              selected={vm.selectedMethod === item.id}
+              onClick={() => vm.selectMethod(item.id)}
             />
           ))}
         </div>
@@ -47,10 +48,10 @@ export function DepositScreen(props: MoneyScreenProps) {
       </div>
 
       <div className="money-actions">
-        <button className="primary-button" type="button" onClick={() => props.onSimulate("Add money")}>
+        <button className="primary-button" type="button" onClick={() => vm.simulate("Add money")}>
           Add money
         </button>
-        <p className="prototype-note">{SIMULATED_NOTE}</p>
+        <p className="prototype-note">{vm.simulatedNote}</p>
       </div>
     </div>
   );
