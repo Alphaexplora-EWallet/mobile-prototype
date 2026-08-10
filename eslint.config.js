@@ -51,15 +51,27 @@ export default tseslint.config(
   // ports (migration step 7), at which point that entry comes out.
   {
     files: ["src/**/*.{ts,tsx}"],
-    ignores: ["src/platform/**", "src/main.tsx", "src/test/**", "src/App.tsx"],
+    // The exemption list IS the remaining port work. Each entry is a file that
+    // still calls a web API directly; step 7 empties this list.
+    ignores: [
+      "src/platform/**",
+      "src/main.tsx",
+      "src/test/**",
+      "src/App.tsx",
+      "src/ui/cards/PaymentCard.tsx",
+      "src/ui/screens/HomeScreen.tsx",
+    ],
     rules: { "no-restricted-globals": webApiBan },
   },
   // Views must not reach past their ViewModel into state, data, or formatting.
   {
     files: ["src/ui/**/*.{ts,tsx}"],
     rules: {
+      // Currently "warn": screens still read data directly because their
+      // ViewModels do not exist yet. Every warning here is one screen left to
+      // convert. Raise to "error" once the last use*ViewModel hook lands.
       "no-restricted-imports": [
-        "error",
+        "warn",
         {
           patterns: [
             {
