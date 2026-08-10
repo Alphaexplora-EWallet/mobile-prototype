@@ -8,6 +8,7 @@ import type { Theme } from "../theme/ThemeContext";
 import { BrandMark } from "../layout/BrandMark";
 import { Icon } from "../primitives/Icon";
 import { QuickAction } from "../primitives/QuickAction";
+import { useReduceMotion } from "@/core/viewmodels/useReduceMotion";
 import { CardFace } from "../cards/CardFace";
 import { IMAGERY } from "../assets";
 
@@ -41,6 +42,7 @@ export function HomeScreen({
   onAction: (action: string) => void;
 }) {
   const [stackingCard, setStackingCard] = useState<CardId | null>(null);
+  const reduceMotion = useReduceMotion();
   const cards = getCardViews(frozenCards, rewardUnlocked, cardStyleApplied);
   const selectedIndex = cards.findIndex((card) => card.id === selectedCard);
   const activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
@@ -50,8 +52,8 @@ export function HomeScreen({
 
   useEffect(() => {
     if (!stackingCard) return;
-    const animationFallback = window.setTimeout(() => setStackingCard(null), 520);
-    return () => window.clearTimeout(animationFallback);
+    const animationFallback = setTimeout(() => setStackingCard(null), 520);
+    return () => clearTimeout(animationFallback);
   }, [stackingCard]);
 
   const handleCardPress = (card: CardView, isActive: boolean) => {
@@ -61,8 +63,7 @@ export function HomeScreen({
       return;
     }
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reducedMotion) setStackingCard(card.id);
+    if (!reduceMotion) setStackingCard(card.id);
     onSelectCard(card.id);
   };
 

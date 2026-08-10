@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
 import type { CardView } from "@/core/domain/card";
 import { maskCardNumber } from "@/core/domain/card";
 import { MOCK_CARDHOLDER } from "@/core/data/mock/cards.mock";
+import { useCardPrivacy } from "@/core/viewmodels/useCardPrivacy";
 import { Icon } from "../primitives/Icon";
 import { BrandMark } from "../layout/BrandMark";
 import { CardFace } from "./CardFace";
@@ -17,56 +17,8 @@ export function PaymentCard({
   onClick: () => void;
   onFreeze: () => void;
 }) {
-  const [flipped, setFlipped] = useState(false);
-  const [revealed, setRevealed] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false);
-
-  useEffect(() => {
-    if (!selected) {
-      setFlipped(false);
-      setRevealed(false);
-      setAuthOpen(false);
-    }
-  }, [selected]);
-
-  useEffect(() => {
-    if (!revealed) return;
-    const privacyTimer = window.setTimeout(() => setRevealed(false), 20_000);
-    return () => window.clearTimeout(privacyTimer);
-  }, [revealed]);
-
-  useEffect(() => {
-    const hideSensitiveDetails = () => {
-      if (document.hidden) setRevealed(false);
-    };
-    const hideOnBlur = () => setRevealed(false);
-    document.addEventListener("visibilitychange", hideSensitiveDetails);
-    window.addEventListener("blur", hideOnBlur);
-    return () => {
-      document.removeEventListener("visibilitychange", hideSensitiveDetails);
-      window.removeEventListener("blur", hideOnBlur);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!authOpen) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setAuthOpen(false);
-    };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [authOpen]);
-
-  const toggleFlip = () => {
-    if (!selected) onClick();
-    setFlipped((value) => {
-      if (value) {
-        setRevealed(false);
-        setAuthOpen(false);
-      }
-      return !value;
-    });
-  };
+  const { flipped, revealed, authOpen, toggleFlip, requestReveal, confirmReveal, cancelReveal, hideNumber } =
+    useCardPrivacy(selected, onClick);
 
   const toggleFreeze = () => {
     if (!selected) onClick();
@@ -119,7 +71,7 @@ export function PaymentCard({
             <button
               className="card-reveal-button"
               type="button"
-              onClick={() => (revealed ? setRevealed(false) : setAuthOpen(true))}
+              onClick={() => (revealed ? hideNumber() : requestReveal())}
               tabIndex={flipped ? 0 : -1}
               aria-label={revealed ? "Hide card number" : "Reveal full card number"}
               aria-pressed={revealed}
@@ -155,17 +107,10 @@ export function PaymentCard({
               <strong>Confirm it’s you</strong>
               <small>This prototype simulates biometric verification.</small>
               <div>
-                <button
-                  autoFocus
-                  type="button"
-                  onClick={() => {
-                    setAuthOpen(false);
-                    setRevealed(true);
-                  }}
-                >
+                <button autoFocus type="button" onClick={confirmReveal}>
                   Use demo Face ID
                 </button>
-                <button type="button" onClick={() => setAuthOpen(false)}>
+                <button type="button" onClick={cancelReveal}>
                   Cancel
                 </button>
               </div>

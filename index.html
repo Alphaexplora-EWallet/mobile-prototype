@@ -6,6 +6,23 @@
     <meta name="theme-color" content="#fbf7ef" />
     <meta name="description" content="FIN-A — a personality-powered e-wallet prototype." />
     <title>FIN-A Wallet</title>
+    <script>
+      // Paints the stored theme before React mounts. Theme hydration is async
+      // in the app (storage is async on device), so without this a dark-mode
+      // user would see a light flash on every load.
+      (function () {
+        try {
+          var t = localStorage.getItem("fina-theme");
+          if (t !== "light" && t !== "dark") {
+            t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          }
+          document.documentElement.dataset.theme = t;
+          document.documentElement.style.colorScheme = t;
+        } catch (_) {
+          /* storage unavailable; the app will settle it after mount */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

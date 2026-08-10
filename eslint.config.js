@@ -51,16 +51,10 @@ export default tseslint.config(
   // ports (migration step 7), at which point that entry comes out.
   {
     files: ["src/**/*.{ts,tsx}"],
-    // The exemption list IS the remaining port work. Each entry is a file that
-    // still calls a web API directly; step 7 empties this list.
-    ignores: [
-      "src/platform/**",
-      "src/main.tsx",
-      "src/test/**",
-      "src/App.tsx",
-      "src/ui/cards/PaymentCard.tsx",
-      "src/ui/screens/HomeScreen.tsx",
-    ],
+    // Only three kinds of file may name a web API: the adapters that implement
+    // the ports, the web entry point that selects them, the bridges that carry
+    // web-only side effects, and the tests that stub them.
+    ignores: ["src/platform/**", "src/app/bridges/**", "src/main.tsx", "src/test/**"],
     rules: { "no-restricted-globals": webApiBan },
   },
   // Views must not reach past their ViewModel into state, data, or formatting.

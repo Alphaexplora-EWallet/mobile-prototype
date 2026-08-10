@@ -1,9 +1,11 @@
-import { useLayoutEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import type { CardId } from "@/core/domain/card";
 import type { Screen } from "@/core/navigation/screens";
 import { isTabScreen } from "@/core/navigation/screens";
 import { INITIAL_FROZEN } from "@/core/data/mock/cards.mock";
+import { usePlatform } from "@/core/platform/PlatformContext";
+import { ThemeBridge } from "@/app/bridges/ThemeBridge";
 
 import type { Theme } from "@/ui/theme/ThemeContext";
 import { ThemeProvider } from "@/ui/theme/ThemeContext";
@@ -24,11 +26,10 @@ import { RewardScreen } from "@/ui/screens/RewardScreen";
 import { ProfileScreen } from "@/ui/screens/ProfileScreen";
 
 function App() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = window.localStorage.getItem("fina-theme");
-    if (savedTheme === "light" || savedTheme === "dark") return savedTheme;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  });
+  const { scroll } = usePlatform();
+  // Hydrated from storage by ThemeBridge; index.html has already painted the
+  // right theme before React runs, so this default is never seen.
+  const [theme, setTheme] = useState<Theme>("light");
   const [screen, setScreen] = useState<Screen>("welcome");
   const [selectedAnswer, setSelectedAnswer] = useState(0);
   const [balanceVisible, setBalanceVisible] = useState(true);
@@ -42,17 +43,14 @@ function App() {
   const [atmWithdrawals, setAtmWithdrawals] = useState(true);
   const [sheet, setSheet] = useState<string | null>(null);
 
-  useLayoutEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
-    window.localStorage.setItem("fina-theme", theme);
-  }, [theme]);
-
-  const navigate = (next: Screen) => {
-    setSheet(null);
-    setScreen(next);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const navigate = useCallback(
+    (next: Screen) => {
+      setSheet(null);
+      setScreen(next);
+      scroll.scrollToTop();
+    },
+    [scroll],
+  );
 
   const openLimitSetup = () => {
     setSelectedCard("main");
@@ -163,6 +161,7 @@ function App() {
 
   return (
     <ThemeProvider value={theme}>
+      <ThemeBridge theme={theme} onThemeChange={setTheme} />
       <main className="app-stage">
         <section className="phone-shell" aria-label="FIN-A mobile app prototype">
           <StatusBar />
