@@ -7,162 +7,42 @@ import {
   type AnimationEvent as ReactAnimationEvent,
   type ReactNode,
 } from "react";
-import finaLogoLockup from "./assets/fina-logo-lockup.svg";
-import finaWordmark from "./assets/fina-wordmark.svg";
-import finaWordmarkLight from "./assets/fina-wordmark-light.svg";
-import sunsetJeepney from "./assets/sunset-jeepney.webp";
-import welcomeManila from "./assets/welcome-manila.webp";
+import type { CardId, CardView } from "@/core/domain/card";
+import { cardTag, deriveCardViews, maskBalance, maskCardNumber } from "@/core/domain/card";
+import type { IconName } from "@/core/domain/icons";
+import { SIMULATED_NOTE } from "@/core/domain/simulation";
+import type { Screen, TabScreen } from "@/core/navigation/screens";
+import { TAB_ITEMS, isTabScreen } from "@/core/navigation/screens";
+import { INITIAL_FROZEN, MOCK_CARDHOLDER, MOCK_CARDS } from "@/core/data/mock/cards.mock";
+import {
+  MOCK_AMOUNT_PRESETS,
+  MOCK_BILLERS,
+  MOCK_DEPOSIT_METHODS,
+  MOCK_RECIPIENTS,
+  MOCK_SCHEDULED_PAYMENTS,
+  MOCK_TRANSACTIONS,
+} from "@/core/data/mock/payments.mock";
+import { MOCK_QUIZ_QUESTION } from "@/core/data/mock/quiz.mock";
+import { ARTWORK, BRAND, IMAGERY } from "@/ui/assets";
 
-type Screen =
-  | "welcome"
-  | "sign-in"
-  | "quiz"
-  | "result"
-  | "home"
-  | "wallet"
-  | "transfer"
-  | "deposit"
-  | "payments"
-  | "quest"
-  | "reward"
-  | "profile";
-type TabScreen = Extract<Screen, "home" | "wallet" | "payments" | "quest" | "profile">;
-type CardId = "main" | "travel";
 type Theme = "light" | "dark";
 const ThemeContext = createContext<Theme>("light");
-type CardVariant = "teal" | "sunset";
-type CardDefinition = {
-  id: CardId;
-  number: string;
-  fullNumber: string;
-  expiry: string;
-  balance: string;
-  label: string;
-  rewardLabel?: string;
-  variant: CardVariant;
-  artwork?: string;
-};
-type CardView = CardDefinition & {
-  frozen: boolean;
-  unlocked: boolean;
-};
-type IconName =
-  | "arrow-down"
-  | "arrow-left"
-  | "bank"
-  | "bolt"
-  | "card"
-  | "check"
-  | "chevron-right"
-  | "clock"
-  | "contrast"
-  | "eye"
-  | "eye-off"
-  | "globe"
-  | "heart"
-  | "home"
-  | "limit"
-  | "lock"
-  | "mail"
-  | "more"
-  | "plus"
-  | "qr"
-  | "receipt"
-  | "rotate"
-  | "send"
-  | "snow"
-  | "star"
-  | "target"
-  | "user"
-  | "wallet";
 
-const quizAnswers = [
-  { label: "I get it while the feeling is fresh", icon: "wallet" as IconName },
-  { label: "I check my budget first", icon: "limit" as IconName },
-  { label: "I save it for later", icon: "bank" as IconName },
-  { label: "I usually avoid deciding", icon: "more" as IconName },
-];
-
-const transactions = [
-  { icon: "☕", name: "Daily Brew", when: "Today, 8:23 AM", amount: "−₱160.00", positive: false },
-  { icon: "◈", name: "FreshMart", when: "Yesterday, 6:42 PM", amount: "−₱845.75", positive: false },
-  { icon: "↙", name: "Money received", when: "Yesterday, 11:18 AM", amount: "+₱2,000.00", positive: true },
-];
-
-const SIMULATED_NOTE =
-  "This frontend prototype keeps financial actions safely simulated. The real service can connect here later.";
-
-const amountPresets = ["500", "1,000", "2,500"];
-
-const recentRecipients = [
-  { initials: "JD", name: "Jomar D.", handle: "•••• 4471" },
-  { initials: "MS", name: "Mira S.", handle: "0917 ••• 2288" },
-  { initials: "AR", name: "Ate Rosa", handle: "•••• 9032" },
-  { initials: "KL", name: "Kuya Lito", handle: "0998 ••• 1140" },
-];
-
-const depositMethods: { id: string; icon: IconName; title: string; detail: string }[] = [
-  { id: "bank", icon: "bank", title: "Linked bank account", detail: "BPI Savings •••• 6612" },
-  { id: "card", icon: "card", title: "Debit or credit card", detail: "Visa •••• 4102" },
-  { id: "counter", icon: "wallet", title: "Over the counter", detail: "7-Eleven, Palawan, and partners" },
-  { id: "qr", icon: "qr", title: "Scan to cash in", detail: "Show a QR at any partner branch" },
-];
-
-const billers: { id: string; icon: IconName; name: string; detail: string; due: string }[] = [
-  { id: "power", icon: "bolt", name: "Meralco", detail: "Electricity", due: "Due Aug 18" },
-  { id: "internet", icon: "globe", name: "Converge", detail: "Home internet", due: "Due Aug 22" },
-  { id: "rent", icon: "home", name: "Landlord", detail: "Monthly rent", due: "Due Sep 1" },
-  { id: "card-bill", icon: "receipt", name: "Card statement", detail: "Credit card", due: "Due Sep 4" },
-];
-
-const scheduledPayments = [
-  { icon: "⚡", name: "Meralco", when: "Autopay · Aug 18", amount: "₱2,340.00" },
-  { icon: "◎", name: "Converge", when: "Autopay · Aug 22", amount: "₱1,699.00" },
-];
-
-const cardOrder: readonly CardId[] = ["main", "travel"];
-
-const cardDefinitions: Record<CardId, CardDefinition> = {
-  main: {
-    id: "main",
-    number: "8421",
-    fullNumber: "4829 5510 8823 8421",
-    expiry: "05/29",
-    balance: "₱24,680.50",
-    label: "Main wallet",
-    variant: "teal",
-  },
-  travel: {
-    id: "travel",
-    number: "1198",
-    fullNumber: "4829 5510 8823 1198",
-    expiry: "11/30",
-    balance: "₱8,450.00",
-    label: "Travel jar",
-    rewardLabel: "Sunset Ride",
-    variant: "sunset",
-    artwork: sunsetJeepney,
-  },
-};
-
+/**
+ * Adapter over the pure derivation, kept while App still owns this state.
+ * Removed once the wallet and quest stores land.
+ */
 function getCardViews(
   frozenCards: Record<CardId, boolean>,
   rewardUnlocked: boolean,
   cardStyleApplied: boolean,
 ): CardView[] {
-  return cardOrder.map((id) => {
-    const card = cardDefinitions[id];
-    return {
-      ...card,
-      label: id === "travel" && cardStyleApplied ? (card.rewardLabel ?? card.label) : card.label,
-      frozen: frozenCards[id],
-      unlocked: id === "main" || rewardUnlocked,
-    };
+  return deriveCardViews({
+    cards: MOCK_CARDS,
+    frozen: frozenCards,
+    rewardUnlocked,
+    styleApplied: cardStyleApplied,
   });
-}
-
-function maskBalance(balance: string) {
-  return balance.replace(/\d/g, "•");
 }
 
 function App() {
@@ -179,7 +59,7 @@ function App() {
   const [limitConfirmed, setLimitConfirmed] = useState(false);
   const [rewardUnlocked, setRewardUnlocked] = useState(false);
   const [cardStyleApplied, setCardStyleApplied] = useState(false);
-  const [frozenCards, setFrozenCards] = useState<Record<CardId, boolean>>({ main: false, travel: false });
+  const [frozenCards, setFrozenCards] = useState<Record<CardId, boolean>>(INITIAL_FROZEN);
   const [onlinePayments, setOnlinePayments] = useState(true);
   const [atmWithdrawals, setAtmWithdrawals] = useState(true);
   const [sheet, setSheet] = useState<string | null>(null);
@@ -303,16 +183,13 @@ function App() {
     }
   };
 
-  const tabScreen = screen === "quest" ? "quest" : screen;
-  const showTabs = ["home", "wallet", "payments", "quest", "profile"].includes(screen);
-
   return (
     <ThemeContext.Provider value={theme}>
       <main className="app-stage">
         <section className="phone-shell" aria-label="FIN-A mobile app prototype">
           <StatusBar />
           <div className={`screen screen-${screen}`}>{renderScreen()}</div>
-          {showTabs && <BottomNav active={tabScreen as TabScreen} onNavigate={navigate} />}
+          {isTabScreen(screen) && <BottomNav active={screen} onNavigate={navigate} />}
           {sheet && <ActionSheet action={sheet} onClose={() => setSheet(null)} />}
         </section>
       </main>
@@ -346,7 +223,7 @@ function BrandMark({
   return (
     <img
       className={`brand-mark ${compact ? "brand-mark-compact" : ""} ${tagline ? "brand-mark-lockup" : ""}`}
-      src={tagline ? finaLogoLockup : useLightWordmark ? finaWordmarkLight : finaWordmark}
+      src={tagline ? BRAND.lockup : useLightWordmark ? BRAND.wordmarkLight : BRAND.wordmark}
       alt={tagline ? "FIN-A, Financial Assistant App" : "FIN-A"}
     />
   );
@@ -373,7 +250,7 @@ function WelcomeScreen({ onStart, onSignIn }: { onStart: () => void; onSignIn: (
 
       <figure className="welcome-visual">
         <img
-          src={welcomeManila}
+          src={IMAGERY.welcomeManila}
           alt="Friends walking through a sunny Manila street beside a jeepney and neighborhood store"
         />
         <span className="welcome-visual-fade" />
@@ -517,7 +394,7 @@ function QuizScreen({
 
       <fieldset className="answer-list">
         <legend>When you want something, what usually happens?</legend>
-        {quizAnswers.map((answer, index) => (
+        {MOCK_QUIZ_QUESTION.answers.map((answer, index) => (
           <button
             className={`answer-option ${selected === index ? "is-selected" : ""}`}
             key={answer.label}
@@ -695,7 +572,9 @@ function HomeScreen({
             <button
               type="button"
               onClick={onToggleBalance}
-              aria-label={balanceVisible ? `Hide ${activeCard.label} balance` : `Show ${activeCard.label} balance`}
+              aria-label={
+                balanceVisible ? `Hide ${activeCard.displayLabel} balance` : `Show ${activeCard.displayLabel} balance`
+              }
             >
               <Icon name={balanceVisible ? "eye" : "eye-off"} />
             </button>
@@ -718,7 +597,9 @@ function HomeScreen({
                 onClick={() => handleCardPress(card, isActive)}
                 onAnimationEnd={isStacking ? finishPromotion : undefined}
                 aria-label={
-                  isActive ? `Open ${card.label} card ending in ${card.number}` : `Bring ${card.label} card to front`
+                  isActive
+                    ? `Open ${card.displayLabel} card ending in ${card.last4}`
+                    : `Bring ${card.displayLabel} card to front`
                 }
                 aria-pressed={isActive}
                 aria-disabled={stackingCard ? true : undefined}
@@ -732,7 +613,7 @@ function HomeScreen({
               className="home-stack-next"
               type="button"
               onClick={() => handleCardPress(rearCard, false)}
-              aria-label={`Show next card, ${rearCard.label}`}
+              aria-label={`Show next card, ${rearCard.displayLabel}`}
               aria-disabled={stackingCard ? true : undefined}
             >
               <Icon name="chevron-right" />
@@ -750,7 +631,7 @@ function HomeScreen({
       <section className="home-section">
         <h2>Made for your money style</h2>
         <button className="quest-card" type="button" onClick={onQuest}>
-          <img src={sunsetJeepney} alt="Jeepney traveling beside the coast at sunset" />
+          <img src={IMAGERY.sunsetJeepney} alt="Jeepney traveling beside the coast at sunset" />
           <span className="quest-card-scrim" />
           <span className="quest-card-content">
             <span className="quest-heading">
@@ -791,14 +672,14 @@ function HomeScreen({
       <section className="home-section transactions-section">
         <h2>Recent transactions</h2>
         <div className="transaction-list">
-          {transactions.map((transaction) => (
+          {MOCK_TRANSACTIONS.map((transaction) => (
             <button
               type="button"
               className="transaction-row"
               key={transaction.name}
               onClick={() => onAction(transaction.name)}
             >
-              <span className="transaction-icon">{transaction.icon}</span>
+              <span className="transaction-icon">{transaction.glyph}</span>
               <span className="transaction-copy">
                 <strong>{transaction.name}</strong>
                 <small>{transaction.when}</small>
@@ -898,7 +779,7 @@ function QuestScreen({
           <small>Reward</small>
         </span>
         <i />
-        <img src={sunsetJeepney} alt="Sunset Ride card preview" />
+        <img src={IMAGERY.sunsetJeepney} alt="Sunset Ride card preview" />
         <span>
           <small>Unlock</small>
           <strong className="teal-text">Sunset Ride</strong>
@@ -937,7 +818,7 @@ type WalletProps = {
 
 function WalletScreen(props: WalletProps) {
   const cards = getCardViews(props.frozenCards, props.rewardUnlocked, props.cardStyleApplied);
-  const selectedNumber = cards.find((card) => card.id === props.selectedCard)?.number ?? cards[0].number;
+  const selectedNumber = cards.find((card) => card.id === props.selectedCard)?.last4 ?? cards[0].last4;
   return (
     <div className="tab-page wallet-page">
       <header className="centered-app-bar page-app-bar">
@@ -1130,18 +1011,18 @@ function PaymentCard({
             className="card-select-surface"
             type="button"
             onClick={onClick}
-            aria-label={`${card.label} card ending in ${card.number}${selected ? ", selected" : ""}`}
+            aria-label={`${card.displayLabel} card ending in ${card.last4}${selected ? ", selected" : ""}`}
             aria-pressed={selected}
             tabIndex={flipped ? -1 : 0}
           />
 
-          <aside className="card-utility-rail" aria-label={`${card.label} quick actions`}>
+          <aside className="card-utility-rail" aria-label={`${card.displayLabel} quick actions`}>
             <button
               type="button"
               onClick={toggleFreeze}
               tabIndex={flipped ? -1 : 0}
               aria-pressed={card.frozen}
-              aria-label={`${card.frozen ? "Unfreeze" : "Freeze"} ${card.label} card`}
+              aria-label={`${card.frozen ? "Unfreeze" : "Freeze"} ${card.displayLabel} card`}
             >
               <Icon name="snow" />
               <span>{card.frozen ? "Unfreeze" : "Freeze"}</span>
@@ -1151,7 +1032,7 @@ function PaymentCard({
               type="button"
               onClick={toggleFlip}
               tabIndex={flipped ? -1 : 0}
-              aria-label={`View secure details for ${card.label} card`}
+              aria-label={`View secure details for ${card.displayLabel} card`}
             >
               <Icon name="eye" />
               <span>Details</span>
@@ -1162,7 +1043,7 @@ function PaymentCard({
         <section className="payment-card payment-card-back" aria-hidden={!flipped}>
           <div className="card-back-top">
             <span className="card-back-number" aria-live="polite">
-              {revealed ? card.fullNumber : `•••• •••• •••• ${card.number}`}
+              {revealed ? card.fullNumber : maskCardNumber(card.last4)}
             </span>
             <button
               className="card-reveal-button"
@@ -1178,7 +1059,7 @@ function PaymentCard({
           <div className="card-back-meta">
             <span>
               <small>Account opened</small>
-              <strong>Jan 2025</strong>
+              <strong>{MOCK_CARDHOLDER.openedLabel}</strong>
             </span>
             <span>
               <small>Expires</small>
@@ -1186,15 +1067,15 @@ function PaymentCard({
             </span>
             <span>
               <small>Security code</small>
-              <strong>{revealed ? "427" : "•••"}</strong>
+              <strong>{revealed ? MOCK_CARDHOLDER.securityCode : "•••"}</strong>
             </span>
           </div>
           <div className="signature-line">
             <small>Signature</small>
-            <strong>Maya Santos</strong>
+            <strong>{MOCK_CARDHOLDER.name}</strong>
           </div>
           <div className="card-back-brand">
-            <span>{card.label}</span>
+            <span>{card.displayLabel}</span>
             <BrandMark compact light />
           </div>
 
@@ -1238,7 +1119,7 @@ function PaymentCard({
 function CardFace({ card }: { card: CardView }) {
   return (
     <>
-      {card.artwork && <img className="card-artwork" src={card.artwork} alt="" />}
+      {card.artworkId && <img className="card-artwork" src={ARTWORK[card.artworkId]} alt="" />}
       <span className="card-overlay" />
       <span className="card-front-content">
         <span className="card-top">
@@ -1250,7 +1131,7 @@ function CardFace({ card }: { card: CardView }) {
           <span className="contactless">)))</span>
         </span>
         <span className="card-data-row">
-          <span className="card-number">•••• {card.number}</span>
+          <span className="card-number">•••• {card.last4}</span>
           <span className="card-expiry">
             <small>
               Valid
@@ -1261,10 +1142,10 @@ function CardFace({ card }: { card: CardView }) {
           </span>
         </span>
         <span className="card-bottom">
-          <strong>Maya Santos</strong>
+          <strong>{MOCK_CARDHOLDER.name}</strong>
           <b>VISA</b>
         </span>
-        <span className="card-tag">{card.frozen ? "Frozen" : card.unlocked ? card.label : "Locked reward"}</span>
+        <span className="card-tag">{cardTag(card)}</span>
       </span>
     </>
   );
@@ -1341,7 +1222,7 @@ function RewardScreen({ onApply, onHome }: { onApply: () => void; onHome: () => 
         </div>
 
         <div className="unlocked-card">
-          <img src={sunsetJeepney} alt="Jeepney traveling along the coast at sunset" />
+          <img src={IMAGERY.sunsetJeepney} alt="Jeepney traveling along the coast at sunset" />
           <span className="card-overlay" />
           <span className="card-top">
             <BrandMark compact preserveInk />
@@ -1390,7 +1271,7 @@ function ProfileScreen({ onRestart }: { onRestart: () => void }) {
         <span className="profile-avatar">
           <Icon name="user" />
         </span>
-        <h1>Maya Santos</h1>
+        <h1>{MOCK_CARDHOLDER.name}</h1>
         <p>The Free Spirit · Level 3</p>
         <div className="profile-level">
           <span style={{ width: "75%" }} />
@@ -1490,9 +1371,9 @@ function SourcePicker({
           >
             <span className="source-option-top">
               <Icon name="card" />
-              <strong>{card.label}</strong>
+              <strong>{card.displayLabel}</strong>
             </span>
-            <small>•••• {card.number}</small>
+            <small>•••• {card.last4}</small>
             <b>{card.balance}</b>
             {card.frozen && <em>Frozen</em>}
           </button>
@@ -1532,7 +1413,7 @@ function AmountField({
         <small className="amount-available">Available {available}</small>
       </div>
       <div className="amount-presets">
-        {amountPresets.map((preset) => (
+        {MOCK_AMOUNT_PRESETS.map((preset) => (
           <button
             className={`amount-preset ${value === preset ? "is-selected" : ""}`}
             type="button"
@@ -1560,7 +1441,7 @@ type MoneyScreenProps = {
 
 function TransferScreen(props: MoneyScreenProps) {
   const [amount, setAmount] = useState("");
-  const [recipient, setRecipient] = useState(recentRecipients[0].initials);
+  const [recipient, setRecipient] = useState(MOCK_RECIPIENTS[0].initials);
   const [note, setNote] = useState("");
   const cards = getCardViews(props.frozenCards, props.rewardUnlocked, props.cardStyleApplied);
   const source = cards.find((card) => card.id === props.selectedCard) ?? cards[0];
@@ -1575,7 +1456,7 @@ function TransferScreen(props: MoneyScreenProps) {
       <section className="money-field">
         <span className="field-label">Send to</span>
         <div className="recipient-row">
-          {recentRecipients.map((person) => (
+          {MOCK_RECIPIENTS.map((person) => (
             <button
               className={`recipient-chip ${recipient === person.initials ? "is-selected" : ""}`}
               type="button"
@@ -1635,7 +1516,7 @@ function TransferScreen(props: MoneyScreenProps) {
 
 function DepositScreen(props: MoneyScreenProps) {
   const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState(depositMethods[0].id);
+  const [method, setMethod] = useState(MOCK_DEPOSIT_METHODS[0].id);
   const cards = getCardViews(props.frozenCards, props.rewardUnlocked, props.cardStyleApplied);
   const destination = cards.find((card) => card.id === props.selectedCard) ?? cards[0];
 
@@ -1649,7 +1530,7 @@ function DepositScreen(props: MoneyScreenProps) {
       <section className="money-field">
         <span className="field-label">Choose a method</span>
         <div className="control-list">
-          {depositMethods.map((item) => (
+          {MOCK_DEPOSIT_METHODS.map((item) => (
             <LinkRow
               key={item.id}
               icon={item.icon}
@@ -1705,7 +1586,7 @@ function PaymentsScreen(props: MoneyScreenProps & { onNavigate: (screen: Screen)
           <LinkRow
             icon="send"
             title="Send money"
-            detail={`From •••• ${source.number}`}
+            detail={`From •••• ${source.last4}`}
             onClick={() => props.onNavigate("transfer")}
           />
           <LinkRow
@@ -1720,7 +1601,7 @@ function PaymentsScreen(props: MoneyScreenProps & { onNavigate: (screen: Screen)
       <section className="money-field">
         <span className="field-label">Pay a bill</span>
         <div className="control-list">
-          {billers.map((biller) => (
+          {MOCK_BILLERS.map((biller) => (
             <LinkRow
               key={biller.id}
               icon={biller.icon}
@@ -1736,14 +1617,14 @@ function PaymentsScreen(props: MoneyScreenProps & { onNavigate: (screen: Screen)
       <section className="home-section">
         <h2>Scheduled</h2>
         <div className="transaction-list">
-          {scheduledPayments.map((payment) => (
+          {MOCK_SCHEDULED_PAYMENTS.map((payment) => (
             <button
               type="button"
               className="transaction-row"
               key={payment.name}
               onClick={() => props.onSimulate(payment.name)}
             >
-              <span className="transaction-icon">{payment.icon}</span>
+              <span className="transaction-icon">{payment.glyph}</span>
               <span className="transaction-copy">
                 <strong>{payment.name}</strong>
                 <small>{payment.when}</small>
@@ -1760,16 +1641,9 @@ function PaymentsScreen(props: MoneyScreenProps & { onNavigate: (screen: Screen)
 }
 
 function BottomNav({ active, onNavigate }: { active: TabScreen; onNavigate: (screen: Screen) => void }) {
-  const items: { id: TabScreen; label: string; icon: IconName }[] = [
-    { id: "home", label: "Home", icon: "home" },
-    { id: "wallet", label: "Wallet", icon: "wallet" },
-    { id: "payments", label: "Pay", icon: "qr" },
-    { id: "quest", label: "Quests", icon: "target" },
-    { id: "profile", label: "Profile", icon: "user" },
-  ];
   return (
     <nav className="bottom-nav" aria-label="Primary navigation">
-      {items.map((item) => (
+      {TAB_ITEMS.map((item) => (
         <button
           className={active === item.id ? "is-active" : ""}
           type="button"
