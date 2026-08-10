@@ -3,6 +3,7 @@ import type { QuizQuestion } from "../domain/quiz";
 import { quizProgressPercent } from "../domain/quiz";
 import { MOCK_QUIZ_QUESTION } from "../data/mock/quiz.mock";
 import { MOCK_CARDHOLDER } from "../data/mock/cards.mock";
+import { formatMoney } from "../money/format";
 import { useNavigation } from "../navigation/useNavigation";
 import { questActions, useQuestStore } from "../stores/quest.store";
 import { walletActions } from "../stores/wallet.store";
@@ -65,7 +66,7 @@ export function useRewardViewModel() {
   const quest = useQuestStore((state) => state.quest);
   return {
     xpEarned: quest.xpReward,
-    limitLabel: quest.limitLabel,
+    limitLabel: formatMoney(quest.limit, { fractionDigits: 0 }),
     rewardName: quest.rewardName,
     apply: () => {
       questActions.applyRewardStyle();

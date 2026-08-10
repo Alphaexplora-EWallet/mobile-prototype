@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { type Money, pesos } from "../money/money";
 
 /**
  * The quest's lifecycle as one value rather than three booleans.
@@ -19,9 +20,9 @@ export type QuestState = {
     title: string;
     /** The home card sets this title over two lines; the break is content, not styling. */
     titleLines: readonly string[];
-    spentLabel: string;
-    limitLabel: string;
-    remainingLabel: string;
+    spent: Money;
+    limit: Money;
+    remaining: Money;
     /**
      * Hardcoded, matching the conic-gradient in quest.css. Deriving it from the
      * amounts would give 41.33% here while the ring stayed at 41%.
@@ -47,9 +48,9 @@ export const useQuestStore = create<QuestState>()((set) => ({
   quest: {
     title: "Keep today intentional",
     titleLines: ["Keep today", "intentional"],
-    spentLabel: "₱1,240",
-    limitLabel: "₱3,000",
-    remainingLabel: "₱1,760",
+    spent: pesos(1_240),
+    limit: pesos(3_000),
+    remaining: pesos(1_760),
     progressPercent: 41,
     hoursLeftLabel: "2h left today",
     xpReward: 80,

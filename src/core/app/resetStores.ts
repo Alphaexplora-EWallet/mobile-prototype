@@ -5,6 +5,7 @@ import { useQuestStore } from "../stores/quest.store";
 import { useUiStore } from "../stores/ui.store";
 import { useWalletStore } from "../stores/wallet.store";
 import { INITIAL_FROZEN } from "../data/mock/cards.mock";
+import { pesos } from "../money/money";
 
 /**
  * Returns every store to its initial state.
@@ -23,6 +24,6 @@ export function resetStores(): void {
     frozen: INITIAL_FROZEN,
     onlinePayments: true,
     atmWithdrawals: true,
-    limits: { main: "₱3,000", travel: "₱3,000" },
+    limits: { main: pesos(3_000), travel: pesos(3_000) },
   });
 }

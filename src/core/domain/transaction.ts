@@ -1,20 +1,25 @@
+import type { Money } from "../money/money";
+
 export type Transaction = {
   id: string;
   /** Decorative glyph shown in the row. Not an IconName; these are emoji/symbols. */
   glyph: string;
   name: string;
-  /** Display string today (e.g. "Today, 8:23 AM"). Deliberately not a Date — see README. */
+  /** Display string. Deliberately not a Date: these are frozen fixtures, and a
+   * real relative-time formatter needs timezone and locale requirements that
+   * do not exist yet. */
   when: string;
-  /** Pre-signed display string today (e.g. "−₱160.00"). Becomes signed Money later. */
-  amount: string;
-  /** True for money coming in. Derived from the amount once it is numeric. */
-  positive: boolean;
+  /** Signed: negative is money leaving. Direction is derived, never stored. */
+  amount: Money;
 };
+
+/** Replaces the hand-maintained `positive` flag that sat beside a signed string. */
+export const isIncoming = (transaction: Transaction) => transaction.amount.amount > 0;
 
 export type ScheduledPayment = {
   id: string;
   glyph: string;
   name: string;
   when: string;
-  amount: string;
+  amount: Money;
 };

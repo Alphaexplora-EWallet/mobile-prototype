@@ -19,8 +19,10 @@ export function DepositScreen() {
         label="Amount to add"
         value={amount}
         onChange={vm.setAmount}
-        available={destination.balance}
-        presets={vm.amountPresets}
+        available={destination.balanceLabel}
+        presets={vm.presets}
+        selectedPresetId={vm.selectedPresetId}
+        onSelectPreset={vm.selectPreset}
       />
 
       <section className="money-field">

@@ -17,8 +17,10 @@ export function TransferScreen() {
         label="Amount to send"
         value={amount}
         onChange={vm.setAmount}
-        available={source.balance}
-        presets={vm.amountPresets}
+        available={source.balanceLabel}
+        presets={vm.presets}
+        selectedPresetId={vm.selectedPresetId}
+        onSelectPreset={vm.selectPreset}
       />
 
       <section className="money-field">

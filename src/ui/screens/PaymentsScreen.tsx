@@ -59,7 +59,7 @@ export function PaymentsScreen() {
       <section className="home-section">
         <h2>Scheduled</h2>
         <div className="transaction-list">
-          {vm.scheduled.map((payment) => (
+          {vm.scheduledLabels.map((payment) => (
             <button
               type="button"
               className="transaction-row"
@@ -71,7 +71,7 @@ export function PaymentsScreen() {
                 <strong>{payment.name}</strong>
                 <small>{payment.when}</small>
               </span>
-              <strong>{payment.amount}</strong>
+              <strong>{payment.amountLabel}</strong>
             </button>
           ))}
         </div>

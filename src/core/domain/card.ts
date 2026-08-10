@@ -1,3 +1,5 @@
+import type { Money } from "../money/money";
+
 export type CardId = "main" | "travel";
 export type CardVariant = "teal" | "sunset";
 
@@ -19,11 +21,7 @@ export type CardDefinition = {
   holderName: string;
   /** When the account behind this card was opened. */
   openedLabel: string;
-  /**
-   * Display string today (e.g. "₱24,680.50"). Becomes Money in the centavos
-   * migration, which is the last step precisely because it changes output.
-   */
-  balance: string;
+  balance: Money;
   label: string;
   /** Shown instead of `label` once the quest reward style is applied. */
   rewardLabel?: string;
@@ -66,11 +64,3 @@ export function cardTag(card: CardView): string {
 }
 
 export const maskCardNumber = (last4: string) => `•••• •••• •••• ${last4}`;
-
-/**
- * Masks an already-formatted amount. Operates on the formatted string rather
- * than the value so the masked output keeps the shape of the real one.
- */
-export function maskBalance(balance: string): string {
-  return balance.replace(/\d/g, "•");
-}

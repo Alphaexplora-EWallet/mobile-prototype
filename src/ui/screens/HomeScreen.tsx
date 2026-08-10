@@ -166,7 +166,7 @@ export function HomeScreen() {
                 <strong>{transaction.name}</strong>
                 <small>{transaction.when}</small>
               </span>
-              <strong className={transaction.positive ? "positive" : ""}>{transaction.amount}</strong>
+              <strong className={transaction.incoming ? "positive" : ""}>{transaction.amountLabel}</strong>
             </button>
           ))}
         </div>

@@ -1,25 +1,25 @@
 import type { Biller, DepositMethod, Recipient } from "../../domain/payments";
 import type { ScheduledPayment, Transaction } from "../../domain/transaction";
+import { type Money, pesos } from "../../money/money";
 
 export const MOCK_TRANSACTIONS: readonly Transaction[] = [
-  { id: "daily-brew", glyph: "☕", name: "Daily Brew", when: "Today, 8:23 AM", amount: "−₱160.00", positive: false },
-  { id: "freshmart", glyph: "◈", name: "FreshMart", when: "Yesterday, 6:42 PM", amount: "−₱845.75", positive: false },
+  { id: "daily-brew", glyph: "☕", name: "Daily Brew", when: "Today, 8:23 AM", amount: pesos(-160) },
+  { id: "freshmart", glyph: "◈", name: "FreshMart", when: "Yesterday, 6:42 PM", amount: pesos(-845.75) },
   {
     id: "money-received",
     glyph: "↙",
     name: "Money received",
     when: "Yesterday, 11:18 AM",
-    amount: "+₱2,000.00",
-    positive: true,
+    amount: pesos(2_000),
   },
 ];
 
 export const MOCK_SCHEDULED_PAYMENTS: readonly ScheduledPayment[] = [
-  { id: "meralco", glyph: "⚡", name: "Meralco", when: "Autopay · Aug 18", amount: "₱2,340.00" },
-  { id: "converge", glyph: "◎", name: "Converge", when: "Autopay · Aug 22", amount: "₱1,699.00" },
+  { id: "meralco", glyph: "⚡", name: "Meralco", when: "Autopay · Aug 18", amount: pesos(2_340) },
+  { id: "converge", glyph: "◎", name: "Converge", when: "Autopay · Aug 22", amount: pesos(1_699) },
 ];
 
-export const MOCK_AMOUNT_PRESETS: readonly string[] = ["500", "1,000", "2,500"];
+export const MOCK_AMOUNT_PRESETS: readonly Money[] = [pesos(500), pesos(1_000), pesos(2_500)];
 
 export const MOCK_RECIPIENTS: readonly Recipient[] = [
   { initials: "JD", name: "Jomar D.", handle: "•••• 4471" },

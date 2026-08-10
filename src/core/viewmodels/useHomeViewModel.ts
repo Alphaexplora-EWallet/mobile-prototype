@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import type { CardId, CardView } from "../domain/card";
-import { maskBalance } from "../domain/card";
+import type { CardId } from "../domain/card";
+import { formatMoney, formatSignedMoney, maskMoney } from "../money/format";
 import type { IconName } from "../domain/icons";
-import type { Transaction } from "../domain/transaction";
+import { isIncoming } from "../domain/transaction";
 import { MOCK_TRANSACTIONS } from "../data/mock/payments.mock";
 import type { Screen } from "../navigation/screens";
 import { useNavigation } from "../navigation/useNavigation";
@@ -11,7 +11,7 @@ import { useQuestStore } from "../stores/quest.store";
 import { uiActions } from "../stores/ui.store";
 import { walletActions, useWalletStore } from "../stores/wallet.store";
 import type { Theme } from "@/ui/theme/ThemeContext";
-import { useCardViews } from "./useCardViews";
+import { type CardPresentation, useCardViews } from "./useCardViews";
 import { useReduceMotion } from "./useReduceMotion";
 
 /** Matches the home-card-stack-forward keyframe; a safety net if animationend never fires. */
@@ -31,11 +31,18 @@ export type HomeViewModel = {
   theme: Theme;
   themeToggleLabel: string;
   balance: { heading: string; label: string; visible: boolean; toggleLabel: string; isChanging: boolean };
-  deck: { cards: readonly CardView[]; activeId: CardId; rearId: CardId | null; stackingId: CardId | null };
+  deck: { cards: readonly CardPresentation[]; activeId: CardId; rearId: CardId | null; stackingId: CardId | null };
   quickActions: readonly QuickActionVM[];
   quest: { titleLines: readonly string[]; spendLabel: string; progressPercent: number; hoursLeftLabel: string };
   styleProgress: { title: string; percent: number; percentLabel: string };
-  transactions: readonly Transaction[];
+  transactions: readonly {
+    id: string;
+    glyph: string;
+    name: string;
+    when: string;
+    amountLabel: string;
+    incoming: boolean;
+  }[];
   toggleTheme(): void;
   toggleBalance(): void;
   pressCard(id: CardId): void;
@@ -89,7 +96,7 @@ export function useHomeViewModel(): HomeViewModel {
     themeToggleLabel: `Switch to ${theme === "dark" ? "light" : "dark"} mode`,
     balance: {
       heading: "Available balance",
-      label: balanceVisible ? activeCard.balance : maskBalance(activeCard.balance),
+      label: balanceVisible ? formatMoney(activeCard.balance) : maskMoney(activeCard.balance),
       visible: balanceVisible,
       toggleLabel: `${balanceVisible ? "Hide" : "Show"} ${activeCard.displayLabel} balance`,
       isChanging: stackingId !== null,
@@ -103,12 +110,19 @@ export function useHomeViewModel(): HomeViewModel {
     quickActions: QUICK_ACTIONS,
     quest: {
       titleLines: quest.titleLines,
-      spendLabel: `${quest.spentLabel} of ${quest.limitLabel}`,
+      spendLabel: `${formatMoney(quest.spent, { fractionDigits: 0 })} of ${formatMoney(quest.limit, { fractionDigits: 0 })}`,
       progressPercent: quest.progressPercent,
       hoursLeftLabel: quest.hoursLeftLabel,
     },
     styleProgress: { title: "The Free Spirit · Level 3", percent: 75, percentLabel: "75%" },
-    transactions: MOCK_TRANSACTIONS,
+    transactions: MOCK_TRANSACTIONS.map((transaction) => ({
+      id: transaction.id,
+      glyph: transaction.glyph,
+      name: transaction.name,
+      when: transaction.when,
+      amountLabel: formatSignedMoney(transaction.amount),
+      incoming: isIncoming(transaction),
+    })),
     toggleTheme: preferencesActions.toggleTheme,
     toggleBalance: preferencesActions.toggleBalanceVisibility,
     pressCard,

@@ -1,4 +1,5 @@
-import type { CardId, CardView } from "@/core/domain/card";
+import type { CardId } from "@/core/domain/card";
+import type { CardPresentation } from "@/core/viewmodels/useCardViews";
 import { Icon } from "../primitives/Icon";
 
 export function SourcePicker({
@@ -8,7 +9,7 @@ export function SourcePicker({
   onSelect,
 }: {
   label: string;
-  cards: CardView[];
+  cards: CardPresentation[];
   selected: CardId;
   onSelect: (card: CardId) => void;
 }) {
@@ -29,7 +30,7 @@ export function SourcePicker({
               <strong>{card.displayLabel}</strong>
             </span>
             <small>•••• {card.last4}</small>
-            <b>{card.balance}</b>
+            <b>{card.balanceLabel}</b>
             {card.frozen && <em>Frozen</em>}
           </button>
         ))}

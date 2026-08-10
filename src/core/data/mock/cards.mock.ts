@@ -1,4 +1,5 @@
 import type { CardDefinition, CardId } from "../../domain/card";
+import { pesos } from "../../money/money";
 
 export const MOCK_CARDS: readonly CardDefinition[] = [
   {
@@ -9,7 +10,7 @@ export const MOCK_CARDS: readonly CardDefinition[] = [
     securityCode: "427",
     holderName: "Maya Santos",
     openedLabel: "Jan 2025",
-    balance: "₱24,680.50",
+    balance: pesos(24_680.5),
     label: "Main wallet",
     variant: "teal",
   },
@@ -21,7 +22,7 @@ export const MOCK_CARDS: readonly CardDefinition[] = [
     securityCode: "118",
     holderName: "Maya Santos",
     openedLabel: "Jan 2025",
-    balance: "₱8,450.00",
+    balance: pesos(8_450),
     label: "Travel jar",
     rewardLabel: "Sunset Ride",
     variant: "sunset",

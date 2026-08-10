@@ -2,6 +2,7 @@ import { useShallow } from "zustand/react/shallow";
 import type { CardId, CardView } from "../domain/card";
 import type { IconName } from "../domain/icons";
 import type { Screen } from "../navigation/screens";
+import { formatMoney } from "../money/format";
 import { useNavigation } from "../navigation/useNavigation";
 import { questActions, useQuestStore } from "../stores/quest.store";
 import { walletActions, useWalletStore } from "../stores/wallet.store";
@@ -54,7 +55,7 @@ export function useWalletViewModel(): WalletViewModel {
   );
   const limit = useWalletStore((state) => state.limits[state.selectedCardId]);
   const limitSetupActive = useQuestStore((state) => state.limitSetupActive);
-  const proposedLimit = useQuestStore((state) => state.quest.limitLabel);
+  const proposedLimit = useQuestStore((state) => state.quest.limit);
 
   const confirmLimit = () => {
     walletActions.setSpendingLimit(selectedCardId, proposedLimit);
@@ -66,7 +67,7 @@ export function useWalletViewModel(): WalletViewModel {
     title: limitSetupActive ? "Set spending limit" : "My Cards",
     limitSetupActive,
     limitBanner: { title: "Quest step", detail: "Set a limit on your main card to continue." },
-    confirmLimitLabel: `Confirm ${proposedLimit} limit`,
+    confirmLimitLabel: `Confirm ${formatMoney(proposedLimit, { fractionDigits: 0 })} limit`,
     cards,
     selectedCardId,
     controlsTitle: `Controls for •••• ${selected.last4}`,
@@ -96,7 +97,7 @@ export function useWalletViewModel(): WalletViewModel {
     spendingLimit: {
       title: "Spending limit",
       detail: "Daily limit for this card",
-      amountLabel: limit ?? "Not set",
+      amountLabel: limit ? formatMoney(limit, { fractionDigits: 0 }) : "Not set",
       periodLabel: "/ day",
     },
     moveMoney: {

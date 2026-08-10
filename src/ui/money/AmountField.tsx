@@ -4,12 +4,16 @@ export function AmountField({
   onChange,
   available,
   presets,
+  selectedPresetId,
+  onSelectPreset,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   available: string;
-  presets: readonly string[];
+  presets: readonly { id: string; label: string }[];
+  selectedPresetId: string | null;
+  onSelectPreset: (id: string) => void;
 }) {
   return (
     <section className="money-field">
@@ -32,13 +36,13 @@ export function AmountField({
       <div className="amount-presets">
         {presets.map((preset) => (
           <button
-            className={`amount-preset ${value === preset ? "is-selected" : ""}`}
+            className={`amount-preset ${selectedPresetId === preset.id ? "is-selected" : ""}`}
             type="button"
-            key={preset}
-            onClick={() => onChange(preset)}
-            aria-pressed={value === preset}
+            key={preset.id}
+            onClick={() => onSelectPreset(preset.id)}
+            aria-pressed={selectedPresetId === preset.id}
           >
-            ₱{preset}
+            {preset.label}
           </button>
         ))}
       </div>

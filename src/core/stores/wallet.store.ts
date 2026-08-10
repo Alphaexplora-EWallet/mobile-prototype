@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { CardDefinition, CardId } from "../domain/card";
 import { INITIAL_FROZEN, MOCK_CARDS } from "../data/mock/cards.mock";
+import { type Money, pesos } from "../money/money";
 
 export type WalletState = {
   cards: readonly CardDefinition[];
@@ -8,15 +9,14 @@ export type WalletState = {
   frozen: Readonly<Record<CardId, boolean>>;
   onlinePayments: boolean;
   atmWithdrawals: boolean;
-  /** Display string until the centavos migration; per card, though only main is set today. */
-  limits: Readonly<Partial<Record<CardId, string>>>;
+  limits: Readonly<Partial<Record<CardId, Money>>>;
   actions: {
     selectCard(id: CardId): void;
     setFrozen(id: CardId, frozen: boolean): void;
     toggleFrozen(id: CardId): void;
     setOnlinePayments(enabled: boolean): void;
     setAtmWithdrawals(enabled: boolean): void;
-    setSpendingLimit(id: CardId, limit: string): void;
+    setSpendingLimit(id: CardId, limit: Money): void;
   };
 };
 
@@ -26,7 +26,7 @@ export const useWalletStore = create<WalletState>()((set, get) => ({
   frozen: INITIAL_FROZEN,
   onlinePayments: true,
   atmWithdrawals: true,
-  limits: { main: "₱3,000", travel: "₱3,000" },
+  limits: { main: pesos(3_000), travel: pesos(3_000) },
   actions: {
     selectCard: (id) => {
       if (get().selectedCardId === id) return; // no-op writes still wake subscribers

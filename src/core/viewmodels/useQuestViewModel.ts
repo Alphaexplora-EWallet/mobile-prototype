@@ -1,3 +1,4 @@
+import { formatMoney } from "../money/format";
 import { useNavigation } from "../navigation/useNavigation";
 import { questActions, useQuestStore } from "../stores/quest.store";
 import { walletActions } from "../stores/wallet.store";
@@ -39,11 +40,16 @@ export function useQuestViewModel(): QuestViewModel {
     navigation.navigate("reward");
   };
 
+  const limitLabel = formatMoney(quest.limit, { fractionDigits: 0 });
+
   return {
     ...quest,
+    spentLabel: formatMoney(quest.spent, { fractionDigits: 0 }),
+    limitLabel,
+    remainingLabel: formatMoney(quest.remaining, { fractionDigits: 0 }),
     isTracking,
-    trackingNote: `${quest.limitLabel} limit active`,
-    primaryLabel: isTracking ? "Preview end-of-day result" : `Set ${quest.limitLabel} limit`,
+    trackingNote: `${limitLabel} limit active`,
+    primaryLabel: isTracking ? "Preview end-of-day result" : `Set ${limitLabel} limit`,
     secondaryLabel: isTracking ? "Back to home" : "Choose another amount",
     pressPrimary: isTracking ? complete : beginLimitSetup,
     pressSecondary: isTracking ? () => navigation.navigate("home") : beginLimitSetup,
