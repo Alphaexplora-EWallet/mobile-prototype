@@ -117,6 +117,7 @@ export function useActivityViewModel() {
       activityActions.selectTransaction(id);
       navigation.navigate("transaction-detail");
     },
+    openInsights: () => navigation.navigate("insights"),
     back: navigation.goBack,
   };
 }

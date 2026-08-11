@@ -3,13 +3,31 @@ import type { ScheduledPayment, Transaction } from "../../domain/transaction";
 import { type Money, pesos } from "../../money/money";
 
 export const MOCK_TRANSACTIONS: readonly Transaction[] = [
-  { id: "daily-brew", glyph: "☕", name: "Daily Brew", when: "Today, 8:23 AM", amount: pesos(-160) },
-  { id: "freshmart", glyph: "◈", name: "FreshMart", when: "Yesterday, 6:42 PM", amount: pesos(-845.75) },
+  // `date` is the machine-readable twin of `when`: "Today, 8:23 AM" is
+  // 2026-08-11 in the simulated timeline, the same timeline the statements
+  // fixtures are dated against (July 2026 is the last posted month).
+  {
+    id: "daily-brew",
+    glyph: "☕",
+    name: "Daily Brew",
+    when: "Today, 8:23 AM",
+    date: "2026-08-11",
+    amount: pesos(-160),
+  },
+  {
+    id: "freshmart",
+    glyph: "◈",
+    name: "FreshMart",
+    when: "Yesterday, 6:42 PM",
+    date: "2026-08-10",
+    amount: pesos(-845.75),
+  },
   {
     id: "money-received",
     glyph: "↙",
     name: "Money received",
     when: "Yesterday, 11:18 AM",
+    date: "2026-08-10",
     amount: pesos(2_000),
   },
 ];

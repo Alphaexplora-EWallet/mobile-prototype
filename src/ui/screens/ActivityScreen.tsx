@@ -2,6 +2,7 @@ import { useActivityViewModel } from "@/core/viewmodels/useActivityViewModel";
 import { PageBar } from "../layout/PageBar";
 import { TransactionRow } from "../money/TransactionRow";
 import { Icon } from "../primitives/Icon";
+import { LinkRow } from "../primitives/LinkRow";
 import { StateBlock } from "../primitives/StateBlock";
 
 export function ActivityScreen() {
@@ -15,6 +16,16 @@ export function ActivityScreen() {
         <p className="eyebrow">NetBank sandbox</p>
         <h1>All activity</h1>
         <p>{vm.intro}</p>
+      </section>
+
+      <section className="money-field insights-entry">
+        <span className="field-label">Spending insights</span>
+        <LinkRow
+          icon="receipt"
+          title="Monthly totals"
+          detail="Break down spend by category and merchant"
+          onClick={vm.openInsights}
+        />
       </section>
 
       <label className="money-note activity-search">

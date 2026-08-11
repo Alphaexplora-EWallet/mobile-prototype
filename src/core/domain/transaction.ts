@@ -9,6 +9,11 @@ export type Transaction = {
    * real relative-time formatter needs timezone and locale requirements that
    * do not exist yet. */
   when: string;
+  /** Calendar date, ISO `YYYY-MM-DD`. The machine-readable anchor `when`'s
+   * display string renders from; derivations such as spending insights group
+   * by the month of this field. Stored as a string because these are frozen
+   * fixtures and the prototype has no timezone story. */
+  date: string;
   /** Signed: negative is money leaving. Direction is derived, never stored. */
   amount: Money;
 };

@@ -55,6 +55,8 @@ export type ScreenParams = {
   dispute: undefined;
   "sign-in-otp": undefined;
   "forgot-password": undefined;
+  /** Monthly spend breakdown, reached from Activity. */
+  insights: undefined;
 };
 
 export type Screen = keyof ScreenParams;

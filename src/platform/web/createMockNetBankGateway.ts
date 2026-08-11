@@ -87,6 +87,18 @@ export type MockGatewayOptions = {
   kycTier?: KycTier;
   /** How many `payments.status` polls a pending transfer needs to clear. */
   settleAfterPolls?: number;
+  /**
+   * Replaces the seeded activity feed. Defaults to `MOCK_TRANSACTIONS` with
+   * kinds/status/references attached. Tests use this to reach states the
+   * default fixtures do not show — e.g. a month with no transactions.
+   */
+  seedActivity?: readonly BankingTransaction[];
+  /**
+   * The simulated "today" that session receipts are dated against. Fixed by
+   * default so the mock stays deterministic; `MOCK_TRANSACTIONS` dates follow
+   * the same timeline ("Today, 8:23 AM" → 2026-08-11).
+   */
+  todayIso?: string;
 };
 
 /**
@@ -204,10 +216,20 @@ const receiptDescription = (intent: PaymentIntent): string => {
  * the bank is what actually knows them — which is why `insufficient-funds` can
  * be a real answer here and could not be before.
  */
-export function createMockNetBankGateway(options: MockGatewayOptions = {}): BankingGateway {
-  const { latencyMs = 0, failures = {}, kycTier = INITIAL_KYC_STATUS.tier, settleAfterPolls = 2 } = options;
+/** The simulated "now" the seed fixtures' "Today"/"Yesterday" labels point at. */
+const DEFAULT_TODAY_ISO = "2026-08-11";
 
-  let activityLog = seedActivity();
+export function createMockNetBankGateway(options: MockGatewayOptions = {}): BankingGateway {
+  const {
+    latencyMs = 0,
+    failures = {},
+    kycTier = INITIAL_KYC_STATUS.tier,
+    settleAfterPolls = 2,
+    seedActivity: seed = undefined,
+    todayIso = DEFAULT_TODAY_ISO,
+  } = options;
+
+  let activityLog: BankingTransaction[] = seed ? [...seed] : seedActivity();
   let balances = seedBalances();
   let kyc: KycStatus = { ...INITIAL_KYC_STATUS, tier: kycTier };
   let sessionList: readonly DeviceSession[] = MOCK_SESSIONS;
@@ -424,6 +446,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
           glyph: RECEIPT_GLYPH[intent.kind],
           name: receiptName(intent),
           when: "Just now",
+          date: todayIso,
           amount: money(signed, intent.amount.currency),
           kind: intentTransactionKind(intent),
           status: quote.settlesLater ? "pending" : "completed",
