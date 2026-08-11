@@ -53,7 +53,23 @@ export type QrIntent = {
   note: string;
 };
 
-export type PaymentIntent = TransferIntent | CashInIntent | BillIntent | QrIntent;
+/**
+ * Withdrawing to a saved bank account — the mirror of `CashInIntent`. The
+ * account arrives in recipient shape because the pipeline already knows how to
+ * show "who is on the other side" for a recipient; the holder's name was
+ * confirmed when the account was linked, so there is no inquiry step.
+ */
+export type CashOutIntent = {
+  kind: "cash-out";
+  sourceCardId: CardId;
+  sourceLabel: string;
+  account: Recipient;
+  /** Cash-outs travel the account's cheapest instant rail (InstaPay here). */
+  rail: TransferRail;
+  amount: Money;
+};
+
+export type PaymentIntent = TransferIntent | CashInIntent | BillIntent | QrIntent | CashOutIntent;
 
 export type PaymentIntentKind = PaymentIntent["kind"];
 
@@ -68,6 +84,8 @@ export const intentTransactionKind = (intent: PaymentIntent): TransactionKind =>
       return "bill-payment";
     case "qr":
       return "qr-payment";
+    case "cash-out":
+      return "cash-out";
   }
 };
 
@@ -92,11 +110,13 @@ export const intentCounterparty = (intent: PaymentIntent): string => {
       return intent.biller.name;
     case "qr":
       return intent.instruction.merchantName;
+    case "cash-out":
+      return intent.account.name;
   }
 };
 
 export const intentRail = (intent: PaymentIntent): TransferRail | null =>
-  intent.kind === "transfer" ? intent.rail : null;
+  intent.kind === "transfer" || intent.kind === "cash-out" ? intent.rail : null;
 
 /** The second line under the counterparty: how to recognise who is being paid. */
 export const intentCounterpartyDetail = (intent: PaymentIntent): string => {
@@ -109,6 +129,8 @@ export const intentCounterpartyDetail = (intent: PaymentIntent): string => {
       return `Account ${intent.accountNumber}`;
     case "qr":
       return intent.instruction.merchantCity;
+    case "cash-out":
+      return intent.account.handle;
   }
 };
 
@@ -137,5 +159,8 @@ export const STEP_UP_THRESHOLD = pesos(10_000);
 export const requiresStepUp = (intent: PaymentIntent): boolean => {
   if (intent.kind === "cash-in") return false;
   if (intent.kind === "transfer") return intent.rail !== "internal";
+  // A withdrawal is irreversible the moment the rail accepts it, like any
+  // transfer off the FIN-A ledger, so it always steps up.
+  if (intent.kind === "cash-out") return true;
   return compareMoney(intent.amount, STEP_UP_THRESHOLD) >= 0;
 };

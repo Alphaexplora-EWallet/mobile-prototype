@@ -1,4 +1,4 @@
-import type { AutopayEnrollment, Biller, DepositMethod, Recipient } from "../../domain/payments";
+import type { AutopayEnrollment, Biller, DepositMethod, Recipient, SavedBankAccount } from "../../domain/payments";
 import type { ScheduledPayment, Transaction } from "../../domain/transaction";
 import { type Money, pesos } from "../../money/money";
 
@@ -50,6 +50,39 @@ export const MOCK_AUTOPAY: readonly AutopayEnrollment[] = [
 ];
 
 export const MOCK_AMOUNT_PRESETS: readonly Money[] = [pesos(500), pesos(1_000), pesos(2_500)];
+
+/**
+ * The accounts a verified wallet can withdraw to. These were linked and
+ * verified earlier, so cash-out picks one instead of running a name inquiry —
+ * the inquiry exists for *un*known destinations. `handle` matches the deposit
+ * method copy ("BPI Savings •••• 6612") so the two screens agree.
+ */
+export const MOCK_CASHOUT_ACCOUNTS: readonly SavedBankAccount[] = [
+  {
+    id: "bpi-savings",
+    bankCode: "BPI",
+    label: "BPI Savings",
+    accountName: "MAYA SANTOS",
+    accountNumber: "004823016612",
+    handle: "•••• 6612",
+  },
+  {
+    id: "bdo-checking",
+    bankCode: "BDO",
+    label: "BDO Checking",
+    accountName: "MAYA SANTOS",
+    accountNumber: "000510232244",
+    handle: "•••• 2244",
+  },
+  {
+    id: "gcash-wallet",
+    bankCode: "GCASH",
+    label: "GCash",
+    accountName: "MAYA SANTOS",
+    accountNumber: "09174562288",
+    handle: "0917 ••• 2288",
+  },
+];
 
 /**
  * `handle` is stored rather than derived from `accountNumber`: bank accounts

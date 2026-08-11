@@ -19,7 +19,7 @@ export type ControlToggleVM = {
 };
 
 export type MoveMoneyRowVM = {
-  id: Extract<Screen, "transfer" | "deposit" | "payments">;
+  id: Extract<Screen, "transfer" | "deposit" | "cash-out" | "payments">;
   icon: IconName;
   title: string;
   detail: string;
@@ -107,6 +107,7 @@ export function useWalletViewModel(): WalletViewModel {
       rows: [
         { id: "transfer", icon: "send", title: "Send money", detail: `From •••• ${selected.last4}` },
         { id: "deposit", icon: "arrow-down", title: "Add money", detail: "Top up this card" },
+        { id: "cash-out", icon: "bank", title: "Cash out", detail: "To a linked bank account" },
         { id: "payments", icon: "receipt", title: "Pay a bill", detail: "Billers and QR payments" },
       ],
     },

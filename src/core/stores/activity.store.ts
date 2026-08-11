@@ -7,7 +7,7 @@ export type ActivityFilter = "all" | "in" | "out" | "bills";
 export const ACTIVITY_FILTER_KINDS: Readonly<Record<ActivityFilter, readonly TransactionKind[] | undefined>> = {
   all: undefined,
   in: ["cash-in", "transfer-in"],
-  out: ["transfer-out", "card-payment"],
+  out: ["transfer-out", "cash-out", "card-payment"],
   bills: ["bill-payment", "qr-payment"],
 };
 

@@ -130,6 +130,7 @@ const MESSAGES: Readonly<Record<GatewayErrorCode, string>> = {
 const REFERENCE_PREFIX: Readonly<Record<PaymentIntent["kind"], string>> = {
   transfer: "NBK-TRF",
   "cash-in": "NBK-CSH",
+  "cash-out": "NBK-WDR",
   bill: "NBK-BIL",
   qr: "NBK-QRP",
 };
@@ -137,6 +138,7 @@ const REFERENCE_PREFIX: Readonly<Record<PaymentIntent["kind"], string>> = {
 const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
   transfer: "↗",
   "cash-in": "↙",
+  "cash-out": "↗",
   bill: "⚡",
   qr: "◫",
 };
@@ -180,6 +182,8 @@ const receiptName = (intent: PaymentIntent): string => {
       return `Paid ${intent.biller.name}`;
     case "qr":
       return `Paid ${intent.instruction.merchantName}`;
+    case "cash-out":
+      return `Withdrawn to ${intent.account.name}`;
   }
 };
 
@@ -193,6 +197,8 @@ const receiptDescription = (intent: PaymentIntent): string => {
       return `${intent.biller.name} account ${intent.accountNumber}.`;
     case "cash-in":
       return `Cash in through ${intent.method.title}.`;
+    case "cash-out":
+      return `Cash-out of ${formatMoney(intent.amount)} to ${intent.account.name} (${intent.account.handle}).`;
   }
 };
 
@@ -430,7 +436,8 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
           reference,
           description: receiptDescription(intent),
           sourceLabel: intentCardLabel(intent),
-          recipient: intent.kind === "transfer" ? intent.recipient : undefined,
+          recipient:
+            intent.kind === "transfer" ? intent.recipient : intent.kind === "cash-out" ? intent.account : undefined,
           fee: quote.fee,
           rail: quote.rail ?? undefined,
           arrivalLabel: quote.arrivalLabel,
