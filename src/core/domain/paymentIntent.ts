@@ -56,6 +56,7 @@ export type QrIntent = {
 };
 
 /**
+<<<<<<< HEAD
  * Withdrawing to a saved bank account — the mirror of `CashInIntent`. The
  * account arrives in recipient shape because the pipeline already knows how to
  * show "who is on the other side" for a recipient; the holder's name was
@@ -106,8 +107,33 @@ export type RequestIntent = {
 };
 
 export type PaymentIntent = TransferIntent | CashInIntent | BillIntent | QrIntent | CashOutIntent | LoadIntent | RequestIntent;
+=======
+ * Moves into the savings jar: money leaves a wallet card and lands in the jar's
+ * own balance, which is deliberately separate from the main balance and the
+ * spending limit.
+ */
+export type JarInIntent = {
+  kind: "jar-in";
+  sourceCardId: CardId;
+  sourceLabel: string;
+  amount: Money;
+};
+
+/** Moves out of the savings jar: money returns from the jar to a wallet card. */
+export type JarOutIntent = {
+  kind: "jar-out";
+  destinationCardId: CardId;
+  destinationLabel: string;
+  amount: Money;
+};
+
+export type PaymentIntent = TransferIntent | CashInIntent | BillIntent | QrIntent | JarInIntent | JarOutIntent;
+>>>>>>> feat/gap-07-savings-jar
 
 export type PaymentIntentKind = PaymentIntent["kind"];
+
+/** The label the jar presents as on review rows and receipts. */
+export const JAR_LABEL = "Savings jar";
 
 /** The transaction this intent becomes once the rail accepts it. */
 export const intentTransactionKind = (intent: PaymentIntent): TransactionKind => {
@@ -120,16 +146,24 @@ export const intentTransactionKind = (intent: PaymentIntent): TransactionKind =>
       return "bill-payment";
     case "qr":
       return "qr-payment";
+<<<<<<< HEAD
     case "cash-out":
       return "cash-out";
     case "buyload":
       return "load-purchase";
     case "request":
       return "request-in";
+=======
+    case "jar-in":
+      return "jar-in";
+    case "jar-out":
+      return "jar-out";
+>>>>>>> feat/gap-07-savings-jar
   }
 };
 
 /** Which card the money moves through, whichever direction it is going. */
+<<<<<<< HEAD
 export const intentCardId = (intent: PaymentIntent): CardId =>
   intent.kind === "cash-in" || intent.kind === "request" ? intent.destinationCardId : intent.sourceCardId;
 
@@ -139,6 +173,24 @@ export const intentCardLabel = (intent: PaymentIntent): string =>
 /** True when this intent adds to the balance rather than drawing it down. */
 export const isIncomingIntent = (intent: PaymentIntent): boolean =>
   intent.kind === "cash-in" || intent.kind === "request";
+=======
+export const intentCardId = (intent: PaymentIntent): CardId => {
+  if (intent.kind === "cash-in" || intent.kind === "jar-out") return intent.destinationCardId;
+  return intent.sourceCardId;
+};
+
+export const intentCardLabel = (intent: PaymentIntent): string => {
+  if (intent.kind === "cash-in" || intent.kind === "jar-out") return intent.destinationLabel;
+  return intent.sourceLabel;
+};
+
+/**
+ * True when this intent adds to the wallet-card balance rather than drawing it
+ * down. Money coming back out of the jar lands on the card, so it is incoming.
+ */
+export const isIncomingIntent = (intent: PaymentIntent): boolean =>
+  intent.kind === "cash-in" || intent.kind === "jar-out";
+>>>>>>> feat/gap-07-savings-jar
 
 /** Who or what is on the other side, for receipt and activity copy. */
 export const intentCounterparty = (intent: PaymentIntent): string => {
@@ -151,12 +203,18 @@ export const intentCounterparty = (intent: PaymentIntent): string => {
       return intent.biller.name;
     case "qr":
       return intent.instruction.merchantName;
+<<<<<<< HEAD
     case "cash-out":
       return intent.account.name;
     case "buyload":
       return intent.operator.name;
     case "request":
       return intent.payer.name;
+=======
+    case "jar-in":
+    case "jar-out":
+      return JAR_LABEL;
+>>>>>>> feat/gap-07-savings-jar
   }
 };
 
@@ -174,12 +232,19 @@ export const intentCounterpartyDetail = (intent: PaymentIntent): string => {
       return `Account ${intent.accountNumber}`;
     case "qr":
       return intent.instruction.merchantCity;
+<<<<<<< HEAD
     case "cash-out":
       return intent.account.handle;
     case "buyload":
       return maskMobileNumber(intent.phoneNumber);
     case "request":
       return intent.payer.handle;
+=======
+    case "jar-in":
+      return "Set aside for a goal";
+    case "jar-out":
+      return "Back to your wallet";
+>>>>>>> feat/gap-07-savings-jar
   }
 };
 
@@ -207,7 +272,12 @@ export const STEP_UP_THRESHOLD = pesos(10_000);
  *   only once the amount is large.
  */
 export const requiresStepUp = (intent: PaymentIntent): boolean => {
+<<<<<<< HEAD
   if (intent.kind === "cash-in" || intent.kind === "request") return false;
+=======
+  if (intent.kind === "cash-in") return false;
+  if (intent.kind === "jar-in" || intent.kind === "jar-out") return false;
+>>>>>>> feat/gap-07-savings-jar
   if (intent.kind === "transfer") return intent.rail !== "internal";
   // A withdrawal is irreversible the moment the rail accepts it, like any
   // transfer off the FIN-A ledger, so it always steps up.

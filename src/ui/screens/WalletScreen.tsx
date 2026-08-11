@@ -39,6 +39,27 @@ export function WalletScreen() {
         ))}
       </section>
 
+      {vm.jar.opened && (
+        <section className="jar-card" aria-label="Savings jar">
+          <span className="jar-card-icon">
+            <Icon name="star" />
+          </span>
+          <span className="jar-card-copy">
+            <strong>{vm.jar.heading}</strong>
+            <small>{vm.jar.detail}</small>
+            <b aria-live="polite">{vm.jar.balanceLabel}</b>
+          </span>
+          <span className="jar-card-actions">
+            <button type="button" onClick={() => vm.startJarMove("in")}>
+              Add money
+            </button>
+            <button type="button" onClick={() => vm.startJarMove("out")}>
+              Withdraw
+            </button>
+          </span>
+        </section>
+      )}
+
       <button className="add-card-button" type="button" onClick={vm.addCard}>
         <Icon name="plus" /> Add card
       </button>

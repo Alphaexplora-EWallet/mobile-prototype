@@ -6,6 +6,7 @@ import {
   intentCounterparty,
   intentCounterpartyDetail,
   intentNote,
+  JAR_LABEL,
   requiresStepUp,
 } from "../domain/paymentIntent";
 import { railName } from "../domain/rails";
@@ -15,8 +16,12 @@ import { pesos } from "../money/money";
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
 import { activityActions } from "../stores/activity.store";
+<<<<<<< HEAD
 import { buyloadActions } from "../stores/buyload.store";
 import { cashOutActions } from "../stores/cashout.store";
+=======
+import { jarActions } from "../stores/jar.store";
+>>>>>>> feat/gap-07-savings-jar
 import { paymentActions, usePaymentStore } from "../stores/payment.store";
 import { requestsActions } from "../stores/requests.store";
 import { transferActions } from "../stores/transfer.store";
@@ -62,14 +67,30 @@ const COPY = {
     action: "Confirm and pay",
     submitting: "Paying securely…",
   },
+<<<<<<< HEAD
   "cash-out": {
     reviewTitle: "Review withdrawal",
     reviewLead: "You’re withdrawing",
     receiptTitle: "Withdrawal complete",
+=======
+  "jar-in": {
+    reviewTitle: "Review jar deposit",
+    reviewLead: "You’re moving into",
+    receiptTitle: "Jar topped up",
+    pendingTitle: "Jar deposit on its way",
+    action: "Confirm and move",
+    submitting: "Moving securely…",
+  },
+  "jar-out": {
+    reviewTitle: "Review jar withdrawal",
+    reviewLead: "You’re moving out",
+    receiptTitle: "Withdrawn from jar",
+>>>>>>> feat/gap-07-savings-jar
     pendingTitle: "Withdrawal on its way",
     action: "Confirm and withdraw",
     submitting: "Withdrawing securely…",
   },
+<<<<<<< HEAD
   buyload: {
     reviewTitle: "Review load",
     reviewLead: "You’re buying",
@@ -86,6 +107,8 @@ const COPY = {
     action: "Confirm and receive",
     submitting: "Receiving securely…",
   },
+=======
+>>>>>>> feat/gap-07-savings-jar
 } as const;
 
 /**
@@ -158,10 +181,25 @@ export function usePaymentReviewViewModel() {
   const note = intent ? intentNote(intent) : "";
   const rows = intent
     ? [
+<<<<<<< HEAD
         {
           label: intent.kind === "cash-in" || intent.kind === "request" ? "To" : "From",
           value: intentCardLabel(intent),
         },
+=======
+        // The jar is not a card, so the first row names the side it is on.
+        ...(intent.kind === "jar-in"
+          ? [
+              { label: "From", value: intentCardLabel(intent) },
+              { label: "To", value: JAR_LABEL },
+            ]
+          : intent.kind === "jar-out"
+            ? [
+                { label: "From", value: JAR_LABEL },
+                { label: "To", value: intentCardLabel(intent) },
+              ]
+            : [{ label: intent.kind === "cash-in" ? "To" : "From", value: intentCardLabel(intent) }]),
+>>>>>>> feat/gap-07-savings-jar
         ...(quote?.rail ? [{ label: "Rail", value: railName(quote.rail) }] : []),
         { label: "Arrival", value: quote?.arrivalLabel ?? "Checking…" },
         { label: "Fee", value: formatMoney(quote?.fee ?? pesos(0)) },
@@ -173,6 +211,8 @@ export function usePaymentReviewViewModel() {
   return {
     title: copy.reviewTitle,
     lead: copy.reviewLead,
+    /** Money out of the jar reads "from Savings jar", not "to" it. */
+    counterpartyPreposition: intent?.kind === "jar-out" ? "from" : "to",
     actionLabel: stepUp ? "Continue to confirm" : copy.action,
     submittingLabel: copy.submitting,
     isReady: intent !== null,
@@ -289,8 +329,12 @@ export function usePaymentReceiptViewModel() {
     done: () => {
       paymentActions.reset();
       transferActions.reset();
+<<<<<<< HEAD
       cashOutActions.reset();
       buyloadActions.reset();
+=======
+      jarActions.reset();
+>>>>>>> feat/gap-07-savings-jar
       navigation.resetTo("home");
     },
   };
@@ -378,10 +422,17 @@ const receiptKind = (receipt: PaymentReceipt): keyof typeof COPY => {
       return "bill";
     case "qr-payment":
       return "qr";
+<<<<<<< HEAD
     case "load-purchase":
       return "buyload";
     case "request-in":
       return "request";
+=======
+    case "jar-in":
+      return "jar-in";
+    case "jar-out":
+      return "jar-out";
+>>>>>>> feat/gap-07-savings-jar
     default:
       return "transfer";
   }

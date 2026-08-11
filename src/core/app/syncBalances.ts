@@ -13,13 +13,17 @@ import { walletActions } from "../stores/wallet.store";
  *
  * Failures are swallowed on purpose: a stale balance is a cosmetic problem and
  * the payment already succeeded, so there is nothing useful to tell the user.
+ * The jar balance is the same cache discipline: the bank owns it, so it is
+ * re-read alongside the cards rather than recomputed here.
  */
 export async function syncBalances(gateway: BankingGateway): Promise<void> {
-  const result = await gateway.accounts.list();
-  if (!result.ok) return;
-  const balances = result.value.reduce<Partial<Record<CardId, Money>>>(
-    (accumulated, account) => ({ ...accumulated, [account.cardId]: account.balance }),
-    {},
-  );
-  walletActions.setBalances(balances);
+  const [accountsResult, jarResult] = await Promise.all([gateway.accounts.list(), gateway.payments.jarState()]);
+  if (accountsResult.ok) {
+    const balances = accountsResult.value.reduce<Partial<Record<CardId, Money>>>(
+      (accumulated, account) => ({ ...accumulated, [account.cardId]: account.balance }),
+      {},
+    );
+    walletActions.setBalances(balances);
+  }
+  if (jarResult.ok) walletActions.setJarState(jarResult.value);
 }

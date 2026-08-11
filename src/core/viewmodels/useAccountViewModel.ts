@@ -5,6 +5,7 @@ import { formatMoney } from "../money/format";
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
 import { uiActions } from "../stores/ui.store";
+import { walletActions, useWalletStore } from "../stores/wallet.store";
 import { useSelectedCard } from "./useCardViews";
 
 export function useAccountDetailsViewModel() {
@@ -83,10 +84,28 @@ export function useCardDetailViewModel() {
 
 export function useCardAddViewModel() {
   const navigation = useNavigation();
+  const gateway = useBankingGateway();
+  const jarOpened = useWalletStore((state) => state.jar.opened);
+  const [error, setError] = useState<string | null>(null);
+
+  const openJar = async () => {
+    // Opening the jar is a bank-side outcome, so it is simulated through the
+    // gateway; the jar card face then appears on the Wallet screen. A failure
+    // keeps the user here with the reason, like every other gateway error.
+    const result = await gateway.payments.openJar();
+    if (!result.ok) {
+      setError(result.error.message);
+      return;
+    }
+    walletActions.setJarState(result.value);
+    navigation.navigate("wallet");
+  };
 
   return {
     title: "Add a card",
-    intro: "Choose what you want to open. A prototype cannot issue a real card, so these end in a summary.",
+    intro: "Choose what you want to open. A prototype cannot issue a real card, so the card options end in a summary.",
+    jarOpened,
+    error,
     options: [
       {
         id: "virtual",
@@ -100,14 +119,24 @@ export function useCardAddViewModel() {
         title: "Physical card",
         detail: "Delivered in 5 to 7 banking days",
       },
-      {
-        id: "jar",
-        icon: "star" as const,
-        title: "Savings jar",
-        detail: "A separate balance with its own card face",
-      },
+      ...(jarOpened
+        ? []
+        : [
+            {
+              id: "jar",
+              icon: "star" as const,
+              title: "Savings jar",
+              detail: "A separate balance with its own card face",
+            },
+          ]),
     ],
-    choose: (id: string) => uiActions.showSimulated(`Open a ${id} card`),
+    choose: (id: string) => {
+      if (id === "jar") {
+        void openJar();
+        return;
+      }
+      uiActions.showSimulated(`Open a ${id} card`);
+    },
     back: navigation.goBack,
   };
 }

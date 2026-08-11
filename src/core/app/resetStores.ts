@@ -9,6 +9,7 @@ import { INITIAL_BILLS, useBillsStore } from "../stores/bills.store";
 import { INITIAL_BUYLOAD_DRAFT, useBuyloadStore } from "../stores/buyload.store";
 import { INITIAL_CASHOUT_DRAFT, useCashOutStore } from "../stores/cashout.store";
 import { INITIAL_DEPOSIT_DRAFT, useDepositStore } from "../stores/deposit.store";
+import { INITIAL_JAR_DRAFT, useJarStore } from "../stores/jar.store";
 import { INITIAL_PAYMENT_FLOW, usePaymentStore } from "../stores/payment.store";
 import { INITIAL_KYC, useKycStore } from "../stores/kyc.store";
 import { INITIAL_QR, useQrStore } from "../stores/qr.store";
@@ -35,6 +36,7 @@ export function resetStores(): void {
   useActivityStore.setState({ selectedTransactionId: null });
   useStatementStore.setState({ selectedStatementId: null });
   useTransferStore.setState(INITIAL_TRANSFER_DRAFT);
+  useJarStore.setState(INITIAL_JAR_DRAFT);
   useBillsStore.setState(INITIAL_BILLS);
   useBuyloadStore.setState(INITIAL_BUYLOAD_DRAFT);
   useCashOutStore.setState(INITIAL_CASHOUT_DRAFT);
@@ -54,5 +56,6 @@ export function resetStores(): void {
     onlinePayments: true,
     atmWithdrawals: true,
     limits: { main: pesos(3_000), travel: pesos(3_000) },
+    jar: { opened: false, balance: pesos(0) },
   });
 }

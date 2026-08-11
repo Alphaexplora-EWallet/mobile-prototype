@@ -1,9 +1,11 @@
 import { useShallow } from "zustand/react/shallow";
 import type { CardId, CardView } from "../domain/card";
 import type { IconName } from "../domain/icons";
+import { JAR_LABEL } from "../domain/paymentIntent";
 import type { Screen } from "../navigation/screens";
 import { formatMoney } from "../money/format";
 import { useNavigation } from "../navigation/useNavigation";
+import { jarActions, type JarMoveDirection } from "../stores/jar.store";
 import { questActions, useQuestStore } from "../stores/quest.store";
 import { walletActions, useWalletStore } from "../stores/wallet.store";
 import { useCardViews, useSelectedCard } from "./useCardViews";
@@ -36,6 +38,11 @@ export type WalletViewModel = {
   controls: readonly ControlToggleVM[];
   spendingLimit: { title: string; detail: string; amountLabel: string; periodLabel: string };
   moveMoney: { visible: boolean; rows: readonly MoveMoneyRowVM[] };
+  /**
+   * The savings jar, distinct from the card stack: its balance is separate and
+   * never counts toward the main balance or the spending limit.
+   */
+  jar: { opened: boolean; heading: string; detail: string; balanceLabel: string };
   selectCard(id: CardId): void;
   toggleFrozen(id: CardId): void;
   setControl(id: ControlId, value: boolean): void;
@@ -44,6 +51,7 @@ export type WalletViewModel = {
   goTo(screen: Screen): void;
   addCard(): void;
   openAccount(): void;
+  startJarMove(direction: JarMoveDirection): void;
 };
 
 export function useWalletViewModel(): WalletViewModel {
@@ -56,6 +64,7 @@ export function useWalletViewModel(): WalletViewModel {
     useShallow((state) => ({ onlinePayments: state.onlinePayments, atmWithdrawals: state.atmWithdrawals })),
   );
   const limit = useWalletStore((state) => state.limits[state.selectedCardId]);
+  const jar = useWalletStore((state) => state.jar);
   const limitSetupActive = useQuestStore((state) => state.limitSetupActive);
   const proposedLimit = useQuestStore((state) => state.quest.limit);
 
@@ -111,6 +120,12 @@ export function useWalletViewModel(): WalletViewModel {
         { id: "payments", icon: "receipt", title: "Pay a bill", detail: "Billers and QR payments" },
       ],
     },
+    jar: {
+      opened: jar.opened,
+      heading: JAR_LABEL,
+      detail: "Set aside money, separate from your spending",
+      balanceLabel: formatMoney(jar.balance),
+    },
     selectCard: walletActions.selectCard,
     toggleFrozen: walletActions.toggleFrozen,
     setControl: (id, value) => {
@@ -124,5 +139,9 @@ export function useWalletViewModel(): WalletViewModel {
     /** Both were rendered with no handler at all. */
     addCard: () => navigation.navigate("card-add"),
     openAccount: () => navigation.navigate("account-details"),
+    startJarMove: (direction) => {
+      jarActions.begin(direction);
+      navigation.navigate("jar-move");
+    },
   };
 }

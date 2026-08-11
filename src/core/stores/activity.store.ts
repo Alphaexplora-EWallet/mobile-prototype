@@ -6,8 +6,13 @@ export type ActivityFilter = "all" | "in" | "out" | "bills";
 
 export const ACTIVITY_FILTER_KINDS: Readonly<Record<ActivityFilter, readonly TransactionKind[] | undefined>> = {
   all: undefined,
+<<<<<<< HEAD
   in: ["cash-in", "transfer-in", "request-in"],
   out: ["transfer-out", "cash-out", "card-payment", "load-purchase"],
+=======
+  in: ["cash-in", "transfer-in", "jar-out"],
+  out: ["transfer-out", "card-payment", "jar-in"],
+>>>>>>> feat/gap-07-savings-jar
   bills: ["bill-payment", "qr-payment"],
 };
 

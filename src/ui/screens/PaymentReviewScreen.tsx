@@ -27,7 +27,9 @@ export function PaymentReviewScreen() {
             </span>
             <p>{vm.lead}</p>
             <h1>{vm.amountLabel}</h1>
-            <strong>{vm.counterpartyLine}</strong>
+            <strong>
+              {vm.counterpartyPreposition} {vm.counterparty}
+            </strong>
             <small>{vm.counterpartyDetail}</small>
           </section>
 

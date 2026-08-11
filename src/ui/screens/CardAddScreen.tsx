@@ -1,6 +1,7 @@
 import { useCardAddViewModel } from "@/core/viewmodels/useAccountViewModel";
 import { PageBar } from "../layout/PageBar";
 import { LinkRow } from "../primitives/LinkRow";
+import { StateBlock } from "../primitives/StateBlock";
 
 export function CardAddScreen() {
   const vm = useCardAddViewModel();
@@ -13,6 +14,8 @@ export function CardAddScreen() {
         <h1>Open something new</h1>
         <p>{vm.intro}</p>
       </section>
+
+      {vm.error && <StateBlock tone="error" message={vm.error} />}
 
       <div className="control-list">
         {vm.options.map((option) => (
