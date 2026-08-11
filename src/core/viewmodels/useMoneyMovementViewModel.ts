@@ -50,8 +50,9 @@ export type PresetVM = { id: string; label: string };
 /**
  * Presets are matched on parsed value, not on string equality. Typing "500.00"
  * previously failed to highlight the ₱500 preset because "500.00" !== "500".
+ * Exported so the cash-out screen composes the same amount field.
  */
-function createAmountDraft(amount: string, setAmount: (value: string) => void) {
+export function createAmountDraft(amount: string, setAmount: (value: string) => void) {
   const parsed = parseMoneyInput(amount);
   const presets: PresetVM[] = MOCK_AMOUNT_PRESETS.map((preset) => ({
     id: formatMoney(preset, { symbol: false, fractionDigits: 0 }),

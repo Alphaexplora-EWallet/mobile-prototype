@@ -45,6 +45,25 @@ export type Recipient = {
 /** Last four of an account number, for building a `handle`. */
 export const maskAccountNumber = (accountNumber: string): string => `•••• ${accountNumber.slice(-4)}`;
 
+/**
+ * An external bank account the user has linked for cash-out. Unlike `Recipient`
+ * (which is often built ad hoc from a name inquiry), a saved account was
+ * verified when it was linked, so the withdrawal flow skips the inquiry and
+ * picks from this list instead. GAP-09 owns managing the list; this gap only
+ * reads it.
+ */
+export type SavedBankAccount = {
+  id: string;
+  bankCode: BankCode;
+  /** What the user calls it, e.g. "BPI Savings". */
+  label: string;
+  /** The account holder's name, confirmed when the account was linked. */
+  accountName: string;
+  accountNumber: string;
+  /** Masked display string, e.g. "•••• 6612". */
+  handle: string;
+};
+
 export type ScheduledPaymentStatus = "active" | "paused";
 
 /**

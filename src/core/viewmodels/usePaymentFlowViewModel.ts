@@ -15,6 +15,7 @@ import { pesos } from "../money/money";
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
 import { activityActions } from "../stores/activity.store";
+import { cashOutActions } from "../stores/cashout.store";
 import { paymentActions, usePaymentStore } from "../stores/payment.store";
 import { transferActions } from "../stores/transfer.store";
 import { uiActions } from "../stores/ui.store";
@@ -58,6 +59,14 @@ const COPY = {
     pendingTitle: "Payment on its way",
     action: "Confirm and pay",
     submitting: "Paying securely…",
+  },
+  "cash-out": {
+    reviewTitle: "Review withdrawal",
+    reviewLead: "You’re withdrawing",
+    receiptTitle: "Withdrawal complete",
+    pendingTitle: "Withdrawal on its way",
+    action: "Confirm and withdraw",
+    submitting: "Withdrawing securely…",
   },
 } as const;
 
@@ -191,6 +200,10 @@ export function usePaymentConfirmViewModel() {
     await submit(verified.value);
   };
 
+  // "Withdrawing securely…" for cash-out, "Sending securely…" for transfers —
+  // the busy label must not claim a kind the intent is not.
+  const busyLabel = isVerifying ? "Checking your PIN…" : intent ? COPY[intent.kind].submitting : "Sending securely…";
+
   return {
     title: "Confirm this payment",
     intro: intent
@@ -203,7 +216,7 @@ export function usePaymentConfirmViewModel() {
     setPin: (value: string) => setPin(value.replace(/\D/g, "").slice(0, TRANSACTION_PIN_LENGTH)),
     canSubmit: pin.length === TRANSACTION_PIN_LENGTH && !isVerifying && !isSubmitting,
     isBusy: isVerifying || isSubmitting,
-    busyLabel: isVerifying ? "Checking your PIN…" : "Sending securely…",
+    busyLabel,
     error,
     confirm,
     back: navigation.goBack,
@@ -250,6 +263,7 @@ export function usePaymentReceiptViewModel() {
     done: () => {
       paymentActions.reset();
       transferActions.reset();
+      cashOutActions.reset();
       navigation.resetTo("home");
     },
   };
@@ -331,6 +345,8 @@ const receiptKind = (receipt: PaymentReceipt): keyof typeof COPY => {
   switch (receipt.kind) {
     case "cash-in":
       return "cash-in";
+    case "cash-out":
+      return "cash-out";
     case "bill-payment":
       return "bill";
     case "qr-payment":

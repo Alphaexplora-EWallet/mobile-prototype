@@ -30,6 +30,7 @@ export type ScreenParams = {
   "payment-status": undefined;
   deposit: undefined;
   "fund-wallet": undefined;
+  "cash-out": undefined;
   "qr-scan": undefined;
   "qr-receive": undefined;
   "bill-entry": undefined;
