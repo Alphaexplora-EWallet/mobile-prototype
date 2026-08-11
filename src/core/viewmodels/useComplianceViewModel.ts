@@ -6,8 +6,22 @@ import { formatMoney } from "../money/format";
 import { subtractMoney } from "../money/money";
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
-import { KYC_STEPS, kycActions, useKycStore } from "../stores/kyc.store";
+import { KYC_STEPS, kycActions, useKycStore, type KycStep } from "../stores/kyc.store";
 import { uiActions } from "../stores/ui.store";
+
+/** Human names for the capture steps, used when a rejection points at one. */
+const KYC_STEP_LABELS: Readonly<Record<KycStep, string>> = {
+  document: "ID selection",
+  front: "front-of-ID photo",
+  back: "back-of-ID photo",
+  selfie: "selfie",
+  address: "address",
+};
+
+const stepLabel = (stepIndex: number): string => {
+  const clamped = Math.max(0, Math.min(KYC_STEPS.length - 1, stepIndex));
+  return KYC_STEP_LABELS[KYC_STEPS[clamped]];
+};
 
 export function useKycStatusViewModel() {
   const navigation = useNavigation();
@@ -31,6 +45,10 @@ export function useKycStatusViewModel() {
 
   const current = status ? KYC_TIERS[status.tier] : null;
   const upcoming = status ? nextKycTier(status.tier) : null;
+  const rejection =
+    status && status.state === "rejected"
+      ? { reason: status.reviewNote ?? "", stepIndex: status.rejectedStepIndex ?? 0 }
+      : null;
 
   return {
     title: "Verification",
@@ -40,6 +58,10 @@ export function useKycStatusViewModel() {
     tierRequirement: current?.requirement ?? "",
     stateLabel: status?.submittedLabel ?? "",
     unlocked: current?.unlocks ?? [],
+    /** True when the last submission was rejected — a resubmit is the way out. */
+    isRejected: rejection !== null,
+    rejectedReason: rejection?.reason ?? "",
+    rejectedStepLabel: rejection ? stepLabel(rejection.stepIndex) : "",
     /** Null once fully verified — there is nothing left to ask for. */
     nextTier: upcoming
       ? {
@@ -50,6 +72,12 @@ export function useKycStatusViewModel() {
       : null,
     startVerification: () => {
       kycActions.reset();
+      navigation.navigate("kyc-capture");
+    },
+    /** Restarts capture at the step that failed review. */
+    resubmit: () => {
+      if (!rejection) return;
+      kycActions.resumeFromRejection(rejection);
       navigation.navigate("kyc-capture");
     },
     back: navigation.goBack,
@@ -66,6 +94,7 @@ export function useKycCaptureViewModel() {
   const gateway = useBankingGateway();
   const stepIndex = useKycStore((state) => state.stepIndex);
   const draft = useKycStore((state) => state.draft);
+  const rejection = useKycStore((state) => state.rejection);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -118,6 +147,9 @@ export function useKycCaptureViewModel() {
     isLast,
     isSubmitting,
     error,
+    /** True when this capture run is a resubmission after a rejection. */
+    resumingFromRejection: rejection !== null,
+    resumeStepLabel: rejection ? stepLabel(rejection.stepIndex) : "",
     advance: async () => {
       if (!stepDone) return;
       if (!isLast) {

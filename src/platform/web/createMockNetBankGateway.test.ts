@@ -224,4 +224,55 @@ describe("mock NetBank gateway", () => {
       true,
     );
   });
+
+  it("reports a seeded rejection and clears it when the resubmission is reviewed", async () => {
+    const gateway = createMockNetBankGateway({
+      kycTier: "verified",
+      kycRejection: { reason: "Blurry ID photo", stepIndex: 1 },
+    });
+
+    const rejected = unwrap(await gateway.compliance.kycStatus());
+    expect(rejected.state).toBe("rejected");
+    expect(rejected.reviewNote).toBe("Blurry ID photo");
+    expect(rejected.rejectedStepIndex).toBe(1);
+
+    const resubmitted = unwrap(
+      await gateway.compliance.submitKyc({
+        documentType: "philsys",
+        frontCaptured: true,
+        backCaptured: true,
+        selfieCaptured: true,
+        addressLine: "12 Mabini St",
+        city: "Quezon City",
+        postalCode: "1100",
+      }),
+    );
+    expect(resubmitted.state).toBe("approved");
+    expect(resubmitted.tier).toBe("full");
+    expect(resubmitted.reviewNote).toBeUndefined();
+    expect(resubmitted.rejectedStepIndex).toBeUndefined();
+  });
+
+  it("clears a rejection at the top tier without promoting past it", async () => {
+    const gateway = createMockNetBankGateway({
+      kycTier: "full",
+      kycRejection: { reason: "Unreadable ID photo", stepIndex: 1 },
+    });
+
+    const resubmitted = unwrap(
+      await gateway.compliance.submitKyc({
+        documentType: "philsys",
+        frontCaptured: true,
+        backCaptured: true,
+        selfieCaptured: true,
+        addressLine: "12 Mabini St",
+        city: "Quezon City",
+        postalCode: "1100",
+      }),
+    );
+    expect(resubmitted.state).toBe("approved");
+    expect(resubmitted.tier).toBe("full");
+    expect(resubmitted.reviewNote).toBeUndefined();
+    expect(resubmitted.rejectedStepIndex).toBeUndefined();
+  });
 });

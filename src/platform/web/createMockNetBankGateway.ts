@@ -85,6 +85,12 @@ export type MockGatewayOptions = {
   failures?: Readonly<Partial<Record<MockGatewayCall, GatewayErrorCode>>>;
   /** PESONet is gated behind the `full` tier, so this decides what works. */
   kycTier?: KycTier;
+  /**
+   * Seed the KYC submission as rejected, so the resubmission path is reachable
+   * instead of dead code. `reason` is what the status screen shows; `stepIndex`
+   * is the capture step that failed review, where a resubmit restarts.
+   */
+  kycRejection?: { reason: string; stepIndex: number } | null;
   /** How many `payments.status` polls a pending transfer needs to clear. */
   settleAfterPolls?: number;
 };
@@ -205,11 +211,26 @@ const receiptDescription = (intent: PaymentIntent): string => {
  * be a real answer here and could not be before.
  */
 export function createMockNetBankGateway(options: MockGatewayOptions = {}): BankingGateway {
-  const { latencyMs = 0, failures = {}, kycTier = INITIAL_KYC_STATUS.tier, settleAfterPolls = 2 } = options;
+  const {
+    latencyMs = 0,
+    failures = {},
+    kycTier = INITIAL_KYC_STATUS.tier,
+    kycRejection = null,
+    settleAfterPolls = 2,
+  } = options;
 
   let activityLog = seedActivity();
   let balances = seedBalances();
-  let kyc: KycStatus = { ...INITIAL_KYC_STATUS, tier: kycTier };
+  let kyc: KycStatus = kycRejection
+    ? {
+        ...INITIAL_KYC_STATUS,
+        tier: kycTier,
+        state: "rejected",
+        submittedLabel: "Rejected Jul 2, 2026",
+        reviewNote: kycRejection.reason,
+        rejectedStepIndex: kycRejection.stepIndex,
+      }
+    : { ...INITIAL_KYC_STATUS, tier: kycTier };
   let sessionList: readonly DeviceSession[] = MOCK_SESSIONS;
   let idempotencyCounter = 0;
   const referenceCounters: Record<string, number> = {};
@@ -513,10 +534,10 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
         if (!submission.addressLine.trim() || !submission.city.trim()) {
           return failed("invalid-account", "Add your home address so we can finish verification.");
         }
+        // A resubmission clears the rejection and promotes — the mock simulates
+        // that the corrected capture passed review.
         const promoted = nextKycTier(kyc.tier);
-        kyc = promoted
-          ? { tier: promoted, state: "approved", submittedLabel: "Approved just now" }
-          : { ...kyc, state: "approved" };
+        kyc = { tier: promoted ?? kyc.tier, state: "approved", submittedLabel: "Approved just now" };
         return ok(kyc);
       });
     },

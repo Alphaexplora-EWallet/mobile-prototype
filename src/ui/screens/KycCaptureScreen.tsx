@@ -43,6 +43,13 @@ export function KycCaptureScreen() {
         </div>
       </div>
 
+      {vm.resumingFromRejection && (
+        <section className="capture-resume" role="status" aria-label="Resubmission notice">
+          <Icon name="rotate" />
+          <p>Resubmitting after a rejection — re-capture the {vm.resumeStepLabel} that failed review.</p>
+        </section>
+      )}
+
       {vm.step === "document" && (
         <section className="money-field">
           <span className="field-label">Which ID will you use?</span>

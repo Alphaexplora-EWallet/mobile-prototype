@@ -5,6 +5,17 @@ import type { IdDocumentType, KycSubmission } from "../domain/compliance";
 export const KYC_STEPS = ["document", "front", "back", "selfie", "address"] as const;
 export type KycStep = (typeof KYC_STEPS)[number];
 
+/**
+ * Why a submission was turned down and where, so a resubmit can restart at the
+ * failed step instead of making the user repeat the whole flow.
+ */
+export type KycRejection = {
+  /** From the compliance layer, not a real KYC/AML verdict. */
+  reason: string;
+  /** The capture step that failed review; resubmission restarts here. */
+  stepIndex: number;
+};
+
 export const INITIAL_KYC_DRAFT: KycSubmission = {
   documentType: "philsys",
   frontCaptured: false,
@@ -18,6 +29,8 @@ export const INITIAL_KYC_DRAFT: KycSubmission = {
 export const INITIAL_KYC = {
   stepIndex: 0,
   draft: INITIAL_KYC_DRAFT,
+  /** Set while the user is resubmitting after a rejection. */
+  rejection: null as KycRejection | null,
 };
 
 type KycState = typeof INITIAL_KYC & {
@@ -28,8 +41,54 @@ type KycState = typeof INITIAL_KYC & {
     setDocumentType(type: IdDocumentType): void;
     capture(field: "frontCaptured" | "backCaptured" | "selfieCaptured"): void;
     setAddress(field: "addressLine" | "city" | "postalCode", value: string): void;
+    /**
+     * Restarts capture at the step that failed review. Earlier steps' data is
+     * kept; the failed step's own artifact is cleared so it must be re-done.
+     */
+    resumeFromRejection(rejection: KycRejection): void;
     reset(): void;
   };
+};
+
+/** Drops the rejected artifact for a step, leaving the rest of the draft alone. */
+const clearFailedStep = (draft: KycSubmission, step: KycStep): KycSubmission => {
+  switch (step) {
+    case "document":
+      return draft;
+    case "front":
+      return { ...draft, frontCaptured: false };
+    case "back":
+      return { ...draft, backCaptured: false };
+    case "selfie":
+      return { ...draft, selfieCaptured: false };
+    case "address":
+      return { ...draft, addressLine: "", city: "", postalCode: "" };
+  }
+};
+
+/**
+ * Builds the draft for a resubmission. Steps before the failed one already
+ * passed review, so their captures are kept complete; the failed step's own
+ * artifact is cleared so it must be re-done.
+ */
+const resumeDraft = (draft: KycSubmission, failedStepIndex: number): KycSubmission => {
+  let next = clearFailedStep(draft, KYC_STEPS[failedStepIndex]);
+  for (let index = 0; index < failedStepIndex; index += 1) {
+    switch (KYC_STEPS[index]) {
+      case "front":
+        next = { ...next, frontCaptured: true };
+        break;
+      case "back":
+        next = { ...next, backCaptured: true };
+        break;
+      case "selfie":
+        next = { ...next, selfieCaptured: true };
+        break;
+      default:
+        break;
+    }
+  }
+  return next;
 };
 
 /**
@@ -50,6 +109,15 @@ export const useKycStore = create<KycState>()((set, get) => ({
     setDocumentType: (documentType) => set((state) => ({ draft: { ...state.draft, documentType } })),
     capture: (field) => set((state) => ({ draft: { ...state.draft, [field]: true } })),
     setAddress: (field, value) => set((state) => ({ draft: { ...state.draft, [field]: value } })),
+    resumeFromRejection: (rejection) => {
+      const clamped = Math.max(0, Math.min(KYC_STEPS.length - 1, rejection.stepIndex));
+      set((state) => ({
+        stepIndex: clamped,
+        // Persist the clamped index so the marker can never diverge from the position.
+        rejection: { ...rejection, stepIndex: clamped },
+        draft: resumeDraft(state.draft, clamped),
+      }));
+    },
     reset: () => set(INITIAL_KYC),
   },
 }));

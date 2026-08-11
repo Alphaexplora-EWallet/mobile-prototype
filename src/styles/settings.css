@@ -217,6 +217,63 @@
   margin-top: 12px;
 }
 
+/* --- KYC rejection -------------------------------------------------------- */
+.capture-resume {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0 0 18px;
+  padding: 13px 15px;
+  border: 1px solid var(--danger-line);
+  border-radius: 16px;
+  color: var(--danger-ink);
+  background: var(--cream-deep);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.capture-resume svg {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin-top: 1px;
+}
+.capture-resume p {
+  margin: 0;
+}
+.tier-rejected {
+  border-color: var(--danger-line);
+  background: var(--cream-deep);
+  animation: rejection-in 260ms ease-out both;
+}
+.tier-rejected h2 {
+  color: var(--danger-ink);
+}
+.tier-rejected .rejection-reason {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.tier-rejected .rejection-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.tier-rejected .primary-button {
+  margin-top: 18px;
+}
+@keyframes rejection-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* --- Limits --------------------------------------------------------------- */
 .rail-card {
   margin-bottom: 14px;

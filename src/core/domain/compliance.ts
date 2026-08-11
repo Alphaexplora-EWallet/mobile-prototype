@@ -48,6 +48,12 @@ export type KycStatus = {
   submittedLabel?: string;
   /** Why a submission was rejected, or what review is waiting on. */
   reviewNote?: string;
+  /**
+   * Which capture step failed review, so a resubmit can restart there instead
+   * of from the top. Index into the capture flow's step list; present when
+   * `state === "rejected"`.
+   */
+  rejectedStepIndex?: number;
 };
 
 export type IdDocumentType = "philsys" | "passport" | "drivers-license" | "umid";
