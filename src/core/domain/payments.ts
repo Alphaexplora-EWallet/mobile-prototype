@@ -18,13 +18,41 @@ export type DepositMethod = {
   inbound?: boolean;
 };
 
+/**
+ * Catalog headings for the biller list. `BILLER_CATEGORY_ORDER` is the order
+ * the Pay screen renders them in; the labels below are what it shows.
+ */
+export type BillerCategory = "electric" | "telecom" | "water" | "government" | "other";
+
+export const BILLER_CATEGORY_ORDER: readonly BillerCategory[] = ["electric", "telecom", "water", "government", "other"];
+
+export const BILLER_CATEGORY_LABELS: Readonly<Record<BillerCategory, string>> = {
+  electric: "Electricity",
+  telecom: "Telecom",
+  water: "Water",
+  government: "Government",
+  other: "Other",
+};
+
 export type Biller = {
   id: string;
   icon: IconName;
   name: string;
   detail: string;
   due: string;
+  category: BillerCategory;
 };
+
+/**
+ * GAP-08: substring match on biller name, case-insensitive. A prefix is just a
+ * substring that starts at the first character, so one rule covers both. The
+ * empty query matches everything and surrounding whitespace is ignored.
+ */
+export function searchBillers(billers: readonly Biller[], query: string): readonly Biller[] {
+  const term = query.trim().toLowerCase();
+  if (!term) return billers;
+  return billers.filter((biller) => biller.name.toLowerCase().includes(term));
+}
 
 export type Recipient = {
   /** Stable key. `initials` was used for this and is not unique. */

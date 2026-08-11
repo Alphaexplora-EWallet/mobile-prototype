@@ -331,3 +331,48 @@
 .pay-scan-card > svg {
   color: var(--teal);
 }
+
+/* Biller catalog: search, favorites, and category groups (GAP-08). */
+.biller-search {
+  margin-bottom: 12px;
+}
+.biller-group {
+  margin-bottom: 16px;
+}
+.biller-group:last-child {
+  margin-bottom: 0;
+}
+.biller-row {
+  display: flex;
+  align-items: stretch;
+}
+.biller-row .link-row {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.control-list .biller-row:last-child .link-row,
+.control-list .biller-row:last-child .favorite-toggle {
+  border-bottom: 0;
+}
+.favorite-toggle {
+  display: grid;
+  place-items: center;
+  flex: 0 0 54px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.favorite-toggle:hover {
+  color: var(--amber);
+}
+.favorite-toggle.is-active {
+  color: var(--amber);
+}
+.favorite-toggle svg {
+  width: 21px;
+  height: 21px;
+}

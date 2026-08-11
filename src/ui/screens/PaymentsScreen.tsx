@@ -1,7 +1,9 @@
 import { Icon } from "../primitives/Icon";
 import { LinkRow } from "../primitives/LinkRow";
 import { PageBar } from "../layout/PageBar";
+import { StateBlock } from "../primitives/StateBlock";
 import { TransactionRow } from "../money/TransactionRow";
+import { BillerRow } from "../primitives/BillerRow";
 import { usePaymentsViewModel } from "@/core/viewmodels/useMoneyMovementViewModel";
 
 export function PaymentsScreen() {
@@ -58,18 +60,55 @@ export function PaymentsScreen() {
 
       <section className="money-field">
         <span className="field-label">Pay a bill</span>
-        <div className="control-list">
-          {vm.billers.map((biller) => (
-            <LinkRow
-              key={biller.id}
-              icon={biller.icon}
-              title={biller.name}
-              detail={biller.detail}
-              meta={biller.due}
-              onClick={() => vm.payBill(biller.id)}
+
+        <label className="money-note biller-search">
+          <span className="input-shell">
+            <Icon name="search" />
+            <input
+              type="search"
+              placeholder="Search billers"
+              aria-label="Search billers"
+              value={vm.searchQuery}
+              onChange={(event) => vm.setSearchQuery(event.target.value)}
             />
-          ))}
-        </div>
+          </span>
+        </label>
+
+        {vm.emptySearch && <StateBlock tone="empty" message="No billers match that search." />}
+
+        {vm.showFavorites && (
+          <div className="biller-group">
+            <span className="field-label">Favorites</span>
+            <div className="control-list">
+              {vm.favorites.map((biller) => (
+                <BillerRow
+                  key={biller.id}
+                  biller={biller}
+                  favorited={biller.favorited}
+                  onPress={() => vm.payBill(biller.id)}
+                  onToggleFavorite={() => vm.toggleFavorite(biller.id)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {vm.catalog.map((group) => (
+          <div className="biller-group" key={group.category}>
+            <span className="field-label">{group.label}</span>
+            <div className="control-list">
+              {group.billers.map((biller) => (
+                <BillerRow
+                  key={biller.id}
+                  biller={biller}
+                  favorited={biller.favorited}
+                  onPress={() => vm.payBill(biller.id)}
+                  onToggleFavorite={() => vm.toggleFavorite(biller.id)}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
       </section>
 
       <section className="home-section">

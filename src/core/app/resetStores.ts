@@ -5,6 +5,7 @@ import { useQuestStore } from "../stores/quest.store";
 import { useUiStore } from "../stores/ui.store";
 import { useActivityStore } from "../stores/activity.store";
 import { useStatementStore } from "../stores/statement.store";
+import { INITIAL_BILLER_CATALOG, useBillerCatalogStore } from "../stores/billerCatalog.store";
 import { INITIAL_BILLS, useBillsStore } from "../stores/bills.store";
 import { INITIAL_BUYLOAD_DRAFT, useBuyloadStore } from "../stores/buyload.store";
 import { INITIAL_CASHOUT_DRAFT, useCashOutStore } from "../stores/cashout.store";
@@ -37,6 +38,7 @@ export function resetStores(): void {
   useStatementStore.setState({ selectedStatementId: null });
   useTransferStore.setState(INITIAL_TRANSFER_DRAFT);
   useJarStore.setState(INITIAL_JAR_DRAFT);
+  useBillerCatalogStore.setState(INITIAL_BILLER_CATALOG);
   useBillsStore.setState(INITIAL_BILLS);
   useBuyloadStore.setState(INITIAL_BUYLOAD_DRAFT);
   useCashOutStore.setState(INITIAL_CASHOUT_DRAFT);

@@ -276,8 +276,35 @@ export const MOCK_DEPOSIT_METHODS: readonly DepositMethod[] = [
 ];
 
 export const MOCK_BILLERS: readonly Biller[] = [
-  { id: "power", icon: "bolt", name: "Meralco", detail: "Electricity", due: "Due Aug 18" },
-  { id: "internet", icon: "globe", name: "Converge", detail: "Home internet", due: "Due Aug 22" },
-  { id: "rent", icon: "home", name: "Landlord", detail: "Monthly rent", due: "Due Sep 1" },
-  { id: "card-bill", icon: "receipt", name: "Card statement", detail: "Credit card", due: "Due Sep 4" },
+  { id: "power", icon: "bolt", name: "Meralco", detail: "Electricity", due: "Due Aug 18", category: "electric" },
+  { id: "internet", icon: "globe", name: "Converge", detail: "Home internet", due: "Due Aug 22", category: "telecom" },
+  { id: "globe", icon: "phone", name: "Globe", detail: "Postpaid mobile", due: "Due Aug 25", category: "telecom" },
+  { id: "smart", icon: "phone", name: "Smart", detail: "Mobile & broadband", due: "Due Aug 30", category: "telecom" },
+  { id: "maynilad", icon: "droplet", name: "Maynilad", detail: "Water utility", due: "Due Aug 21", category: "water" },
+  {
+    id: "manila-water",
+    icon: "droplet",
+    name: "Manila Water",
+    detail: "Water utility",
+    due: "Due Aug 24",
+    category: "water",
+  },
+  { id: "sss", icon: "landmark", name: "SSS", detail: "Social security", due: "Due Aug 15", category: "government" },
+  {
+    id: "pagibig",
+    icon: "landmark",
+    name: "Pag-IBIG",
+    detail: "Housing fund",
+    due: "Due Sep 5",
+    category: "government",
+  },
+  { id: "rent", icon: "home", name: "Landlord", detail: "Monthly rent", due: "Due Sep 1", category: "other" },
+  {
+    id: "card-bill",
+    icon: "receipt",
+    name: "Card statement",
+    detail: "Credit card",
+    due: "Due Sep 4",
+    category: "other",
+  },
 ];
