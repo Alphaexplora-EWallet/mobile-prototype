@@ -45,6 +45,15 @@ export type Recipient = {
 /** Last four of an account number, for building a `handle`. */
 export const maskAccountNumber = (accountNumber: string): string => `•••• ${accountNumber.slice(-4)}`;
 
+/** "MARIA CLARA S. DELA CRUZ" → "MD". Falls back to one letter for a single word. */
+export const initialsOf = (name: string): string => {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "?";
+  const first = words[0][0];
+  const last = words.length > 1 ? words[words.length - 1][0] : "";
+  return `${first}${last}`.toUpperCase();
+};
+
 export type ScheduledPaymentStatus = "active" | "paused";
 
 /**

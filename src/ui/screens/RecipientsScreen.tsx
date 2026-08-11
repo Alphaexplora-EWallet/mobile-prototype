@@ -15,6 +15,17 @@ export function RecipientsScreen() {
         <p>{vm.intro}</p>
       </section>
 
+      <button className="destination-cta" type="button" onClick={vm.addMobile}>
+        <span className="destination-cta-icon">
+          <Icon name="send" />
+        </span>
+        <span className="control-copy">
+          <strong>Send to a mobile number</strong>
+          <small>Any FIN-A wallet registered to a Philippine number</small>
+        </span>
+        <Icon name="chevron-right" />
+      </button>
+
       <button className="destination-cta" type="button" onClick={vm.addBankAccount}>
         <span className="destination-cta-icon">
           <Icon name="bank" />
