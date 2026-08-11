@@ -12,7 +12,12 @@ import "./styles/index.css";
 const platform = createWebPlatform();
 // A real rail is not instant. Tests default this to 0 for determinism, so the
 // dev server is the only place the loading and error states are visible at all.
-const bankingGateway = createMockNetBankGateway({ latencyMs: 450 });
+// The KYC gateway is seeded with one rejection (selfie failed review) so the
+// resubmission path is reachable in the prototype instead of dead code.
+const bankingGateway = createMockNetBankGateway({
+  latencyMs: 450,
+  kycRejection: { reason: "The selfie was too dark to match your ID photo.", stepIndex: 3 },
+});
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

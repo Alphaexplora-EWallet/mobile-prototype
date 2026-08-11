@@ -36,7 +36,18 @@ export function KycStatusScreen() {
             </ul>
           </section>
 
-          {vm.nextTier ? (
+          {vm.isRejected ? (
+            <section className="tier-card tier-rejected" role="alert" aria-label="Submission rejected">
+              <h2>Your submission was rejected</h2>
+              <p className="rejection-reason">{vm.rejectedReason}</p>
+              <p className="rejection-hint">
+                Review stopped at the {vm.rejectedStepLabel} — re-capture it and resubmit.
+              </p>
+              <button className="primary-button" type="button" onClick={vm.resubmit}>
+                Resubmit
+              </button>
+            </section>
+          ) : vm.nextTier ? (
             <section className="tier-card tier-next" aria-label="Next tier">
               <h2>Unlock {vm.nextTier.name}</h2>
               <p>{vm.nextTier.requirement}</p>

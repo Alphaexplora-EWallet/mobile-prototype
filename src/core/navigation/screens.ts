@@ -31,11 +31,8 @@ export type ScreenParams = {
   "payment-status": undefined;
   deposit: undefined;
   "fund-wallet": undefined;
-<<<<<<< HEAD
   "cash-out": undefined;
-=======
   "jar-move": undefined;
->>>>>>> feat/gap-07-savings-jar
   "qr-scan": undefined;
   "qr-receive": undefined;
   "bill-entry": undefined;

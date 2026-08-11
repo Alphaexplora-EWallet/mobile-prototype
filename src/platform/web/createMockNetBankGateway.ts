@@ -17,11 +17,8 @@ import {
   intentCardLabel,
   intentRail,
   intentTransactionKind,
-<<<<<<< HEAD
   isIncomingIntent,
-=======
   JAR_LABEL,
->>>>>>> feat/gap-07-savings-jar
   type PaymentIntent,
   requiresStepUp,
 } from "@/core/domain/paymentIntent";
@@ -52,11 +49,8 @@ import type {
   BillAccountResult,
   CompliancePort,
   DirectoryPort,
-<<<<<<< HEAD
   MobileNameResult,
-=======
   JarState,
->>>>>>> feat/gap-07-savings-jar
   PaymentsPort,
   SecurityPort,
 } from "@/core/platform/bankingGateway";
@@ -101,6 +95,12 @@ export type MockGatewayOptions = {
   failures?: Readonly<Partial<Record<MockGatewayCall, GatewayErrorCode>>>;
   /** PESONet is gated behind the `full` tier, so this decides what works. */
   kycTier?: KycTier;
+  /**
+   * Seed the KYC submission as rejected, so the resubmission path is reachable
+   * instead of dead code. `reason` is what the status screen shows; `stepIndex`
+   * is the capture step that failed review, where a resubmit restarts.
+   */
+  kycRejection?: { reason: string; stepIndex: number } | null;
   /** How many `payments.status` polls a pending transfer needs to clear. */
   settleAfterPolls?: number;
   /**
@@ -161,13 +161,10 @@ const REFERENCE_PREFIX: Readonly<Record<PaymentIntent["kind"], string>> = {
   "cash-out": "NBK-WDR",
   bill: "NBK-BIL",
   qr: "NBK-QRP",
-<<<<<<< HEAD
   buyload: "NBK-LOD",
   request: "NBK-RQS",
-=======
   "jar-in": "NBK-JIN",
   "jar-out": "NBK-JOT",
->>>>>>> feat/gap-07-savings-jar
 };
 
 const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
@@ -176,13 +173,10 @@ const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
   "cash-out": "↗",
   bill: "⚡",
   qr: "◫",
-<<<<<<< HEAD
   buyload: "☎",
   request: "↙",
-=======
   "jar-in": "↓",
   "jar-out": "↑",
->>>>>>> feat/gap-07-savings-jar
 };
 
 const seedActivity = (): BankingTransaction[] =>
@@ -211,12 +205,9 @@ const nonRailFee = (intent: PaymentIntent): Money => (intent.kind === "cash-in" 
 const nonRailArrivalLabel = (intent: PaymentIntent): string => {
   if (intent.kind === "cash-in") return intent.method.arrivalLabel;
   if (intent.kind === "bill") return "Posted to the biller within one banking day";
-<<<<<<< HEAD
   if (intent.kind === "buyload") return "Credited to the number instantly";
   if (intent.kind === "request") return "Credited to your wallet instantly";
-=======
   if (intent.kind === "jar-in" || intent.kind === "jar-out") return "Moved instantly";
->>>>>>> feat/gap-07-savings-jar
   return "Paid instantly";
 };
 
@@ -230,18 +221,15 @@ const receiptName = (intent: PaymentIntent): string => {
       return `Paid ${intent.biller.name}`;
     case "qr":
       return `Paid ${intent.instruction.merchantName}`;
-<<<<<<< HEAD
     case "cash-out":
       return `Withdrawn to ${intent.account.name}`;
     case "buyload":
       return `Bought ${intent.operator.name} load`;
     case "request":
       return `Received from ${intent.payer.name}`;
-=======
     case "jar-in":
     case "jar-out":
       return JAR_LABEL;
->>>>>>> feat/gap-07-savings-jar
   }
 };
 
@@ -255,7 +243,6 @@ const receiptDescription = (intent: PaymentIntent): string => {
       return `${intent.biller.name} account ${intent.accountNumber}.`;
     case "cash-in":
       return `Cash in through ${intent.method.title}.`;
-<<<<<<< HEAD
     case "cash-out":
       return `Cash-out of ${formatMoney(intent.amount)} to ${intent.account.name} (${intent.account.handle}).`;
     case "buyload":
@@ -263,12 +250,10 @@ const receiptDescription = (intent: PaymentIntent): string => {
       return `${intent.operator.name} load for ${maskMobileNumber(intent.phoneNumber)}.`;
     case "request":
       return intent.note.trim() || `Payment for your money request from ${intent.payer.name}.`;
-=======
     case "jar-in":
       return `Moved into the ${JAR_LABEL}.`;
     case "jar-out":
       return `Moved out of the ${JAR_LABEL}.`;
->>>>>>> feat/gap-07-savings-jar
   }
 };
 
@@ -288,6 +273,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
     latencyMs = 0,
     failures = {},
     kycTier = INITIAL_KYC_STATUS.tier,
+    kycRejection = null,
     settleAfterPolls = 2,
     seedActivity: seed = undefined,
     todayIso = DEFAULT_TODAY_ISO,
@@ -296,7 +282,16 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
   let activityLog: BankingTransaction[] = seed ? [...seed] : seedActivity();
   let balances = seedBalances();
   let jarState: JarState = { opened: false, balance: pesos(0) };
-  let kyc: KycStatus = { ...INITIAL_KYC_STATUS, tier: kycTier };
+  let kyc: KycStatus = kycRejection
+    ? {
+        ...INITIAL_KYC_STATUS,
+        tier: kycTier,
+        state: "rejected",
+        submittedLabel: "Rejected Jul 2, 2026",
+        reviewNote: kycRejection.reason,
+        rejectedStepIndex: kycRejection.stepIndex,
+      }
+    : { ...INITIAL_KYC_STATUS, tier: kycTier };
   let sessionList: readonly DeviceSession[] = MOCK_SESSIONS;
   let idempotencyCounter = 0;
   const referenceCounters: Record<string, number> = {};
@@ -377,11 +372,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
       }
     }
 
-<<<<<<< HEAD
-    if (intent.kind !== "cash-in" && intent.kind !== "request") {
-=======
-    if (intent.kind !== "cash-in" && intent.kind !== "jar-out") {
->>>>>>> feat/gap-07-savings-jar
+    if (intent.kind !== "cash-in" && intent.kind !== "request" && intent.kind !== "jar-out") {
       const available = balances[intent.sourceCardId];
       if (available && compareMoney(quote.total, available) > 0) {
         return failed(
@@ -552,15 +543,10 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
         if (rejection) return rejection;
 
         const reference = nextReference(intent.kind);
-<<<<<<< HEAD
-        const signed = isIncomingIntent(intent) ? intent.amount.amount : -intent.amount.amount;
-=======
-        const signed =
-          intent.kind === "cash-in" || intent.kind === "jar-out" ? intent.amount.amount : -intent.amount.amount;
+        const signed = isIncomingIntent(intent) || intent.kind === "jar-out" ? intent.amount.amount : -intent.amount.amount;
         // For jar-out the money leaves the jar, so the "From" label is the jar,
         // not the card it lands on (intentCardLabel would name the destination).
         const sourceLabel = intent.kind === "jar-out" ? JAR_LABEL : intentCardLabel(intent);
->>>>>>> feat/gap-07-savings-jar
         const receipt: PaymentReceipt = {
           id: `netbank-${reference.toLowerCase()}`,
           glyph: RECEIPT_GLYPH[intent.kind],
@@ -572,8 +558,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
           status: quote.settlesLater ? "pending" : "completed",
           reference,
           description: receiptDescription(intent),
-<<<<<<< HEAD
-          sourceLabel: intentCardLabel(intent),
+          sourceLabel,
           recipient:
             intent.kind === "transfer"
               ? intent.recipient
@@ -582,10 +567,6 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
                 : intent.kind === "request"
                   ? intent.payer
                   : undefined,
-=======
-          sourceLabel,
-          recipient: intent.kind === "transfer" ? intent.recipient : undefined,
->>>>>>> feat/gap-07-savings-jar
           fee: quote.fee,
           rail: quote.rail ?? undefined,
           arrivalLabel: quote.arrivalLabel,
@@ -677,10 +658,10 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
         if (!submission.addressLine.trim() || !submission.city.trim()) {
           return failed("invalid-account", "Add your home address so we can finish verification.");
         }
+        // A resubmission clears the rejection and promotes — the mock simulates
+        // that the corrected capture passed review.
         const promoted = nextKycTier(kyc.tier);
-        kyc = promoted
-          ? { tier: promoted, state: "approved", submittedLabel: "Approved just now" }
-          : { ...kyc, state: "approved" };
+        kyc = { tier: promoted ?? kyc.tier, state: "approved", submittedLabel: "Approved just now" };
         return ok(kyc);
       });
     },

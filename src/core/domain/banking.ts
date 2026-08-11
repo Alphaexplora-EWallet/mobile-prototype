@@ -10,7 +10,6 @@ import type { Money } from "../money/money";
  * the client.
  */
 export type TransactionKind =
-<<<<<<< HEAD
   | "card-payment"
   | "cash-in"
   | "cash-out"
@@ -19,10 +18,9 @@ export type TransactionKind =
   | "bill-payment"
   | "qr-payment"
   | "load-purchase"
-  | "request-in";
-=======
-  "card-payment" | "cash-in" | "transfer-in" | "transfer-out" | "bill-payment" | "qr-payment" | "jar-in" | "jar-out";
->>>>>>> feat/gap-07-savings-jar
+  | "request-in"
+  | "jar-in"
+  | "jar-out";
 
 /**
  * `returned` is a real PESONet outcome and distinct from `failed`: the money

@@ -88,6 +88,11 @@ export const SPEND_CATEGORIES: Readonly<Record<TransactionKind, SpendCategory>> 
   "qr-payment": { id: "qr-payment", label: "QR payments", glyph: "◫" },
   "cash-in": { id: "cash-in", label: "Cash in", glyph: "↙" },
   "transfer-in": { id: "transfer-in", label: "Money in", glyph: "↙" },
+  "cash-out": { id: "cash-out", label: "Withdrawals", glyph: "↗" },
+  "load-purchase": { id: "load-purchase", label: "Load", glyph: "☎" },
+  "request-in": { id: "request-in", label: "Money in", glyph: "↙" },
+  "jar-in": { id: "jar-in", label: "Savings", glyph: "↓" },
+  "jar-out": { id: "jar-out", label: "Savings", glyph: "↑" },
 };
 
 const absolute = (value: Money): Money => money(Math.abs(value.amount), value.currency);
