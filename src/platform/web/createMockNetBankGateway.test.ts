@@ -158,6 +158,21 @@ describe("mock NetBank gateway", () => {
     expect(errorOf(await gateway.directory.verifyAccountName("BDO", "123"))).toBe("invalid-account");
   });
 
+  it("answers a mobile name inquiry, and blocks unregistered or malformed numbers", async () => {
+    const gateway = createMockNetBankGateway();
+
+    // Mira S. and Kuya Lito are the fixtures keyed by an 09-prefixed number.
+    expect(unwrap(await gateway.directory.lookupMobileName("09174562288")).accountName).toBe("MIRA S.");
+    expect(unwrap(await gateway.directory.lookupMobileName("09986541140")).phoneNumber).toBe("09986541140");
+
+    // A well-formed number no FIN-A wallet is registered to is blocked, not guessed.
+    expect(errorOf(await gateway.directory.lookupMobileName("09171234567"))).toBe("not-found");
+
+    // Garbage never reaches the registry.
+    expect(errorOf(await gateway.directory.lookupMobileName("12345"))).toBe("invalid-account");
+    expect(errorOf(await gateway.directory.lookupMobileName("0917ABC2288"))).toBe("invalid-account");
+  });
+
   it("decodes a seeded QR PH code and rejects anything else", async () => {
     const gateway = createMockNetBankGateway();
 

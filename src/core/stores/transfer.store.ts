@@ -18,6 +18,14 @@ export const INITIAL_TRANSFER_DRAFT = {
   destinationName: null as string | null,
   destinationRail: null as TransferRail | null,
   saveDestination: false,
+  /**
+   * The "send to a mobile number" draft — the same transfer, addressed by a
+   * FIN-A wallet's phone number instead of a bank account. Amount and note are
+   * shared with the bank-account draft above.
+   */
+  mobileNumber: "",
+  /** Filled by the mobile name inquiry. Null until the name is confirmed. */
+  mobileName: null as string | null,
 };
 
 type TransferState = typeof INITIAL_TRANSFER_DRAFT & {
@@ -32,6 +40,10 @@ type TransferState = typeof INITIAL_TRANSFER_DRAFT & {
     setDestinationRail(rail: TransferRail): void;
     setSaveDestination(save: boolean): void;
     resetDestination(): void;
+    setMobileNumber(mobileNumber: string): void;
+    /** Changing the number invalidates the verified name — it belonged to the old one. */
+    setMobileName(name: string | null): void;
+    resetMobileDestination(): void;
     reset(): void;
   };
 };
@@ -64,6 +76,12 @@ export const useTransferStore = create<TransferState>()((set, get) => ({
         destinationRail: null,
         saveDestination: false,
       }),
+    setMobileNumber: (mobileNumber) => {
+      if (get().mobileNumber === mobileNumber) return;
+      set({ mobileNumber, mobileName: null });
+    },
+    setMobileName: (mobileName) => set({ mobileName }),
+    resetMobileDestination: () => set({ mobileNumber: "", mobileName: null }),
     reset: () => set(INITIAL_TRANSFER_DRAFT),
   },
 }));

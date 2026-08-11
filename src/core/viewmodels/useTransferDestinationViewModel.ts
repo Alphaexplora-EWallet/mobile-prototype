@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { TransferIntent } from "../domain/paymentIntent";
 import type { Bank, TransferRail } from "../domain/rails";
 import { defaultRailFor, RAIL_INFO } from "../domain/rails";
-import { maskAccountNumber, type Recipient } from "../domain/payments";
+import { initialsOf, maskAccountNumber, type Recipient } from "../domain/payments";
 import { parseMoneyInput } from "../money/format";
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
@@ -146,7 +146,7 @@ export function useRecipientsViewModel() {
 
   return {
     title: "Send to",
-    intro: "Saved FIN-A wallets, or reach any Philippine bank account.",
+    intro: "Saved FIN-A wallets, a Philippine mobile number, or any bank account.",
     items: saved.map((recipient) => ({
       id: recipient.id,
       initials: recipient.initials,
@@ -164,15 +164,11 @@ export function useRecipientsViewModel() {
       transferActions.resetDestination();
       navigation.navigate("transfer-destination");
     },
+    /** Send to any FIN-A wallet keyed by phone — the same draft, a different address. */
+    addMobile: () => {
+      transferActions.resetMobileDestination();
+      navigation.navigate("send-mobile");
+    },
     back: navigation.goBack,
   };
 }
-
-/** "MARIA CLARA S. DELA CRUZ" → "MD". Falls back to one letter for a single word. */
-const initialsOf = (name: string): string => {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return "?";
-  const first = words[0][0];
-  const last = words.length > 1 ? words[words.length - 1][0] : "";
-  return `${first}${last}`.toUpperCase();
-};

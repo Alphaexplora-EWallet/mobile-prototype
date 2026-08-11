@@ -25,6 +25,7 @@ import { ActivityScreen } from "@/ui/screens/ActivityScreen";
 import { TransactionDetailScreen } from "@/ui/screens/TransactionDetailScreen";
 import { RecipientsScreen } from "@/ui/screens/RecipientsScreen";
 import { TransferDestinationScreen } from "@/ui/screens/TransferDestinationScreen";
+import { SendMobileScreen } from "@/ui/screens/SendMobileScreen";
 import { PaymentReviewScreen } from "@/ui/screens/PaymentReviewScreen";
 import { PaymentConfirmScreen } from "@/ui/screens/PaymentConfirmScreen";
 import { PaymentReceiptScreen } from "@/ui/screens/PaymentReceiptScreen";
@@ -66,6 +67,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   transfer: TransferScreen,
   recipients: RecipientsScreen,
   "transfer-destination": TransferDestinationScreen,
+  "send-mobile": SendMobileScreen,
   "payment-review": PaymentReviewScreen,
   "payment-confirm": PaymentConfirmScreen,
   "payment-receipt": PaymentReceiptScreen,

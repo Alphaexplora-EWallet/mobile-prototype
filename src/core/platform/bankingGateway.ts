@@ -61,11 +61,18 @@ export interface DirectoryPort {
    * sender has.
    */
   verifyAccountName(bankCode: BankCode, accountNumber: string): Promise<GatewayResult<AccountNameResult>>;
+  /**
+   * Name inquiry for a mobile-number-keyed FIN-A wallet — the same protection
+   * as the bank account check, for a number instead of an account number.
+   */
+  lookupMobileName(phoneNumber: string): Promise<GatewayResult<MobileNameResult>>;
   billers(): Promise<GatewayResult<readonly Biller[]>>;
   validateBillAccount(billerId: string, accountNumber: string): Promise<GatewayResult<BillAccountResult>>;
 }
 
 export type AccountNameResult = { accountName: string; bankCode: BankCode; accountNumber: string };
+
+export type MobileNameResult = { accountName: string; phoneNumber: string };
 
 export type BillAccountResult = {
   accountName: string;

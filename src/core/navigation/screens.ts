@@ -19,6 +19,7 @@ export type ScreenParams = {
   transfer: undefined;
   recipients: undefined;
   "transfer-destination": undefined;
+  "send-mobile": undefined;
   /**
    * One review → confirm → receipt pipeline serves transfers, cash-in, bills and
    * QR. Naming these `payment-*` rather than `transfer-*` is the point: four

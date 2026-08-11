@@ -36,6 +36,7 @@ import {
   MOCK_TRANSACTION_PIN,
 } from "@/core/data/mock/security.mock";
 import { formatMoney } from "@/core/money/format";
+import { isValidMobileNumber } from "@/core/domain/mobile";
 import { addMoney, compareMoney, type Money, money, pesos, subtractMoney } from "@/core/money/money";
 import { maskMobileNumber } from "@/core/domain/load";
 import type {
@@ -46,6 +47,7 @@ import type {
   BillAccountResult,
   CompliancePort,
   DirectoryPort,
+  MobileNameResult,
   PaymentsPort,
   SecurityPort,
 } from "@/core/platform/bankingGateway";
@@ -60,6 +62,7 @@ export type MockGatewayCall =
   | "activity.dispute"
   | "directory.banks"
   | "directory.verifyAccountName"
+  | "directory.lookupMobileName"
   | "directory.billers"
   | "directory.validateBillAccount"
   | "payments.quote"
@@ -398,6 +401,19 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
         const known = MOCK_RECIPIENTS.find((recipient) => recipient.accountNumber === digits);
         const accountName = known ? known.name.toUpperCase() : INQUIRY_NAMES[digitSum(digits) % INQUIRY_NAMES.length];
         return ok({ accountName, bankCode, accountNumber: digits });
+      });
+    },
+    async lookupMobileName(phoneNumber) {
+      return settle<MobileNameResult>("directory.lookupMobileName", () => {
+        const digits = phoneNumber.replace(/[\s-]/g, "");
+        if (!isValidMobileNumber(digits)) {
+          return failed("invalid-account", "Enter an 11-digit Philippine mobile number starting with 09.");
+        }
+        const known = MOCK_RECIPIENTS.find((recipient) => recipient.accountNumber === digits);
+        if (!known) {
+          return failed("not-found", "No FIN-A wallet is registered to that number yet.");
+        }
+        return ok({ accountName: known.name.toUpperCase(), phoneNumber: digits });
       });
     },
     async billers() {
