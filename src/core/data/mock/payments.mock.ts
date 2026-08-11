@@ -1,3 +1,4 @@
+import type { LoadOperator } from "../../domain/load";
 import type { AutopayEnrollment, Biller, DepositMethod, Recipient, SavedBankAccount } from "../../domain/payments";
 import type { ScheduledPayment, Transaction } from "../../domain/transaction";
 import { type Money, pesos } from "../../money/money";
@@ -50,6 +51,92 @@ export const MOCK_AUTOPAY: readonly AutopayEnrollment[] = [
 ];
 
 export const MOCK_AMOUNT_PRESETS: readonly Money[] = [pesos(500), pesos(1_000), pesos(2_500)];
+
+/** Load denominations are smaller than transfer presets; ₱300 is the sweet spot. */
+export const MOCK_LOAD_PRESETS: readonly Money[] = [pesos(50), pesos(100), pesos(300), pesos(500), pesos(1_000)];
+
+/**
+ * The networks a wallet can buy prepaid load for. Prefixes are representative
+ * slices of the real allocations (Smart/Globe each have dozens), enough for
+ * `validateMobileNumber` to exercise every branch without a real registry.
+ */
+export const MOCK_LOAD_OPERATORS: readonly LoadOperator[] = [
+  {
+    id: "smart",
+    icon: "phone",
+    name: "Smart",
+    detail: "Smart, TNT & Sun numbers",
+    prefixes: [
+      "0900",
+      "0907",
+      "0908",
+      "0909",
+      "0918",
+      "0919",
+      "0920",
+      "0921",
+      "0928",
+      "0929",
+      "0938",
+      "0939",
+      "0946",
+      "0947",
+      "0948",
+      "0949",
+      "0950",
+      "0951",
+      "0963",
+      "0998",
+      "0999",
+    ],
+  },
+  {
+    id: "globe",
+    icon: "phone",
+    name: "Globe",
+    detail: "Globe & TM numbers",
+    prefixes: [
+      "0905",
+      "0906",
+      "0915",
+      "0916",
+      "0917",
+      "0926",
+      "0927",
+      "0935",
+      "0936",
+      "0937",
+      "0945",
+      "0953",
+      "0954",
+      "0955",
+      "0956",
+      "0957",
+      "0958",
+      "0959",
+      "0961",
+      "0962",
+      "0975",
+      "0976",
+      "0977",
+      "0978",
+      "0979",
+      "0994",
+      "0995",
+      "0996",
+      "0997",
+    ],
+  },
+  {
+    id: "dito",
+    icon: "phone",
+    name: "DITO",
+    detail: "DITO numbers",
+    // DITO's legacy 089x prefixes are omitted so "every mobile number starts
+    // with 09" stays true in this prototype.
+    prefixes: ["0991", "0992", "0993"],
+  },
+];
 
 /**
  * The accounts a verified wallet can withdraw to. These were linked and

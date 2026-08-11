@@ -5,6 +5,7 @@ import { useQuestStore } from "../stores/quest.store";
 import { useUiStore } from "../stores/ui.store";
 import { useActivityStore } from "../stores/activity.store";
 import { INITIAL_BILLS, useBillsStore } from "../stores/bills.store";
+import { INITIAL_BUYLOAD_DRAFT, useBuyloadStore } from "../stores/buyload.store";
 import { INITIAL_CASHOUT_DRAFT, useCashOutStore } from "../stores/cashout.store";
 import { INITIAL_DEPOSIT_DRAFT, useDepositStore } from "../stores/deposit.store";
 import { INITIAL_PAYMENT_FLOW, usePaymentStore } from "../stores/payment.store";
@@ -32,6 +33,7 @@ export function resetStores(): void {
   useActivityStore.setState({ selectedTransactionId: null });
   useTransferStore.setState(INITIAL_TRANSFER_DRAFT);
   useBillsStore.setState(INITIAL_BILLS);
+  useBuyloadStore.setState(INITIAL_BUYLOAD_DRAFT);
   useCashOutStore.setState(INITIAL_CASHOUT_DRAFT);
   useDepositStore.setState(INITIAL_DEPOSIT_DRAFT);
   usePaymentStore.setState(INITIAL_PAYMENT_FLOW);

@@ -1,6 +1,8 @@
 import type { QrInstruction } from "./account";
 import type { TransactionKind } from "./banking";
 import type { CardId } from "./card";
+import type { LoadOperator } from "./load";
+import { maskMobileNumber } from "./load";
 import type { Biller, DepositMethod, Recipient } from "./payments";
 import type { TransferRail } from "./rails";
 import { compareMoney, type Money, pesos } from "../money/money";
@@ -69,7 +71,22 @@ export type CashOutIntent = {
   amount: Money;
 };
 
-export type PaymentIntent = TransferIntent | CashInIntent | BillIntent | QrIntent | CashOutIntent;
+/**
+ * Buying prepaid load: a top-up is a bill whose "account" is a mobile number.
+ * The number is validated locally against the operator's prefixes (no biller
+ * inquiry round-trip) and is only ever displayed masked.
+ */
+export type LoadIntent = {
+  kind: "buyload";
+  sourceCardId: CardId;
+  sourceLabel: string;
+  operator: LoadOperator;
+  /** Normalized 11-digit number, e.g. "09174562288". Rendered masked only. */
+  phoneNumber: string;
+  amount: Money;
+};
+
+export type PaymentIntent = TransferIntent | CashInIntent | BillIntent | QrIntent | CashOutIntent | LoadIntent;
 
 export type PaymentIntentKind = PaymentIntent["kind"];
 
@@ -86,6 +103,8 @@ export const intentTransactionKind = (intent: PaymentIntent): TransactionKind =>
       return "qr-payment";
     case "cash-out":
       return "cash-out";
+    case "buyload":
+      return "load-purchase";
   }
 };
 
@@ -112,6 +131,8 @@ export const intentCounterparty = (intent: PaymentIntent): string => {
       return intent.instruction.merchantName;
     case "cash-out":
       return intent.account.name;
+    case "buyload":
+      return intent.operator.name;
   }
 };
 
@@ -131,6 +152,8 @@ export const intentCounterpartyDetail = (intent: PaymentIntent): string => {
       return intent.instruction.merchantCity;
     case "cash-out":
       return intent.account.handle;
+    case "buyload":
+      return maskMobileNumber(intent.phoneNumber);
   }
 };
 
@@ -162,5 +185,7 @@ export const requiresStepUp = (intent: PaymentIntent): boolean => {
   // A withdrawal is irreversible the moment the rail accepts it, like any
   // transfer off the FIN-A ledger, so it always steps up.
   if (intent.kind === "cash-out") return true;
+  // Bills, merchant QR and load have a counterparty who can be chased, so
+  // they step up only once the amount is large.
   return compareMoney(intent.amount, STEP_UP_THRESHOLD) >= 0;
 };

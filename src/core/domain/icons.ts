@@ -22,6 +22,7 @@ export type IconName =
   | "lock"
   | "mail"
   | "more"
+  | "phone"
   | "plus"
   | "qr"
   | "receipt"

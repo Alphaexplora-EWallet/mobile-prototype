@@ -94,6 +94,11 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
       <circle cx="12" cy="19" r="1" fill="currentColor" stroke="none" />
     </>
   ),
+  phone: (
+    <>
+      <path d="M5 3h4l2 5-2.5 1.5a12 12 0 006 6L16 13l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 012-2z" />
+    </>
+  ),
   plus: (
     <>
       <circle cx="12" cy="12" r="9" />

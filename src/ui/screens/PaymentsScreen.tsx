@@ -42,6 +42,21 @@ export function PaymentsScreen() {
       </section>
 
       <section className="money-field">
+        <span className="field-label">Buy load</span>
+        <div className="control-list">
+          {vm.loadOperators.map((operator) => (
+            <LinkRow
+              key={operator.id}
+              icon={operator.icon}
+              title={operator.name}
+              detail={operator.detail}
+              onClick={() => vm.buyLoad(operator.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="money-field">
         <span className="field-label">Pay a bill</span>
         <div className="control-list">
           {vm.billers.map((biller) => (

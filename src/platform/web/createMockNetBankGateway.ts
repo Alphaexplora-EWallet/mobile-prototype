@@ -36,6 +36,7 @@ import {
 } from "@/core/data/mock/security.mock";
 import { formatMoney } from "@/core/money/format";
 import { addMoney, compareMoney, type Money, money, pesos, subtractMoney } from "@/core/money/money";
+import { maskMobileNumber } from "@/core/domain/load";
 import type {
   AccountNameResult,
   AccountsPort,
@@ -133,6 +134,7 @@ const REFERENCE_PREFIX: Readonly<Record<PaymentIntent["kind"], string>> = {
   "cash-out": "NBK-WDR",
   bill: "NBK-BIL",
   qr: "NBK-QRP",
+  buyload: "NBK-LOD",
 };
 
 const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
@@ -141,6 +143,7 @@ const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
   "cash-out": "↗",
   bill: "⚡",
   qr: "◫",
+  buyload: "☎",
 };
 
 const seedActivity = (): BankingTransaction[] =>
@@ -169,6 +172,7 @@ const nonRailFee = (intent: PaymentIntent): Money => (intent.kind === "cash-in" 
 const nonRailArrivalLabel = (intent: PaymentIntent): string => {
   if (intent.kind === "cash-in") return intent.method.arrivalLabel;
   if (intent.kind === "bill") return "Posted to the biller within one banking day";
+  if (intent.kind === "buyload") return "Credited to the number instantly";
   return "Paid instantly";
 };
 
@@ -184,6 +188,8 @@ const receiptName = (intent: PaymentIntent): string => {
       return `Paid ${intent.instruction.merchantName}`;
     case "cash-out":
       return `Withdrawn to ${intent.account.name}`;
+    case "buyload":
+      return `Bought ${intent.operator.name} load`;
   }
 };
 
@@ -199,6 +205,9 @@ const receiptDescription = (intent: PaymentIntent): string => {
       return `Cash in through ${intent.method.title}.`;
     case "cash-out":
       return `Cash-out of ${formatMoney(intent.amount)} to ${intent.account.name} (${intent.account.handle}).`;
+    case "buyload":
+      // The number is masked even inside the receipt copy; it never renders raw.
+      return `${intent.operator.name} load for ${maskMobileNumber(intent.phoneNumber)}.`;
   }
 };
 
