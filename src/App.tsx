@@ -30,6 +30,7 @@ import { PaymentConfirmScreen } from "@/ui/screens/PaymentConfirmScreen";
 import { PaymentReceiptScreen } from "@/ui/screens/PaymentReceiptScreen";
 import { PaymentStatusScreen } from "@/ui/screens/PaymentStatusScreen";
 import { FundWalletScreen } from "@/ui/screens/FundWalletScreen";
+import { JarMoveScreen } from "@/ui/screens/JarMoveScreen";
 import { QrScanScreen } from "@/ui/screens/QrScanScreen";
 import { QrReceiveScreen } from "@/ui/screens/QrReceiveScreen";
 import { BillEntryScreen } from "@/ui/screens/BillEntryScreen";
@@ -69,6 +70,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   "payment-status": PaymentStatusScreen,
   deposit: DepositScreen,
   "fund-wallet": FundWalletScreen,
+  "jar-move": JarMoveScreen,
   "qr-scan": QrScanScreen,
   "qr-receive": QrReceiveScreen,
   "bill-entry": BillEntryScreen,

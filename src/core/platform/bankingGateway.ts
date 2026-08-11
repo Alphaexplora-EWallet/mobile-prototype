@@ -73,6 +73,16 @@ export type BillAccountResult = {
   amountDue?: Money;
 };
 
+/**
+ * The savings jar as the bank sees it: a separate balance that never counts
+ * toward the main wallet balance or the spending limit. The jar does not exist
+ * until `payments.openJar` creates it.
+ */
+export type JarState = {
+  opened: boolean;
+  balance: Money;
+};
+
 export interface PaymentsPort {
   /** What this intent will cost and when it will land. No side effects. */
   quote(intent: PaymentIntent): Promise<GatewayResult<PaymentQuote>>;
@@ -88,6 +98,10 @@ export interface PaymentsPort {
   ): Promise<GatewayResult<PaymentReceipt>>;
   /** Poll a pending transaction until it clears, fails, or is returned. */
   status(id: string): Promise<GatewayResult<BankingTransaction>>;
+  /** Opens the savings jar; a no-op when it is already open. */
+  openJar(): Promise<GatewayResult<JarState>>;
+  /** The jar's current state — the bank's answer, not the store's cache. */
+  jarState(): Promise<GatewayResult<JarState>>;
   createInboundQr(request: InboundQrRequest): Promise<GatewayResult<QrPayload>>;
   decodeQr(payload: string): Promise<GatewayResult<QrInstruction>>;
 }

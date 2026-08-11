@@ -6,8 +6,8 @@ export type ActivityFilter = "all" | "in" | "out" | "bills";
 
 export const ACTIVITY_FILTER_KINDS: Readonly<Record<ActivityFilter, readonly TransactionKind[] | undefined>> = {
   all: undefined,
-  in: ["cash-in", "transfer-in"],
-  out: ["transfer-out", "card-payment"],
+  in: ["cash-in", "transfer-in", "jar-out"],
+  out: ["transfer-out", "card-payment", "jar-in"],
   bills: ["bill-payment", "qr-payment"],
 };
 

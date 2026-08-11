@@ -53,9 +53,32 @@ export type QrIntent = {
   note: string;
 };
 
-export type PaymentIntent = TransferIntent | CashInIntent | BillIntent | QrIntent;
+/**
+ * Moves into the savings jar: money leaves a wallet card and lands in the jar's
+ * own balance, which is deliberately separate from the main balance and the
+ * spending limit.
+ */
+export type JarInIntent = {
+  kind: "jar-in";
+  sourceCardId: CardId;
+  sourceLabel: string;
+  amount: Money;
+};
+
+/** Moves out of the savings jar: money returns from the jar to a wallet card. */
+export type JarOutIntent = {
+  kind: "jar-out";
+  destinationCardId: CardId;
+  destinationLabel: string;
+  amount: Money;
+};
+
+export type PaymentIntent = TransferIntent | CashInIntent | BillIntent | QrIntent | JarInIntent | JarOutIntent;
 
 export type PaymentIntentKind = PaymentIntent["kind"];
+
+/** The label the jar presents as on review rows and receipts. */
+export const JAR_LABEL = "Savings jar";
 
 /** The transaction this intent becomes once the rail accepts it. */
 export const intentTransactionKind = (intent: PaymentIntent): TransactionKind => {
@@ -68,18 +91,30 @@ export const intentTransactionKind = (intent: PaymentIntent): TransactionKind =>
       return "bill-payment";
     case "qr":
       return "qr-payment";
+    case "jar-in":
+      return "jar-in";
+    case "jar-out":
+      return "jar-out";
   }
 };
 
 /** Which card the money moves through, whichever direction it is going. */
-export const intentCardId = (intent: PaymentIntent): CardId =>
-  intent.kind === "cash-in" ? intent.destinationCardId : intent.sourceCardId;
+export const intentCardId = (intent: PaymentIntent): CardId => {
+  if (intent.kind === "cash-in" || intent.kind === "jar-out") return intent.destinationCardId;
+  return intent.sourceCardId;
+};
 
-export const intentCardLabel = (intent: PaymentIntent): string =>
-  intent.kind === "cash-in" ? intent.destinationLabel : intent.sourceLabel;
+export const intentCardLabel = (intent: PaymentIntent): string => {
+  if (intent.kind === "cash-in" || intent.kind === "jar-out") return intent.destinationLabel;
+  return intent.sourceLabel;
+};
 
-/** True when this intent adds to the balance rather than drawing it down. */
-export const isIncomingIntent = (intent: PaymentIntent): boolean => intent.kind === "cash-in";
+/**
+ * True when this intent adds to the wallet-card balance rather than drawing it
+ * down. Money coming back out of the jar lands on the card, so it is incoming.
+ */
+export const isIncomingIntent = (intent: PaymentIntent): boolean =>
+  intent.kind === "cash-in" || intent.kind === "jar-out";
 
 /** Who or what is on the other side, for receipt and activity copy. */
 export const intentCounterparty = (intent: PaymentIntent): string => {
@@ -92,6 +127,9 @@ export const intentCounterparty = (intent: PaymentIntent): string => {
       return intent.biller.name;
     case "qr":
       return intent.instruction.merchantName;
+    case "jar-in":
+    case "jar-out":
+      return JAR_LABEL;
   }
 };
 
@@ -109,6 +147,10 @@ export const intentCounterpartyDetail = (intent: PaymentIntent): string => {
       return `Account ${intent.accountNumber}`;
     case "qr":
       return intent.instruction.merchantCity;
+    case "jar-in":
+      return "Set aside for a goal";
+    case "jar-out":
+      return "Back to your wallet";
   }
 };
 
@@ -136,6 +178,7 @@ export const STEP_UP_THRESHOLD = pesos(10_000);
  */
 export const requiresStepUp = (intent: PaymentIntent): boolean => {
   if (intent.kind === "cash-in") return false;
+  if (intent.kind === "jar-in" || intent.kind === "jar-out") return false;
   if (intent.kind === "transfer") return intent.rail !== "internal";
   return compareMoney(intent.amount, STEP_UP_THRESHOLD) >= 0;
 };

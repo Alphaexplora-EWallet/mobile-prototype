@@ -16,6 +16,7 @@ import {
   intentCardLabel,
   intentRail,
   intentTransactionKind,
+  JAR_LABEL,
   type PaymentIntent,
   requiresStepUp,
 } from "@/core/domain/paymentIntent";
@@ -44,6 +45,7 @@ import type {
   BillAccountResult,
   CompliancePort,
   DirectoryPort,
+  JarState,
   PaymentsPort,
   SecurityPort,
 } from "@/core/platform/bankingGateway";
@@ -63,6 +65,8 @@ export type MockGatewayCall =
   | "payments.quote"
   | "payments.submit"
   | "payments.status"
+  | "payments.openJar"
+  | "payments.jarState"
   | "payments.createInboundQr"
   | "payments.decodeQr"
   | "compliance.kycStatus"
@@ -132,6 +136,8 @@ const REFERENCE_PREFIX: Readonly<Record<PaymentIntent["kind"], string>> = {
   "cash-in": "NBK-CSH",
   bill: "NBK-BIL",
   qr: "NBK-QRP",
+  "jar-in": "NBK-JIN",
+  "jar-out": "NBK-JOT",
 };
 
 const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
@@ -139,6 +145,8 @@ const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
   "cash-in": "↙",
   bill: "⚡",
   qr: "◫",
+  "jar-in": "↓",
+  "jar-out": "↑",
 };
 
 const seedActivity = (): BankingTransaction[] =>
@@ -167,6 +175,7 @@ const nonRailFee = (intent: PaymentIntent): Money => (intent.kind === "cash-in" 
 const nonRailArrivalLabel = (intent: PaymentIntent): string => {
   if (intent.kind === "cash-in") return intent.method.arrivalLabel;
   if (intent.kind === "bill") return "Posted to the biller within one banking day";
+  if (intent.kind === "jar-in" || intent.kind === "jar-out") return "Moved instantly";
   return "Paid instantly";
 };
 
@@ -180,6 +189,9 @@ const receiptName = (intent: PaymentIntent): string => {
       return `Paid ${intent.biller.name}`;
     case "qr":
       return `Paid ${intent.instruction.merchantName}`;
+    case "jar-in":
+    case "jar-out":
+      return JAR_LABEL;
   }
 };
 
@@ -193,6 +205,10 @@ const receiptDescription = (intent: PaymentIntent): string => {
       return `${intent.biller.name} account ${intent.accountNumber}.`;
     case "cash-in":
       return `Cash in through ${intent.method.title}.`;
+    case "jar-in":
+      return `Moved into the ${JAR_LABEL}.`;
+    case "jar-out":
+      return `Moved out of the ${JAR_LABEL}.`;
   }
 };
 
@@ -209,6 +225,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
 
   let activityLog = seedActivity();
   let balances = seedBalances();
+  let jarState: JarState = { opened: false, balance: pesos(0) };
   let kyc: KycStatus = { ...INITIAL_KYC_STATUS, tier: kycTier };
   let sessionList: readonly DeviceSession[] = MOCK_SESSIONS;
   let idempotencyCounter = 0;
@@ -255,6 +272,18 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
   const rejectIntent = (intent: PaymentIntent, quote: PaymentQuote): GatewayResult<never> | null => {
     if (intent.amount.amount <= 0) return failed("invalid-account", "Enter an amount greater than zero.");
 
+    if (intent.kind === "jar-in" || intent.kind === "jar-out") {
+      if (!jarState.opened) {
+        return failed("not-found", `Open a ${JAR_LABEL} before moving money into it.`);
+      }
+      if (intent.kind === "jar-out" && compareMoney(intent.amount, jarState.balance) > 0) {
+        return failed(
+          "insufficient-funds",
+          `That is ${formatMoney(subtractMoney(intent.amount, jarState.balance))} more than your jar holds.`,
+        );
+      }
+    }
+
     const rail = intentRail(intent);
     if (rail && rail !== "internal") {
       const limit = limitsForTier(kyc.tier).rails.find((entry) => entry.rail === rail);
@@ -278,7 +307,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
       }
     }
 
-    if (intent.kind !== "cash-in") {
+    if (intent.kind !== "cash-in" && intent.kind !== "jar-out") {
       const available = balances[intent.sourceCardId];
       if (available && compareMoney(quote.total, available) > 0) {
         return failed(
@@ -292,6 +321,24 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
   };
 
   const applyToBalance = (intent: PaymentIntent, quote: PaymentQuote) => {
+    if (intent.kind === "jar-in" || intent.kind === "jar-out") {
+      // A jar move touches two balances: the wallet card and the jar itself.
+      const cardId = intentCardId(intent);
+      const current = balances[cardId];
+      if (!current) return;
+      if (intent.kind === "jar-in") {
+        // The card pays quote.total while the jar receives intent.amount. Those
+        // only match because jar moves are free by design (nonRailFee → pesos(0),
+        // no rail). If a jar fee is ever introduced, this branch would destroy
+        // centavos — keep jar fees at zero.
+        balances = { ...balances, [cardId]: subtractMoney(current, quote.total) };
+        jarState = { ...jarState, balance: addMoney(jarState.balance, intent.amount) };
+      } else {
+        balances = { ...balances, [cardId]: addMoney(current, intent.amount) };
+        jarState = { ...jarState, balance: subtractMoney(jarState.balance, intent.amount) };
+      }
+      return;
+    }
     const cardId = intentCardId(intent);
     const current = balances[cardId];
     if (!current) return;
@@ -418,7 +465,11 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
         if (rejection) return rejection;
 
         const reference = nextReference(intent.kind);
-        const signed = intent.kind === "cash-in" ? intent.amount.amount : -intent.amount.amount;
+        const signed =
+          intent.kind === "cash-in" || intent.kind === "jar-out" ? intent.amount.amount : -intent.amount.amount;
+        // For jar-out the money leaves the jar, so the "From" label is the jar,
+        // not the card it lands on (intentCardLabel would name the destination).
+        const sourceLabel = intent.kind === "jar-out" ? JAR_LABEL : intentCardLabel(intent);
         const receipt: PaymentReceipt = {
           id: `netbank-${reference.toLowerCase()}`,
           glyph: RECEIPT_GLYPH[intent.kind],
@@ -429,7 +480,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
           status: quote.settlesLater ? "pending" : "completed",
           reference,
           description: receiptDescription(intent),
-          sourceLabel: intentCardLabel(intent),
+          sourceLabel,
           recipient: intent.kind === "transfer" ? intent.recipient : undefined,
           fee: quote.fee,
           rail: quote.rail ?? undefined,
@@ -474,6 +525,15 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
         activityLog = activityLog.map((transaction) => (transaction.id === id ? cleared : transaction));
         return ok(cleared);
       });
+    },
+    async openJar() {
+      return settle<JarState>("payments.openJar", () => {
+        if (!jarState.opened) jarState = { opened: true, balance: pesos(0) };
+        return ok(jarState);
+      });
+    },
+    async jarState() {
+      return settle<JarState>("payments.jarState", () => ok(jarState));
     },
     async createInboundQr(request: InboundQrRequest) {
       return settle<QrPayload>("payments.createInboundQr", () => {
