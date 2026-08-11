@@ -16,6 +16,7 @@ import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
 import { activityActions } from "../stores/activity.store";
 import { paymentActions, usePaymentStore } from "../stores/payment.store";
+import { requestsActions } from "../stores/requests.store";
 import { transferActions } from "../stores/transfer.store";
 import { uiActions } from "../stores/ui.store";
 
@@ -59,6 +60,14 @@ const COPY = {
     action: "Confirm and pay",
     submitting: "Paying securely…",
   },
+  request: {
+    reviewTitle: "Review request",
+    reviewLead: "You’re receiving",
+    receiptTitle: "Money received",
+    pendingTitle: "Money on its way",
+    action: "Confirm and receive",
+    submitting: "Receiving securely…",
+  },
 } as const;
 
 /**
@@ -87,6 +96,9 @@ function usePaymentSubmit() {
     }
 
     paymentActions.setReceipt(result.value);
+    // The request only becomes "accepted" when its payment actually submits —
+    // walking away from review must leave it pending, because no money moved.
+    if (intent.kind === "request") requestsActions.markAccepted(intent.requestId);
     await syncBalances(gateway);
     setIsSubmitting(false);
     navigation.navigate("payment-receipt");
@@ -128,7 +140,10 @@ export function usePaymentReviewViewModel() {
   const note = intent ? intentNote(intent) : "";
   const rows = intent
     ? [
-        { label: intent.kind === "cash-in" ? "To" : "From", value: intentCardLabel(intent) },
+        {
+          label: intent.kind === "cash-in" || intent.kind === "request" ? "To" : "From",
+          value: intentCardLabel(intent),
+        },
         ...(quote?.rail ? [{ label: "Rail", value: railName(quote.rail) }] : []),
         { label: "Arrival", value: quote?.arrivalLabel ?? "Checking…" },
         { label: "Fee", value: formatMoney(quote?.fee ?? pesos(0)) },
@@ -146,6 +161,8 @@ export function usePaymentReviewViewModel() {
     amountLabel: intent ? formatMoney(intent.amount) : "",
     counterparty: intent ? intentCounterparty(intent) : "",
     counterpartyDetail: intent ? intentCounterpartyDetail(intent) : "",
+    /** One text node on purpose: tests match "to Smart" / "from Jomar D." whole. */
+    counterpartyLine: intent ? `${intent.kind === "request" ? "from" : "to"} ${intentCounterparty(intent)}` : "",
     rows,
     cutoffLabel: quote?.cutoffLabel ?? null,
     limitLabel: quote?.limitLabel ?? null,
@@ -335,6 +352,8 @@ const receiptKind = (receipt: PaymentReceipt): keyof typeof COPY => {
       return "bill";
     case "qr-payment":
       return "qr";
+    case "request-in":
+      return "request";
     default:
       return "transfer";
   }

@@ -53,7 +53,26 @@ export type QrIntent = {
   note: string;
 };
 
-export type PaymentIntent = TransferIntent | CashInIntent | BillIntent | QrIntent;
+/**
+ * An accepted money request, executed as the payer's payment. Incoming like a
+ * cash-in (the money arrives to the requester's card), but with a named
+ * counterparty — the saved recipient who accepted — instead of a deposit
+ * method. `requestId` lets the flow mark the request accepted only once the
+ * payment actually submits, so the balance moves only on acceptance.
+ */
+export type RequestIntent = {
+  kind: "request";
+  /** The `MoneyRequest.id` this payment settles. */
+  requestId: string;
+  destinationCardId: CardId;
+  destinationLabel: string;
+  /** The saved recipient who accepted and is paying. */
+  payer: Recipient;
+  amount: Money;
+  note: string;
+};
+
+export type PaymentIntent = TransferIntent | CashInIntent | BillIntent | QrIntent | RequestIntent;
 
 export type PaymentIntentKind = PaymentIntent["kind"];
 
@@ -68,18 +87,21 @@ export const intentTransactionKind = (intent: PaymentIntent): TransactionKind =>
       return "bill-payment";
     case "qr":
       return "qr-payment";
+    case "request":
+      return "request-in";
   }
 };
 
 /** Which card the money moves through, whichever direction it is going. */
 export const intentCardId = (intent: PaymentIntent): CardId =>
-  intent.kind === "cash-in" ? intent.destinationCardId : intent.sourceCardId;
+  intent.kind === "cash-in" || intent.kind === "request" ? intent.destinationCardId : intent.sourceCardId;
 
 export const intentCardLabel = (intent: PaymentIntent): string =>
-  intent.kind === "cash-in" ? intent.destinationLabel : intent.sourceLabel;
+  intent.kind === "cash-in" || intent.kind === "request" ? intent.destinationLabel : intent.sourceLabel;
 
 /** True when this intent adds to the balance rather than drawing it down. */
-export const isIncomingIntent = (intent: PaymentIntent): boolean => intent.kind === "cash-in";
+export const isIncomingIntent = (intent: PaymentIntent): boolean =>
+  intent.kind === "cash-in" || intent.kind === "request";
 
 /** Who or what is on the other side, for receipt and activity copy. */
 export const intentCounterparty = (intent: PaymentIntent): string => {
@@ -92,6 +114,8 @@ export const intentCounterparty = (intent: PaymentIntent): string => {
       return intent.biller.name;
     case "qr":
       return intent.instruction.merchantName;
+    case "request":
+      return intent.payer.name;
   }
 };
 
@@ -109,12 +133,14 @@ export const intentCounterpartyDetail = (intent: PaymentIntent): string => {
       return `Account ${intent.accountNumber}`;
     case "qr":
       return intent.instruction.merchantCity;
+    case "request":
+      return intent.payer.handle;
   }
 };
 
 /** Only two kinds carry a user-written note; the others have nothing to show. */
 export const intentNote = (intent: PaymentIntent): string =>
-  intent.kind === "transfer" || intent.kind === "qr" ? intent.note.trim() : "";
+  intent.kind === "transfer" || intent.kind === "qr" || intent.kind === "request" ? intent.note.trim() : "";
 
 /** Above this, any outgoing payment asks for a PIN or an OTP. */
 export const STEP_UP_THRESHOLD = pesos(10_000);
@@ -127,6 +153,7 @@ export const STEP_UP_THRESHOLD = pesos(10_000);
  * reversibility.
  *
  * - Cash-in adds money. Nothing to protect.
+ * - An accepted request adds money too, so it never steps up either.
  * - An internal move stays on the FIN-A ledger and can be unwound by support,
  *   so it never steps up — which is also the behaviour the app already had.
  * - A transfer to another bank is irreversible the moment the rail accepts it,
@@ -135,7 +162,7 @@ export const STEP_UP_THRESHOLD = pesos(10_000);
  *   only once the amount is large.
  */
 export const requiresStepUp = (intent: PaymentIntent): boolean => {
-  if (intent.kind === "cash-in") return false;
+  if (intent.kind === "cash-in" || intent.kind === "request") return false;
   if (intent.kind === "transfer") return intent.rail !== "internal";
   return compareMoney(intent.amount, STEP_UP_THRESHOLD) >= 0;
 };

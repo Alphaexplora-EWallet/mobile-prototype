@@ -34,6 +34,7 @@ export type ScreenParams = {
   "qr-receive": undefined;
   "bill-entry": undefined;
   "autopay-detail": undefined;
+  "request-entry": undefined;
   payments: undefined;
   activity: undefined;
   "transaction-detail": undefined;

@@ -9,6 +9,7 @@ import { INITIAL_DEPOSIT_DRAFT, useDepositStore } from "../stores/deposit.store"
 import { INITIAL_PAYMENT_FLOW, usePaymentStore } from "../stores/payment.store";
 import { INITIAL_KYC, useKycStore } from "../stores/kyc.store";
 import { INITIAL_QR, useQrStore } from "../stores/qr.store";
+import { INITIAL_REQUESTS, useRequestsStore } from "../stores/requests.store";
 import { INITIAL_SETTINGS, useSettingsStore } from "../stores/settings.store";
 import { INITIAL_RECIPIENTS, useRecipientsStore } from "../stores/recipients.store";
 import { INITIAL_TRANSFER_DRAFT, useTransferStore } from "../stores/transfer.store";
@@ -33,6 +34,7 @@ export function resetStores(): void {
   useBillsStore.setState(INITIAL_BILLS);
   useDepositStore.setState(INITIAL_DEPOSIT_DRAFT);
   usePaymentStore.setState(INITIAL_PAYMENT_FLOW);
+  useRequestsStore.setState(INITIAL_REQUESTS);
   useQrStore.setState(INITIAL_QR);
   useKycStore.setState(INITIAL_KYC);
   useSettingsStore.setState(INITIAL_SETTINGS);

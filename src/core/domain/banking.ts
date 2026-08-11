@@ -10,7 +10,7 @@ import type { Money } from "../money/money";
  * the client.
  */
 export type TransactionKind =
-  "card-payment" | "cash-in" | "transfer-in" | "transfer-out" | "bill-payment" | "qr-payment";
+  "card-payment" | "cash-in" | "transfer-in" | "transfer-out" | "bill-payment" | "qr-payment" | "request-in";
 
 /**
  * `returned` is a real PESONet outcome and distinct from `failed`: the money
