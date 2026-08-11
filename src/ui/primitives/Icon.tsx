@@ -44,6 +44,7 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
       <path d="M12 3a9 9 0 000 18V3z" fill="currentColor" stroke="none" />
     </>
   ),
+  droplet: <path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z" />,
   eye: (
     <>
       <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" />
@@ -75,6 +76,15 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
       <path d="M12 15l4-4M7 19h10" />
     </>
   ),
+  landmark: (
+    <>
+      <path d="M3 21h18" />
+      <path d="M5 21V11l7-6 7 6v10" />
+      <path d="M9 21v-5h6v5" />
+      <circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none" />
+    </>
+  ),
   lock: (
     <>
       <rect x="4" y="10" width="16" height="11" rx="2" />
@@ -93,6 +103,9 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
       <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
       <circle cx="12" cy="19" r="1" fill="currentColor" stroke="none" />
     </>
+  ),
+  phone: (
+    <path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8 10a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z" />
   ),
   plus: (
     <>
@@ -121,6 +134,12 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
       <path d="M6.1 8A7 7 0 0118.5 6.5L20 12M4 12l1.5 5.5A7 7 0 0017.9 16" />
     </>
   ),
+  search: (
+    <>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.3-4.3" />
+    </>
+  ),
   send: (
     <>
       <path d="M22 2L9.5 14.5M22 2l-7 20-4.5-7.5L3 10l19-8z" />
@@ -132,6 +151,9 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
     </>
   ),
   star: <path d="M12 2l3 6 6.5 1-4.7 4.6 1.1 6.4-5.9-3.1L6.1 20l1.1-6.4L2.5 9 9 8l3-6z" />,
+  "star-filled": (
+    <path d="M12 2l3 6 6.5 1-4.7 4.6 1.1 6.4-5.9-3.1L6.1 20l1.1-6.4L2.5 9 9 8l3-6z" fill="currentColor" stroke="none" />
+  ),
   target: (
     <>
       <circle cx="12" cy="12" r="8" />

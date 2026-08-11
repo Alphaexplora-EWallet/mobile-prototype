@@ -4,6 +4,7 @@ import { usePreferencesStore } from "../stores/preferences.store";
 import { useQuestStore } from "../stores/quest.store";
 import { useUiStore } from "../stores/ui.store";
 import { useActivityStore } from "../stores/activity.store";
+import { INITIAL_BILLER_CATALOG, useBillerCatalogStore } from "../stores/billerCatalog.store";
 import { INITIAL_BILLS, useBillsStore } from "../stores/bills.store";
 import { INITIAL_DEPOSIT_DRAFT, useDepositStore } from "../stores/deposit.store";
 import { INITIAL_PAYMENT_FLOW, usePaymentStore } from "../stores/payment.store";
@@ -30,6 +31,7 @@ export function resetStores(): void {
   useUiStore.setState({ sheet: null });
   useActivityStore.setState({ selectedTransactionId: null });
   useTransferStore.setState(INITIAL_TRANSFER_DRAFT);
+  useBillerCatalogStore.setState(INITIAL_BILLER_CATALOG);
   useBillsStore.setState(INITIAL_BILLS);
   useDepositStore.setState(INITIAL_DEPOSIT_DRAFT);
   usePaymentStore.setState(INITIAL_PAYMENT_FLOW);

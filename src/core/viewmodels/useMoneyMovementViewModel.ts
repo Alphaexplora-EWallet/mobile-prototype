@@ -1,5 +1,6 @@
 import type { CardId } from "../domain/card";
-import type { Biller, DepositMethod, Recipient } from "../domain/payments";
+import type { Biller, BillerCategory, DepositMethod, Recipient } from "../domain/payments";
+import { BILLER_CATEGORY_LABELS, BILLER_CATEGORY_ORDER, searchBillers } from "../domain/payments";
 import { MOCK_AMOUNT_PRESETS, MOCK_BILLERS, MOCK_DEPOSIT_METHODS } from "../data/mock/payments.mock";
 import { findBank } from "../data/mock/banks.mock";
 import { defaultRailFor } from "../domain/rails";
@@ -7,6 +8,7 @@ import { SIMULATED_NOTE } from "../domain/simulation";
 import { formatMoney, parseMoneyInput } from "../money/format";
 import { isZero } from "../money/money";
 import { billsActions, useBillsStore } from "../stores/bills.store";
+import { billerCatalogActions, useBillerCatalogStore } from "../stores/billerCatalog.store";
 import { depositActions, useDepositStore } from "../stores/deposit.store";
 import type { Screen } from "../navigation/screens";
 import { useNavigation } from "../navigation/useNavigation";
@@ -190,22 +192,62 @@ export function useDepositViewModel(): DepositViewModel {
 
 export type PaymentsViewModel = MoneyBase & {
   scheduledLabels: readonly { id: string; glyph: string; name: string; when: string; amountLabel: string }[];
-  billers: readonly Biller[];
+  /** Search box state, backed by the session store so it survives tab switches. */
+  searchQuery: string;
+  setSearchQuery(value: string): void;
+  /** Search-filtered catalog, grouped by category in `BILLER_CATEGORY_ORDER`. */
+  catalog: readonly BillerGroup[];
+  /** Favorited billers, for the pinned section above the grouped catalog. */
+  favorites: readonly BillerRowVM[];
+  /** True when favorites should render as their own section (none hidden by a search). */
+  showFavorites: boolean;
+  /** True when the search matched nothing, so the screen can show an empty state. */
+  emptySearch: boolean;
+  toggleFavorite(id: string): void;
   scanToPay(): void;
   showMyQr(): void;
   payBill(billerId: string): void;
   openAutopay(id: string): void;
 };
 
+/** A catalog row with its favorite state resolved, so the view renders, not derives. */
+export type BillerRowVM = Biller & { favorited: boolean };
+
+export type BillerGroup = {
+  category: BillerCategory;
+  label: string;
+  billers: readonly BillerRowVM[];
+};
+
+const withFavoriteState = (billers: readonly Biller[], favoriteBillerIds: readonly string[]): readonly BillerRowVM[] =>
+  billers.map((biller) => ({ ...biller, favorited: favoriteBillerIds.includes(biller.id) }));
+
 export function usePaymentsViewModel(): PaymentsViewModel {
   const navigation = useNavigation();
   const enrollments = useBillsStore((state) => state.enrollments);
+  const searchQuery = useBillerCatalogStore((state) => state.searchQuery);
+  const favoriteBillerIds = useBillerCatalogStore((state) => state.favoriteBillerIds);
+
+  const matched = searchBillers(MOCK_BILLERS, searchQuery);
+  const favorites = withFavoriteState(MOCK_BILLERS, favoriteBillerIds).filter((biller) => biller.favorited);
 
   return {
     ...useMoneyBase(),
     scanToPay: () => navigation.navigate("qr-scan"),
     showMyQr: () => navigation.navigate("qr-receive"),
-    billers: MOCK_BILLERS,
+    searchQuery,
+    setSearchQuery: billerCatalogActions.setSearchQuery,
+    catalog: BILLER_CATEGORY_ORDER.flatMap((category) => {
+      const billers = withFavoriteState(
+        matched.filter((biller) => biller.category === category),
+        favoriteBillerIds,
+      );
+      return billers.length === 0 ? [] : [{ category, label: BILLER_CATEGORY_LABELS[category], billers }];
+    }),
+    favorites,
+    showFavorites: favorites.length > 0 && searchQuery.trim() === "",
+    emptySearch: searchQuery.trim() !== "" && matched.length === 0,
+    toggleFavorite: billerCatalogActions.toggleFavorite,
     /**
      * From the store, so a paused schedule stays paused. Every enrollment starts
      * active, so these read exactly as the fixture-backed rows did.
