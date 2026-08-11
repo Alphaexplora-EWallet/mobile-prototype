@@ -43,6 +43,7 @@ import { AutopayDetailScreen } from "@/ui/screens/AutopayDetailScreen";
 import { LoadEntryScreen } from "@/ui/screens/LoadEntryScreen";
 import { RequestEntryScreen } from "@/ui/screens/RequestEntryScreen";
 import { SettingsScreen } from "@/ui/screens/SettingsScreen";
+import { BankAccountsScreen } from "@/ui/screens/BankAccountsScreen";
 import { NotificationsScreen } from "@/ui/screens/NotificationsScreen";
 import { SecuritySettingsScreen } from "@/ui/screens/SecuritySettingsScreen";
 import { AccountDetailsScreen } from "@/ui/screens/AccountDetailsScreen";
@@ -98,6 +99,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   reward: RewardScreen,
   profile: ProfileScreen,
   settings: SettingsScreen,
+  "bank-accounts": BankAccountsScreen,
   notifications: NotificationsScreen,
   "security-settings": SecuritySettingsScreen,
   "account-details": AccountDetailsScreen,

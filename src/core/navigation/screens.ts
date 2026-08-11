@@ -50,6 +50,8 @@ export type ScreenParams = {
   profile: undefined;
   /** The account layer, reached from the Settings and Account hubs. */
   settings: undefined;
+  /** Linked bank accounts management (GAP-09): add / remove / set default. */
+  "bank-accounts": undefined;
   notifications: undefined;
   "security-settings": undefined;
   "account-details": undefined;

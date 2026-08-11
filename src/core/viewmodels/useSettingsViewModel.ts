@@ -35,6 +35,7 @@ export function useSettingsViewModel() {
     setBalanceVisible: () => preferencesActions.toggleBalanceVisibility(),
     accountRows: [
       { id: "account-details", icon: "bank", title: "Account details", detail: "Number, status, and funding" },
+      { id: "bank-accounts", icon: "bank", title: "Linked accounts", detail: "Bank accounts you can send from" },
       { id: "limits", icon: "limit", title: "Limits and fees", detail: "What each rail costs and allows" },
       { id: "kyc-status", icon: "user", title: "Verification", detail: "Your tier and what it unlocks" },
       { id: "statements", icon: "receipt", title: "Statements", detail: "Monthly summaries to download" },

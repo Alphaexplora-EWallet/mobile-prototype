@@ -17,6 +17,22 @@ export type BankAccount = {
 };
 
 /**
+ * A bank account linked to this wallet, as the user manages it.
+ *
+ * `BankAccount` above is the rail-level record behind a card face; the linked
+ * set is the recognisable layer — the accounts the transfer/withdraw source
+ * pickers draw from, which the user can add to, remove, or mark as default.
+ * Seeded from `MOCK_ACCOUNTS`; accounts linked in-app have no card face.
+ */
+export type LinkedBankAccount = {
+  id: string;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  status: AccountStatus;
+};
+
+/**
  * The inbound side of a BaaS account: a real, addressable account number that
  * other banks can push to over InstaPay or PESONet. This is the only way money
  * enters the wallet from outside, and the app had no screen for it.
