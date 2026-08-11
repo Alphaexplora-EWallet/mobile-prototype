@@ -10,6 +10,8 @@ replace the mock, built on NetBank as the Banking-as-a-Service custodian.
   moves, or reconciles money outside NetBank's core. NetBank products used: Account-as-a-Service
   (per-user accounts), Virtual Collection Accounts (inbound funding), Disburse-to-Account
   (InstaPay / PESONet), Bills Payment, QRPH, and the KYC/onboarding API.
+- **One NetBank account per wallet, not a shared account with internal division.** Users map to
+  NetBank customer records, wallets to NetBank savings accounts. See `multi-user-model.md` (ALP-7).
 - **Our database holds records, never authoritative balances.** The prototype already states this
   rule (`src/core/stores/wallet.store.ts`): "the wallet is a cache of the bank's answer rather than
   a second ledger that could disagree." The backend keeps the same invariant — balances always come
