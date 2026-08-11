@@ -32,6 +32,7 @@
 @import "./banking.css";
 @import "./qr.css";
 @import "./settings.css";
+@import "./insights.css";
 
 /* Theme overrides keyed to the class names above. Must come after them. */
 @import "./dark.css";

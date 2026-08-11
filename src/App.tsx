@@ -53,6 +53,7 @@ import { HelpScreen } from "@/ui/screens/HelpScreen";
 import { DisputeScreen } from "@/ui/screens/DisputeScreen";
 import { SignInOtpScreen } from "@/ui/screens/SignInOtpScreen";
 import { ForgotPasswordScreen } from "@/ui/screens/ForgotPasswordScreen";
+import { SpendingInsightsScreen } from "@/ui/screens/SpendingInsightsScreen";
 
 /**
  * Where a Screen id meets a component, and the only place that mapping lives.
@@ -103,6 +104,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   dispute: DisputeScreen,
   "sign-in-otp": SignInOtpScreen,
   "forgot-password": ForgotPasswordScreen,
+  insights: SpendingInsightsScreen,
 };
 
 function App() {
