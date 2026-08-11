@@ -63,6 +63,15 @@ export interface ClipboardPort {
   setString(value: string): Promise<boolean>;
 }
 
+/**
+ * Saves a client-generated artifact (statement CSV today). Web: an `<a download>`
+ * click that hands the bytes to the browser. RN: the share/save sheet. Async
+ * and result-bearing because a native save sheet can be cancelled or refused.
+ */
+export interface StatementExportPort {
+  saveCsv(filename: string, content: string): Promise<boolean>;
+}
+
 export interface Platform {
   readonly storage: StoragePort;
   readonly appearance: AppearancePort;
@@ -71,4 +80,5 @@ export interface Platform {
   readonly scroll: ScrollPort;
   readonly backGesture: BackGesturePort;
   readonly clipboard: ClipboardPort;
+  readonly statementExport: StatementExportPort;
 }

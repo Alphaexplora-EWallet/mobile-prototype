@@ -1,6 +1,7 @@
 import type { BankAccount, InboundQrRequest, QrInstruction, QrPayload, VirtualAccount } from "../domain/account";
 import type { ActivityPage, ActivityQuery, BankingTransaction, PaymentQuote, PaymentReceipt } from "../domain/banking";
-import type { KycStatus, KycSubmission, Statement, TierLimits } from "../domain/compliance";
+import type { KycStatus, KycSubmission, TierLimits } from "../domain/compliance";
+import type { Statement } from "../domain/statement";
 import type { GatewayResult } from "../domain/gatewayResult";
 import type { PaymentIntent } from "../domain/paymentIntent";
 import type { Biller } from "../domain/payments";

@@ -31,7 +31,7 @@ export function StatementsScreen() {
                 title={item.title}
                 detail={item.detail}
                 meta={item.closingLabel}
-                onClick={() => vm.download(item.title)}
+                onClick={() => vm.openStatement(item.id)}
               />
             ))}
           </div>

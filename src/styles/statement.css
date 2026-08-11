@@ -1,0 +1,105 @@
+/* Statement month view: summary card, export status, and dated entries. */
+.statement-summary {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  text-align: center;
+  background: var(--surface);
+}
+.statement-summary .eyebrow {
+  margin: 0;
+}
+.statement-balance-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.statement-balance-row > span {
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--teal-soft);
+}
+.statement-balance-row small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.statement-balance-row strong {
+  font-size: 17px;
+  letter-spacing: -0.4px;
+}
+.statement-count {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.statement-export-button {
+  width: 100%;
+  margin-top: 16px;
+}
+.statement-export-status {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+.statement-export-status[role="alert"] {
+  color: var(--danger-ink);
+}
+.statement-entries {
+  display: grid;
+  gap: 2px;
+  margin-top: 16px;
+  padding: 6px 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+}
+.statement-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 14px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.statement-entry:first-child {
+  border-top: 0;
+}
+.statement-entry-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.statement-entry-copy strong {
+  font-size: 13px;
+}
+.statement-entry-copy small {
+  color: var(--muted);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.statement-entry-amounts {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+}
+.statement-entry-amounts strong {
+  font-size: 13px;
+}
+.statement-entry-amounts strong.positive {
+  color: var(--teal-dark);
+}
+.statement-entry-amounts small {
+  color: var(--muted);
+  font-size: 11px;
+}

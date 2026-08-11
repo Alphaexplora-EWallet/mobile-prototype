@@ -33,4 +33,7 @@ export const noopPlatform: Platform = {
   clipboard: {
     setString: async () => false,
   },
+  statementExport: {
+    saveCsv: async () => false,
+  },
 };
