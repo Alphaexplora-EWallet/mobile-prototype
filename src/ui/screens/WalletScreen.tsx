@@ -12,7 +12,7 @@ export function WalletScreen() {
       <header className="centered-app-bar page-app-bar">
         <span className="app-bar-spacer" />
         <strong>{vm.title}</strong>
-        <button className="icon-button clear-button" type="button" aria-label="Card options">
+        <button className="icon-button clear-button" type="button" aria-label="Card options" onClick={vm.openAccount}>
           <Icon name="more" />
         </button>
       </header>
@@ -39,7 +39,7 @@ export function WalletScreen() {
         ))}
       </section>
 
-      <button className="add-card-button" type="button">
+      <button className="add-card-button" type="button" onClick={vm.addCard}>
         <Icon name="plus" /> Add card
       </button>
 

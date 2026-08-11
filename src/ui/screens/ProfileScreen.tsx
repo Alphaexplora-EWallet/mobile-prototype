@@ -2,14 +2,15 @@ import { Icon } from "../primitives/Icon";
 import { useProfileViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
 export function ProfileScreen() {
-  const { name, retakeQuiz } = useProfileViewModel();
+  const { name, retakeQuiz, openSettings } = useProfileViewModel();
 
   return (
     <div className="tab-page profile-page">
       <header className="centered-app-bar page-app-bar">
         <span />
         <strong>Profile</strong>
-        <button className="icon-button clear-button" type="button" aria-label="Profile options">
+        {/* Was decorative with no handler; the settings hub hangs off it. */}
+        <button className="icon-button clear-button" type="button" aria-label="Profile options" onClick={openSettings}>
           <Icon name="more" />
         </button>
       </header>

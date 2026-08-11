@@ -21,6 +21,33 @@ import { DepositScreen } from "@/ui/screens/DepositScreen";
 import { PaymentsScreen } from "@/ui/screens/PaymentsScreen";
 import { RewardScreen } from "@/ui/screens/RewardScreen";
 import { ProfileScreen } from "@/ui/screens/ProfileScreen";
+import { ActivityScreen } from "@/ui/screens/ActivityScreen";
+import { TransactionDetailScreen } from "@/ui/screens/TransactionDetailScreen";
+import { RecipientsScreen } from "@/ui/screens/RecipientsScreen";
+import { TransferDestinationScreen } from "@/ui/screens/TransferDestinationScreen";
+import { PaymentReviewScreen } from "@/ui/screens/PaymentReviewScreen";
+import { PaymentConfirmScreen } from "@/ui/screens/PaymentConfirmScreen";
+import { PaymentReceiptScreen } from "@/ui/screens/PaymentReceiptScreen";
+import { PaymentStatusScreen } from "@/ui/screens/PaymentStatusScreen";
+import { FundWalletScreen } from "@/ui/screens/FundWalletScreen";
+import { QrScanScreen } from "@/ui/screens/QrScanScreen";
+import { QrReceiveScreen } from "@/ui/screens/QrReceiveScreen";
+import { BillEntryScreen } from "@/ui/screens/BillEntryScreen";
+import { AutopayDetailScreen } from "@/ui/screens/AutopayDetailScreen";
+import { SettingsScreen } from "@/ui/screens/SettingsScreen";
+import { NotificationsScreen } from "@/ui/screens/NotificationsScreen";
+import { SecuritySettingsScreen } from "@/ui/screens/SecuritySettingsScreen";
+import { AccountDetailsScreen } from "@/ui/screens/AccountDetailsScreen";
+import { CardDetailScreen } from "@/ui/screens/CardDetailScreen";
+import { CardAddScreen } from "@/ui/screens/CardAddScreen";
+import { LimitsScreen } from "@/ui/screens/LimitsScreen";
+import { KycStatusScreen } from "@/ui/screens/KycStatusScreen";
+import { KycCaptureScreen } from "@/ui/screens/KycCaptureScreen";
+import { StatementsScreen } from "@/ui/screens/StatementsScreen";
+import { HelpScreen } from "@/ui/screens/HelpScreen";
+import { DisputeScreen } from "@/ui/screens/DisputeScreen";
+import { SignInOtpScreen } from "@/ui/screens/SignInOtpScreen";
+import { ForgotPasswordScreen } from "@/ui/screens/ForgotPasswordScreen";
 
 /**
  * Where a Screen id meets a component, and the only place that mapping lives.
@@ -34,11 +61,38 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   home: HomeScreen,
   wallet: WalletScreen,
   transfer: TransferScreen,
+  recipients: RecipientsScreen,
+  "transfer-destination": TransferDestinationScreen,
+  "payment-review": PaymentReviewScreen,
+  "payment-confirm": PaymentConfirmScreen,
+  "payment-receipt": PaymentReceiptScreen,
+  "payment-status": PaymentStatusScreen,
   deposit: DepositScreen,
+  "fund-wallet": FundWalletScreen,
+  "qr-scan": QrScanScreen,
+  "qr-receive": QrReceiveScreen,
+  "bill-entry": BillEntryScreen,
+  "autopay-detail": AutopayDetailScreen,
   payments: PaymentsScreen,
+  activity: ActivityScreen,
+  "transaction-detail": TransactionDetailScreen,
   quest: QuestScreen,
   reward: RewardScreen,
   profile: ProfileScreen,
+  settings: SettingsScreen,
+  notifications: NotificationsScreen,
+  "security-settings": SecuritySettingsScreen,
+  "account-details": AccountDetailsScreen,
+  "card-detail": CardDetailScreen,
+  "card-add": CardAddScreen,
+  limits: LimitsScreen,
+  "kyc-status": KycStatusScreen,
+  "kyc-capture": KycCaptureScreen,
+  statements: StatementsScreen,
+  help: HelpScreen,
+  dispute: DisputeScreen,
+  "sign-in-otp": SignInOtpScreen,
+  "forgot-password": ForgotPasswordScreen,
 };
 
 function App() {

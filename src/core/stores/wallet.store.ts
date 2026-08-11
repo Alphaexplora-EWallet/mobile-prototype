@@ -17,6 +17,12 @@ export type WalletState = {
     setOnlinePayments(enabled: boolean): void;
     setAtmWithdrawals(enabled: boolean): void;
     setSpendingLimit(id: CardId, limit: Money): void;
+    /**
+     * Balances come from the bank, not from this store's arithmetic. The gateway
+     * settles a payment and this pushes the result in, so the wallet is a cache
+     * of the bank's answer rather than a second ledger that could disagree.
+     */
+    setBalances(balances: Readonly<Partial<Record<CardId, Money>>>): void;
   };
 };
 
@@ -37,6 +43,15 @@ export const useWalletStore = create<WalletState>()((set, get) => ({
     setOnlinePayments: (enabled) => set({ onlinePayments: enabled }),
     setAtmWithdrawals: (enabled) => set({ atmWithdrawals: enabled }),
     setSpendingLimit: (id, limit) => set((state) => ({ limits: { ...state.limits, [id]: limit } })),
+    setBalances: (balances) =>
+      set((state) => {
+        const next = state.cards.map((card) => {
+          const balance = balances[card.id];
+          return balance && balance.amount !== card.balance.amount ? { ...card, balance } : card;
+        });
+        // Equal writes still wake subscribers, so bail when nothing moved.
+        return next.every((card, index) => card === state.cards[index]) ? {} : { cards: next };
+      }),
   },
 }));
 

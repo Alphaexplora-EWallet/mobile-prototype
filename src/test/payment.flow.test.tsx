@@ -1,0 +1,187 @@
+import { describe, expect, it } from "vitest";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
+import { MOCK_TRANSACTION_PIN } from "@/core/data/mock/security.mock";
+import { createMockNetBankGateway, type MockGatewayOptions } from "@/platform/web/createMockNetBankGateway";
+import App from "../App";
+
+/**
+ * The interbank send flow, which had no screens at all: choosing a bank, an
+ * account number, the name inquiry that catches a typo, a rail with a real fee,
+ * and a confirmation factor before anything leaves.
+ *
+ * These are new `it` blocks in their own file rather than additions to
+ * `app.flow.test.tsx` — the golden snapshot there is evidence about the
+ * pre-restructure app and must not grow.
+ */
+
+const start = (options: MockGatewayOptions = {}) => {
+  const user = userEvent.setup();
+  render(
+    <BankingGatewayProvider gateway={createMockNetBankGateway(options)}>
+      <App />
+    </BankingGatewayProvider>,
+  );
+  return user;
+};
+
+const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
+  user.click(screen.getByRole("button", { name }));
+
+/** Onboards to Home, then opens Send with an amount typed in. */
+const openTransfer = async (user: ReturnType<typeof userEvent.setup>, amount: string) => {
+  await press(user, /Start my journey/i);
+  await press(user, /^Continue$/);
+  await press(user, /Build my plan/i);
+  await press(user, /^Send$/);
+  await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), amount);
+};
+
+/** Walks Send → recipients → bank destination, stopping before the rail choice. */
+const openBankDestination = async (user: ReturnType<typeof userEvent.setup>, amount: string, accountNumber: string) => {
+  await openTransfer(user, amount);
+  await press(user, /Add recipient/i);
+  await press(user, /Send to a bank account/i);
+  await press(user, /BDO Unibank/i);
+  await user.type(screen.getByRole("textbox", { name: /Account number/i }), accountNumber);
+  await press(user, /Check account name/i);
+};
+
+describe("interbank transfer flow", () => {
+  it("sends over InstaPay after a name inquiry and a PIN", async () => {
+    const user = start();
+    await openBankDestination(user, "500", "003812340001");
+
+    // The inquiry has to answer before a rail can be chosen.
+    expect(await screen.findByText(/Is that right\?/i)).toBeTruthy();
+
+    await press(user, /InstaPay/i);
+    await press(user, /^Continue$/);
+
+    expect(await screen.findByText("Review transfer")).toBeTruthy();
+    const summary = screen.getByRole("region", { name: /Payment summary/i });
+    expect(within(summary).getByText("₱15.00")).toBeTruthy();
+    expect(within(summary).getByText("₱515.00")).toBeTruthy();
+    expect(within(summary).getByText("InstaPay")).toBeTruthy();
+
+    // Money leaving the FIN-A ledger steps up rather than sending straight away.
+    await press(user, /Continue to confirm/i);
+    await user.type(screen.getByLabelText(/Transaction PIN/i), MOCK_TRANSACTION_PIN);
+    await press(user, /Confirm payment/i);
+
+    expect(await screen.findByRole("heading", { name: /Transfer complete/i })).toBeTruthy();
+    expect(screen.getByText(/NBK-TRF-000001/)).toBeTruthy();
+  });
+
+  it("refuses a wrong PIN and does not send", async () => {
+    const user = start();
+    await openBankDestination(user, "500", "003812340001");
+    expect(await screen.findByText(/Is that right\?/i)).toBeTruthy();
+    await press(user, /InstaPay/i);
+    await press(user, /^Continue$/);
+    await press(user, /Continue to confirm/i);
+
+    await user.type(screen.getByLabelText(/Transaction PIN/i), "000000");
+    await press(user, /Confirm payment/i);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/PIN is not right/i);
+    expect(screen.queryByRole("heading", { name: /Transfer complete/i })).toBeNull();
+  });
+
+  it("rejects a malformed account number at the inquiry", async () => {
+    const user = start();
+    await openTransfer(user, "500");
+    await press(user, /Add recipient/i);
+    await press(user, /Send to a bank account/i);
+    await press(user, /BDO Unibank/i);
+    await user.type(screen.getByRole("textbox", { name: /Account number/i }), "123");
+    await press(user, /Check account name/i);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/does not look right/i);
+    expect(screen.queryByText(/Is that right\?/i)).toBeNull();
+  });
+
+  it("blocks an InstaPay transfer over the per-transaction cap", async () => {
+    const user = start();
+    await openBankDestination(user, "60000", "003812340001");
+    expect(await screen.findByText(/Is that right\?/i)).toBeTruthy();
+    await press(user, /InstaPay/i);
+    await press(user, /^Continue$/);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/caps a single transfer at ₱50,000/i);
+    expect(screen.getByRole("button", { name: /Continue to confirm/i })).toBeDisabled();
+  });
+
+  it("blocks PESONet until the account is fully verified", async () => {
+    const user = start({ kycTier: "verified" });
+    await openBankDestination(user, "1000", "003812340001");
+    expect(await screen.findByText(/Is that right\?/i)).toBeTruthy();
+    await press(user, /PESONet/i);
+    await press(user, /^Continue$/);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/fully verified/i);
+  });
+
+  it("tracks a PESONet transfer from pending to credited", async () => {
+    const user = start({ kycTier: "full", settleAfterPolls: 1 });
+    await openBankDestination(user, "1000", "003812340001");
+    expect(await screen.findByText(/Is that right\?/i)).toBeTruthy();
+    await press(user, /PESONet/i);
+    await press(user, /^Continue$/);
+    await press(user, /Continue to confirm/i);
+    await user.type(screen.getByLabelText(/Transaction PIN/i), MOCK_TRANSACTION_PIN);
+    await press(user, /Confirm payment/i);
+
+    // A batch rail cannot promise the money arrived, only that it was accepted.
+    expect(await screen.findByRole("heading", { name: /Transfer on its way/i })).toBeTruthy();
+
+    await press(user, /Track this transfer/i);
+    expect(await screen.findByText(/Waiting for the next batch/i)).toBeTruthy();
+
+    await press(user, /Check for an update/i);
+    expect(await screen.findByText(/Credited to the beneficiary/i)).toBeTruthy();
+  });
+
+  it("refuses to send more than the wallet holds", async () => {
+    const user = start();
+    // ₱30,000 from a wallet holding ₱24,680.50, to a saved FIN-A recipient.
+    await openTransfer(user, "30000");
+    await press(user, /^Continue$/);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/more than this wallet holds/i);
+  });
+
+  it("saves a verified bank account as a recipient", async () => {
+    const user = start();
+    await openBankDestination(user, "500", "003812340001");
+    expect(await screen.findByText(/Is that right\?/i)).toBeTruthy();
+
+    await user.click(screen.getByRole("switch", { name: /Save this recipient/i }));
+    await press(user, /InstaPay/i);
+    await press(user, /^Continue$/);
+    await press(user, /Continue to confirm/i);
+    await user.type(screen.getByLabelText(/Transaction PIN/i), MOCK_TRANSACTION_PIN);
+    await press(user, /Confirm payment/i);
+    expect(await screen.findByRole("heading", { name: /Transfer complete/i })).toBeTruthy();
+
+    // Back through Send, the saved account is now in the recipients list.
+    await press(user, /^Done$/);
+    await press(user, /^Send$/);
+    await press(user, /Add recipient/i);
+    const list = screen.getByRole("region", { name: /Saved recipients/i });
+    expect(within(list).getByText(/•••• 0001/)).toBeTruthy();
+  });
+
+  it("removes a saved recipient", async () => {
+    const user = start();
+    await openTransfer(user, "500");
+    await press(user, /Add recipient/i);
+
+    const list = screen.getByRole("region", { name: /Saved recipients/i });
+    expect(within(list).getByText("Ate Rosa")).toBeTruthy();
+
+    await press(user, /Remove Ate Rosa/i);
+    expect(within(list).queryByText("Ate Rosa")).toBeNull();
+  });
+});

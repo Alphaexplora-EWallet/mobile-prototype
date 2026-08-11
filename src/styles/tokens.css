@@ -15,6 +15,11 @@
   --amber: #f0aa24;
   --coral: #ec5f43;
   --line: #e5ded1;
+  /* Translucent card fill for state blocks and detail cards. */
+  --surface: rgba(255, 253, 248, 0.72);
+  /* Error text and border. --coral is tuned for fills, not for reading against. */
+  --danger-ink: #a64c32;
+  --danger-line: rgba(204, 97, 70, 0.35);
   --shadow: 0 16px 38px rgba(28, 46, 45, 0.12);
 }
 
@@ -32,5 +37,8 @@
   --amber: #e8b24d;
   --coral: #ef826b;
   --line: #2a3632;
+  --surface: rgba(23, 32, 29, 0.6);
+  --danger-ink: #f0a08c;
+  --danger-line: rgba(239, 130, 107, 0.4);
   --shadow: 0 16px 38px rgba(0, 4, 3, 0.5);
 }

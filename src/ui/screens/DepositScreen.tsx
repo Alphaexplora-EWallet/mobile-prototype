@@ -41,16 +41,21 @@ export function DepositScreen() {
         </div>
       </section>
 
+      {/*
+       * Both lines come from the selected method now. They read exactly as the
+       * hardcoded pair did for the default (linked bank), and tell the truth for
+       * the others — over the counter really does charge ₱20.
+       */}
       <div className="summary-strip">
         <Icon name="arrow-down" />
         <span>
-          <strong>No fee</strong>
-          <small>Arrives in seconds once confirmed</small>
+          <strong>{vm.feeLabel}</strong>
+          <small>{vm.arrivalLabel}</small>
         </span>
       </div>
 
       <div className="money-actions">
-        <button className="primary-button" type="button" onClick={() => vm.simulate("Add money")}>
+        <button className="primary-button" type="button" disabled={!vm.canContinue} onClick={vm.submit}>
           Add money
         </button>
         <p className="prototype-note">{vm.simulatedNote}</p>

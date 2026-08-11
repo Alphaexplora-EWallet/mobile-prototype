@@ -17,11 +17,44 @@ export type ScreenParams = {
   home: undefined;
   wallet: undefined;
   transfer: undefined;
+  recipients: undefined;
+  "transfer-destination": undefined;
+  /**
+   * One review → confirm → receipt pipeline serves transfers, cash-in, bills and
+   * QR. Naming these `payment-*` rather than `transfer-*` is the point: four
+   * copies of each would otherwise be eight near-identical screens.
+   */
+  "payment-review": undefined;
+  "payment-confirm": undefined;
+  "payment-receipt": undefined;
+  "payment-status": undefined;
   deposit: undefined;
+  "fund-wallet": undefined;
+  "qr-scan": undefined;
+  "qr-receive": undefined;
+  "bill-entry": undefined;
+  "autopay-detail": undefined;
   payments: undefined;
+  activity: undefined;
+  "transaction-detail": undefined;
   quest: undefined;
   reward: undefined;
   profile: undefined;
+  /** The account layer, reached from the Settings and Account hubs. */
+  settings: undefined;
+  notifications: undefined;
+  "security-settings": undefined;
+  "account-details": undefined;
+  "card-detail": undefined;
+  "card-add": undefined;
+  limits: undefined;
+  "kyc-status": undefined;
+  "kyc-capture": undefined;
+  statements: undefined;
+  help: undefined;
+  dispute: undefined;
+  "sign-in-otp": undefined;
+  "forgot-password": undefined;
 };
 
 export type Screen = keyof ScreenParams;

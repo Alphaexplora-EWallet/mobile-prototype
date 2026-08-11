@@ -4,7 +4,7 @@ import { Icon } from "../primitives/Icon";
 import { useSignInViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
 export function SignInScreen() {
-  const { back, submit } = useSignInViewModel();
+  const { back, submit, forgotPassword } = useSignInViewModel();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,7 +72,7 @@ export function SignInScreen() {
             </button>
           </span>
         </label>
-        <button className="forgot-button" type="button">
+        <button className="forgot-button" type="button" onClick={forgotPassword}>
           Forgot password?
         </button>
         <button className="primary-button" type="submit">

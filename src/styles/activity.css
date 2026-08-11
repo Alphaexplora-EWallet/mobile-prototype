@@ -1,0 +1,188 @@
+/* Transaction activity, transfer review, and receipt pages. */
+.activity-intro,
+.review-hero,
+.receipt-hero,
+.detail-hero {
+  text-align: center;
+}
+.activity-intro {
+  margin: 12px 0 24px;
+}
+.activity-intro h1,
+.review-hero h1,
+.receipt-hero h1,
+.detail-hero h1,
+.transfer-incomplete h1 {
+  margin: 4px 0 8px;
+  font-size: 29px;
+  letter-spacing: -1px;
+}
+.activity-intro p:last-child,
+.detail-hero p,
+.review-hero p,
+.receipt-hero p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.activity-state {
+  display: grid;
+  gap: 14px;
+  margin-top: 36px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  color: var(--muted);
+  text-align: center;
+  background: var(--surface);
+}
+.activity-state p,
+.activity-state h1 {
+  margin: 0;
+}
+.activity-error {
+  border-color: var(--danger-line);
+  color: var(--danger-ink);
+}
+.activity-search {
+  margin-bottom: 12px;
+}
+.activity-filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+}
+.activity-filter {
+  flex: none;
+  padding: 9px 15px;
+  border: 1.5px solid var(--line);
+  border-radius: 99px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  background: var(--surface);
+  cursor: pointer;
+}
+.activity-filter.is-selected {
+  border-color: var(--teal);
+  color: var(--teal-dark);
+  background: var(--teal-soft);
+}
+.activity-list {
+  margin-top: 16px;
+}
+.activity-row-amount {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
+}
+.activity-row-amount strong {
+  font-size: 13px;
+}
+.activity-row-amount small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.detail-hero,
+.review-hero,
+.receipt-hero {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  margin: 18px 0 24px;
+}
+.detail-icon,
+.review-icon,
+.receipt-check {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  color: var(--teal);
+  background: var(--teal-soft);
+  font-size: 22px;
+}
+.review-icon,
+.receipt-check {
+  color: var(--cream);
+  background: var(--teal);
+}
+.review-icon svg,
+.receipt-check svg {
+  width: 27px;
+  height: 27px;
+}
+.status-chip {
+  padding: 5px 9px;
+  border-radius: 99px;
+  color: var(--teal-dark);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: var(--teal-soft);
+}
+.detail-hero > strong,
+.review-hero h1,
+.receipt-hero .receipt-amount {
+  font-size: 32px;
+  letter-spacing: -1.2px;
+}
+.review-hero > strong,
+.receipt-hero > strong {
+  font-size: 16px;
+}
+.review-hero small,
+.receipt-hero small {
+  color: var(--muted);
+}
+.detail-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+}
+.detail-card > div {
+  display: grid;
+  grid-template-columns: minmax(82px, 0.65fr) 1.35fr;
+  gap: 16px;
+  align-items: start;
+  padding: 15px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.detail-card > div:last-child {
+  border-bottom: 0;
+}
+.detail-card span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.detail-card strong {
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.detail-activity-button {
+  margin-top: 18px;
+}
+.transfer-incomplete {
+  margin-top: 48px;
+}
+.transfer-error {
+  margin: 18px 0 0;
+  color: var(--danger-ink);
+  font-size: 13px;
+  text-align: center;
+}
+.receipt-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}

@@ -1,6 +1,7 @@
 import { Icon } from "../primitives/Icon";
 import { LinkRow } from "../primitives/LinkRow";
 import { PageBar } from "../layout/PageBar";
+import { TransactionRow } from "../money/TransactionRow";
 import { usePaymentsViewModel } from "@/core/viewmodels/useMoneyMovementViewModel";
 
 export function PaymentsScreen() {
@@ -11,7 +12,7 @@ export function PaymentsScreen() {
     <div className="tab-page money-page payments-page">
       <PageBar title="Pay" optionsLabel="Payment options" />
 
-      <button className="pay-scan-card" type="button" onClick={() => vm.simulate("Pay with QR")}>
+      <button className="pay-scan-card" type="button" onClick={vm.scanToPay}>
         <span className="pay-scan-icon">
           <Icon name="qr" />
         </span>
@@ -50,7 +51,7 @@ export function PaymentsScreen() {
               title={biller.name}
               detail={biller.detail}
               meta={biller.due}
-              onClick={() => vm.simulate(`Pay ${biller.name}`)}
+              onClick={() => vm.payBill(biller.id)}
             />
           ))}
         </div>
@@ -60,19 +61,7 @@ export function PaymentsScreen() {
         <h2>Scheduled</h2>
         <div className="transaction-list">
           {vm.scheduledLabels.map((payment) => (
-            <button
-              type="button"
-              className="transaction-row"
-              key={payment.id}
-              onClick={() => vm.simulate(payment.name)}
-            >
-              <span className="transaction-icon">{payment.glyph}</span>
-              <span className="transaction-copy">
-                <strong>{payment.name}</strong>
-                <small>{payment.when}</small>
-              </span>
-              <strong>{payment.amountLabel}</strong>
-            </button>
+            <TransactionRow key={payment.id} row={payment} onPress={() => vm.openAutopay(payment.id)} />
           ))}
         </div>
       </section>

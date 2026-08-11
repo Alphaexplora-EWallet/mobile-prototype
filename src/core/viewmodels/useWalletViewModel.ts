@@ -42,6 +42,8 @@ export type WalletViewModel = {
   confirmLimit(): void;
   cancelLimit(): void;
   goTo(screen: Screen): void;
+  addCard(): void;
+  openAccount(): void;
 };
 
 export function useWalletViewModel(): WalletViewModel {
@@ -118,5 +120,8 @@ export function useWalletViewModel(): WalletViewModel {
     confirmLimit,
     cancelLimit: questActions.cancelLimitSetup,
     goTo: navigation.navigate,
+    /** Both were rendered with no handler at all. */
+    addCard: () => navigation.navigate("card-add"),
+    openAccount: () => navigation.navigate("account-details"),
   };
 }

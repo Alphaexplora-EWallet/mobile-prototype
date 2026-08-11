@@ -30,5 +30,6 @@ export type IconName =
   | "snow"
   | "star"
   | "target"
+  | "trash"
   | "user"
   | "wallet";

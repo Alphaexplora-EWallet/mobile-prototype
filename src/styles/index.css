@@ -27,6 +27,10 @@
 @import "./reward-profile.css";
 @import "./nav.css";
 @import "./money.css";
+@import "./activity.css";
+@import "./banking.css";
+@import "./qr.css";
+@import "./settings.css";
 
 /* Theme overrides keyed to the class names above. Must come after them. */
 @import "./dark.css";

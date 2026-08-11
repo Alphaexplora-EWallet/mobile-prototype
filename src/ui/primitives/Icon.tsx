@@ -139,6 +139,13 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
       <path d="M14 10l6-6M16 4h4v4" />
     </>
   ),
+  trash: (
+    <>
+      <path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2" />
+      <path d="M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13" />
+      <path d="M10 11v6M14 11v6" />
+    </>
+  ),
   user: (
     <>
       <circle cx="12" cy="8" r="4" />

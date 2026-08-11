@@ -8,7 +8,7 @@ import type { Screen } from "../navigation/screens";
 import { useNavigation } from "../navigation/useNavigation";
 import { preferencesActions, usePreferencesStore } from "../stores/preferences.store";
 import { useQuestStore } from "../stores/quest.store";
-import { uiActions } from "../stores/ui.store";
+import { activityActions } from "../stores/activity.store";
 import { walletActions, useWalletStore } from "../stores/wallet.store";
 import type { Theme } from "@/ui/theme/ThemeContext";
 import { type CardPresentation, useCardViews } from "./useCardViews";
@@ -50,7 +50,9 @@ export type HomeViewModel = {
   endStacking(): void;
   pressQuickAction(id: QuickActionId): void;
   pressQuest(): void;
-  pressTransaction(name: string): void;
+  pressTransaction(id: string): void;
+  goToActivity(): void;
+  openProfile(): void;
   goTo(screen: Screen): void;
 };
 
@@ -131,7 +133,13 @@ export function useHomeViewModel(): HomeViewModel {
     pressQuickAction: (id) =>
       navigation.navigate(id === "send" ? "transfer" : id === "deposit" ? "deposit" : "payments"),
     pressQuest: () => navigation.navigate("quest"),
-    pressTransaction: uiActions.showSimulated,
+    pressTransaction: (id: string) => {
+      activityActions.selectTransaction(id);
+      navigation.navigate("transaction-detail");
+    },
+    goToActivity: () => navigation.navigate("activity"),
+    /** The avatar was rendered with no handler; Profile was tab-only. */
+    openProfile: () => navigation.navigate("profile"),
     goTo: navigation.navigate,
   };
 }

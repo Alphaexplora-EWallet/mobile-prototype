@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
+import { createMockNetBankGateway } from "@/platform/web/createMockNetBankGateway";
 import App from "../App";
 
 /**
@@ -97,17 +99,59 @@ describe("FIN-A app flow", () => {
     snap(container, "15-profile");
   });
 
+  /**
+   * Retargeted twice as the prototype grew real: first from "Add recipient",
+   * then from the Pay screen's QR card, both of which now lead somewhere.
+   * "Share receipt" is the durable target — handing a receipt to another app
+   * needs a Share port this codebase has no web global to reach for.
+   */
   it("opens and dismisses the simulated action sheet", async () => {
-    render(<App />);
+    const user = userEvent.setup();
+    render(
+      <BankingGatewayProvider gateway={createMockNetBankGateway()}>
+        <App />
+      </BankingGatewayProvider>,
+    );
     await click(/Start my journey/i);
     await click(/^Continue$/);
     await click(/Build my plan/i);
 
-    await click(/Daily Brew/i);
-    const sheet = screen.getByRole("dialog", { name: /Daily Brew/i });
+    await click(/^Send$/);
+    await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), "500");
+    await click(/^Continue$/);
+    await click(/Confirm and send/i);
+    expect(await screen.findByRole("heading", { name: /Transfer complete/i })).toBeTruthy();
+
+    await click(/Share receipt/i);
+    const sheet = screen.getByRole("dialog", { name: /Share receipt/i });
     expect(within(sheet).getByText(/safely simulated/i)).toBeTruthy();
 
     await click(/Got it/i);
     expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("creates a NetBank sandbox receipt and exposes its transaction", async () => {
+    const user = userEvent.setup();
+    render(
+      <BankingGatewayProvider gateway={createMockNetBankGateway()}>
+        <App />
+      </BankingGatewayProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: /Start my journey/i }));
+    await user.click(screen.getByRole("button", { name: /^Continue$/ }));
+    await user.click(screen.getByRole("button", { name: /Build my plan/i }));
+    await user.click(screen.getByRole("button", { name: /^Send$/ }));
+    await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), "500");
+    await user.click(screen.getByRole("button", { name: /^Continue$/ }));
+
+    expect(screen.getByText("Review transfer")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: /Confirm and send/i }));
+
+    expect(await screen.findByRole("heading", { name: /Transfer complete/i })).toBeTruthy();
+    expect(screen.getByText(/NBK-TRF-000001/i)).toBeTruthy();
+
+    await user.click(screen.getByRole("button", { name: /View activity/i }));
+    expect(await screen.findByRole("heading", { name: "Sent to Jomar D." })).toBeTruthy();
   });
 });

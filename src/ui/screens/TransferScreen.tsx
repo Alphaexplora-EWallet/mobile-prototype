@@ -28,18 +28,23 @@ export function TransferScreen() {
         <div className="recipient-row">
           {vm.recipients.map((person) => (
             <button
-              className={`recipient-chip ${vm.selectedRecipient === person.initials ? "is-selected" : ""}`}
+              className={`recipient-chip ${vm.selectedRecipient === person.id ? "is-selected" : ""}`}
               type="button"
-              key={person.initials}
-              onClick={() => vm.selectRecipient(person.initials)}
-              aria-pressed={vm.selectedRecipient === person.initials}
+              key={person.id}
+              onClick={() => vm.selectRecipient(person.id)}
+              aria-pressed={vm.selectedRecipient === person.id}
             >
               <span aria-hidden="true">{person.initials}</span>
               <strong>{person.name}</strong>
               <small>{person.handle}</small>
             </button>
           ))}
-          <button className="recipient-chip recipient-add" type="button" onClick={() => vm.simulate("New recipient")}>
+          <button
+            className="recipient-chip recipient-add"
+            type="button"
+            aria-label="Add recipient"
+            onClick={vm.manageRecipients}
+          >
             <span aria-hidden="true">
               <Icon name="plus" />
             </span>
@@ -71,7 +76,7 @@ export function TransferScreen() {
       </div>
 
       <div className="money-actions">
-        <button className="primary-button" type="button" onClick={() => vm.simulate("Send money")}>
+        <button className="primary-button" type="button" onClick={vm.review}>
           Continue
         </button>
         <p className="prototype-note">{vm.simulatedNote}</p>

@@ -1,0 +1,339 @@
+/* Settings, notifications, verification, limits, statements, help, disputes. */
+
+.settings-page .money-field + .money-field {
+  margin-top: 22px;
+}
+
+/* --- Notifications -------------------------------------------------------- */
+.mark-all-read {
+  min-height: 40px;
+  margin-bottom: 6px;
+}
+.notification-list {
+  display: grid;
+  gap: 8px;
+}
+.notification-row {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  padding: 15px 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  color: inherit;
+  text-align: left;
+  background: var(--surface);
+  cursor: pointer;
+}
+.notification-row.is-unread {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+}
+.notification-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  color: var(--teal);
+  background: var(--cream);
+}
+.notification-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.notification-copy {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+}
+.notification-copy strong {
+  font-size: 14px;
+  line-height: 1.35;
+}
+.notification-copy small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.notification-when {
+  font-weight: 700;
+  opacity: 0.75;
+}
+.unread-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+/* --- Sessions ------------------------------------------------------------- */
+.session-current {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.session-revoke {
+  width: auto;
+  min-height: 36px;
+  padding: 0 4px;
+  font-size: 13px;
+}
+
+/* --- Verification --------------------------------------------------------- */
+.tier-hero {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  margin: 18px 0 24px;
+  text-align: center;
+}
+.tier-badge {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  color: var(--cream);
+  background: var(--teal);
+}
+.tier-badge svg {
+  width: 27px;
+  height: 27px;
+}
+.tier-hero h1 {
+  margin: 4px 0 0;
+  font-size: 27px;
+  letter-spacing: -0.8px;
+}
+.tier-hero small,
+.tier-hero p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.tier-card {
+  margin-bottom: 16px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+}
+.tier-card h2 {
+  margin: 0 0 12px;
+  font-size: 17px;
+  letter-spacing: -0.3px;
+}
+.tier-card ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tier-card li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.tier-card li svg {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin-top: 1px;
+  color: var(--teal);
+}
+.tier-next {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+}
+.tier-next p {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.tier-next .primary-button {
+  margin-top: 18px;
+}
+
+/* --- KYC capture ---------------------------------------------------------- */
+.capture-progress {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 22px;
+}
+.capture-step {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 26px 20px;
+  border: 1.5px dashed var(--line);
+  border-radius: 24px;
+  text-align: center;
+  background: var(--cream-deep);
+}
+.capture-frame {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 68px;
+  border: 2px solid var(--teal);
+  border-radius: 14px;
+  color: var(--teal);
+  background: var(--cream);
+}
+.capture-frame.is-done {
+  color: var(--cream);
+  background: var(--teal);
+}
+.capture-frame svg {
+  width: 30px;
+  height: 30px;
+}
+.capture-step h2 {
+  margin: 4px 0 0;
+  font-size: 19px;
+  letter-spacing: -0.4px;
+}
+.capture-step p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.capture-step .secondary-button {
+  max-width: 220px;
+  min-height: 46px;
+  margin-top: 6px;
+}
+.address-step .money-note + .money-note {
+  margin-top: 12px;
+}
+
+/* --- Limits --------------------------------------------------------------- */
+.rail-card {
+  margin-bottom: 14px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+}
+.rail-card.is-locked {
+  opacity: 0.72;
+}
+.rail-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.rail-card-head strong {
+  font-size: 16px;
+}
+.rail-fee {
+  color: var(--teal-dark);
+  font-size: 13px;
+  font-weight: 800;
+}
+.rail-remaining,
+.rail-locked-note {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.rail-figures {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0 0;
+}
+.rail-figures dt {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.rail-figures dd {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+/* --- Help and disputes ---------------------------------------------------- */
+.help-topics {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.help-topic {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.help-topic button {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 15px 16px;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
+}
+.help-topic button svg {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  color: var(--muted);
+}
+.help-topic p {
+  margin: 0;
+  padding: 0 16px 16px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.help-topic.is-open {
+  border-color: var(--teal);
+}
+.dispute-detail {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 17px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  background: var(--surface);
+}
+.dispute-detail:focus-visible {
+  border-color: var(--teal);
+}
+
+/* --- Cards and accounts --------------------------------------------------- */
+.card-number {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1.5px;
+}

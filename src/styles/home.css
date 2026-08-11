@@ -258,6 +258,26 @@
   font-size: 20px;
   letter-spacing: -0.4px;
 }
+/* A section heading with a trailing action, e.g. "Recent transactions / View all". */
+.home-section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.home-section-heading h2 {
+  margin-right: auto;
+}
+.home-section-heading button {
+  padding: 0;
+  border: 0;
+  color: var(--teal);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  background: transparent;
+  cursor: pointer;
+}
 .quest-card {
   position: relative;
   display: block;
@@ -402,6 +422,19 @@
   border: 1px solid var(--line);
   border-radius: 20px;
   background: rgba(255, 253, 248, 0.72);
+}
+/* Home: edge-to-edge recent transactions (no enclosing box). */
+.home-page .transaction-list {
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.home-page .transaction-row {
+  padding: 12px 2px;
+}
+.home-page .transaction-row:hover {
+  background: var(--surface);
 }
 .transaction-row {
   display: grid;

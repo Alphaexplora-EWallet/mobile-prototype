@@ -54,6 +54,15 @@ export interface BackGesturePort {
   subscribe(handler: () => boolean): Unsubscribe;
 }
 
+/**
+ * RN: Clipboard.setString. Async because the web's `navigator.clipboard` is,
+ * and because it can be refused — copying an account number is the one action on
+ * the funding screen that has to actually work, so the caller needs to know.
+ */
+export interface ClipboardPort {
+  setString(value: string): Promise<boolean>;
+}
+
 export interface Platform {
   readonly storage: StoragePort;
   readonly appearance: AppearancePort;
@@ -61,4 +70,5 @@ export interface Platform {
   readonly appState: AppStatePort;
   readonly scroll: ScrollPort;
   readonly backGesture: BackGesturePort;
+  readonly clipboard: ClipboardPort;
 }

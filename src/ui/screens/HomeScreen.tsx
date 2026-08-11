@@ -4,6 +4,7 @@ import { BrandMark } from "../layout/BrandMark";
 import { Icon } from "../primitives/Icon";
 import { QuickAction } from "../primitives/QuickAction";
 import { CardFace } from "../cards/CardFace";
+import { TransactionRow } from "../money/TransactionRow";
 import { IMAGERY } from "../assets";
 
 export function HomeScreen() {
@@ -36,7 +37,7 @@ export function HomeScreen() {
           >
             <Icon name="contrast" />
           </button>
-          <button className="avatar-button" type="button" aria-label="Open profile">
+          <button className="avatar-button" type="button" aria-label="Open profile" onClick={vm.openProfile}>
             <Icon name="user" />
           </button>
         </span>
@@ -152,22 +153,19 @@ export function HomeScreen() {
       </section>
 
       <section className="home-section transactions-section">
-        <h2>Recent transactions</h2>
+        <div className="home-section-heading">
+          <h2>Recent transactions</h2>
+          <button type="button" onClick={vm.goToActivity}>
+            View all
+          </button>
+        </div>
         <div className="transaction-list">
           {vm.transactions.map((transaction) => (
-            <button
-              type="button"
-              className="transaction-row"
+            <TransactionRow
               key={transaction.id}
-              onClick={() => vm.pressTransaction(transaction.name)}
-            >
-              <span className="transaction-icon">{transaction.glyph}</span>
-              <span className="transaction-copy">
-                <strong>{transaction.name}</strong>
-                <small>{transaction.when}</small>
-              </span>
-              <strong className={transaction.incoming ? "positive" : ""}>{transaction.amountLabel}</strong>
-            </button>
+              row={transaction}
+              onPress={() => vm.pressTransaction(transaction.id)}
+            />
           ))}
         </div>
       </section>

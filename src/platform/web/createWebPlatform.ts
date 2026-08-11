@@ -4,6 +4,7 @@ import type {
   AppStatePort,
   AppStateStatus,
   BackGesturePort,
+  ClipboardPort,
   ColorScheme,
   Platform,
   ScrollPort,
@@ -105,6 +106,23 @@ function createWebBackGesture(): BackGesturePort {
   };
 }
 
+/**
+ * `navigator.clipboard` is absent over plain HTTP and can be refused outright,
+ * so this reports whether the copy actually happened rather than assuming it.
+ */
+function createWebClipboard(): ClipboardPort {
+  return {
+    async setString(value) {
+      try {
+        await navigator.clipboard.writeText(value);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  };
+}
+
 export function createWebPlatform(): Platform {
   return {
     storage: createWebStorage(),
@@ -113,5 +131,6 @@ export function createWebPlatform(): Platform {
     appState: createWebAppState(),
     scroll: createWebScroll(),
     backGesture: createWebBackGesture(),
+    clipboard: createWebClipboard(),
   };
 }

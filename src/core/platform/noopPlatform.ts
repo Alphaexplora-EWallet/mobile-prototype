@@ -30,4 +30,7 @@ export const noopPlatform: Platform = {
   backGesture: {
     subscribe: noSubscription,
   },
+  clipboard: {
+    setString: async () => false,
+  },
 };

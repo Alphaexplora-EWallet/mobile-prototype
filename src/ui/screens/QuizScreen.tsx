@@ -3,12 +3,12 @@ import { Icon } from "../primitives/Icon";
 import { useQuizViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
 export function QuizScreen() {
-  const { question, progressLabel, progressPercent, selectedIndex, select, submit } = useQuizViewModel();
+  const { question, progressLabel, progressPercent, selectedIndex, select, submit, back } = useQuizViewModel();
 
   return (
     <div className="onboarding-page quiz-page">
       <header className="centered-app-bar">
-        <button className="icon-button" type="button" aria-label="Go back">
+        <button className="icon-button" type="button" aria-label="Go back" onClick={back}>
           <Icon name="arrow-left" />
         </button>
         <BrandMark compact />

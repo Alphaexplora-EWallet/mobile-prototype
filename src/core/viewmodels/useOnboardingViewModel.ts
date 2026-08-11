@@ -27,7 +27,14 @@ export function useSignInViewModel() {
   const navigation = useNavigation();
   return {
     back: () => navigation.navigate("welcome"),
+    /**
+     * The demo button still lands straight on Home. The credential form now goes
+     * through a one-time code instead, which is what the email and password were
+     * always implying and never doing.
+     */
     submit: () => navigation.resetTo("home"),
+    signInWithCredentials: () => navigation.navigate("sign-in-otp"),
+    forgotPassword: () => navigation.navigate("forgot-password"),
   };
 }
 
@@ -38,6 +45,7 @@ export function useQuizViewModel(): {
   selectedIndex: number;
   select(index: number): void;
   submit(): void;
+  back(): void;
 } {
   const navigation = useNavigation();
   const [selectedIndex, select] = useState(0);
@@ -49,6 +57,8 @@ export function useQuizViewModel(): {
     selectedIndex,
     select,
     submit: () => navigation.navigate("result"),
+    /** The back arrow was rendered with no handler at all. */
+    back: navigation.goBack,
   };
 }
 
@@ -84,5 +94,6 @@ export function useProfileViewModel() {
     styleLine: "The Free Spirit · Level 3",
     levelPercent: 75,
     retakeQuiz: () => navigation.navigate("quiz"),
+    openSettings: () => navigation.navigate("settings"),
   };
 }

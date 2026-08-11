@@ -56,6 +56,10 @@
 :root[data-theme="dark"] .auth-form label {
   color: #cbd6d2;
 }
+:root[data-theme="dark"] .home-page .transaction-list {
+  background: transparent;
+  box-shadow: none;
+}
 :root[data-theme="dark"] .input-shell,
 :root[data-theme="dark"] .answer-option,
 :root[data-theme="dark"] .style-progress,
