@@ -17,7 +17,8 @@ export type TransactionKind =
   | "transfer-out"
   | "bill-payment"
   | "qr-payment"
-  | "load-purchase";
+  | "load-purchase"
+  | "request-in";
 
 /**
  * `returned` is a real PESONet outcome and distinct from `failed`: the money

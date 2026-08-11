@@ -36,6 +36,7 @@ export type ScreenParams = {
   "bill-entry": undefined;
   "autopay-detail": undefined;
   "load-entry": undefined;
+  "request-entry": undefined;
   payments: undefined;
   activity: undefined;
   "transaction-detail": undefined;

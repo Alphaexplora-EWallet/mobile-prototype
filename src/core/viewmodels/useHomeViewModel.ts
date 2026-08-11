@@ -17,12 +17,13 @@ import { useReduceMotion } from "./useReduceMotion";
 /** Matches the home-card-stack-forward keyframe; a safety net if animationend never fires. */
 const STACK_FALLBACK_MS = 520;
 
-export type QuickActionId = "send" | "deposit" | "pay";
+export type QuickActionId = "send" | "request" | "deposit" | "pay";
 
 export type QuickActionVM = { id: QuickActionId; label: string; icon: IconName };
 
 const QUICK_ACTIONS: readonly QuickActionVM[] = [
   { id: "send", label: "Send", icon: "send" },
+  { id: "request", label: "Request", icon: "arrow-down" },
   { id: "deposit", label: "Add money", icon: "plus" },
   { id: "pay", label: "Pay", icon: "qr" },
 ];
@@ -131,7 +132,9 @@ export function useHomeViewModel(): HomeViewModel {
     pressNextCard: () => rearCard && pressCard(rearCard.id),
     endStacking: useCallback(() => setStackingId(null), []),
     pressQuickAction: (id) =>
-      navigation.navigate(id === "send" ? "transfer" : id === "deposit" ? "deposit" : "payments"),
+      navigation.navigate(
+        id === "send" ? "transfer" : id === "request" ? "request-entry" : id === "deposit" ? "deposit" : "payments",
+      ),
     pressQuest: () => navigation.navigate("quest"),
     pressTransaction: (id: string) => {
       activityActions.selectTransaction(id);

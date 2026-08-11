@@ -16,6 +16,7 @@ import {
   intentCardLabel,
   intentRail,
   intentTransactionKind,
+  isIncomingIntent,
   type PaymentIntent,
   requiresStepUp,
 } from "@/core/domain/paymentIntent";
@@ -135,6 +136,7 @@ const REFERENCE_PREFIX: Readonly<Record<PaymentIntent["kind"], string>> = {
   bill: "NBK-BIL",
   qr: "NBK-QRP",
   buyload: "NBK-LOD",
+  request: "NBK-RQS",
 };
 
 const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
@@ -144,6 +146,7 @@ const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
   bill: "⚡",
   qr: "◫",
   buyload: "☎",
+  request: "↙",
 };
 
 const seedActivity = (): BankingTransaction[] =>
@@ -173,6 +176,7 @@ const nonRailArrivalLabel = (intent: PaymentIntent): string => {
   if (intent.kind === "cash-in") return intent.method.arrivalLabel;
   if (intent.kind === "bill") return "Posted to the biller within one banking day";
   if (intent.kind === "buyload") return "Credited to the number instantly";
+  if (intent.kind === "request") return "Credited to your wallet instantly";
   return "Paid instantly";
 };
 
@@ -190,6 +194,8 @@ const receiptName = (intent: PaymentIntent): string => {
       return `Withdrawn to ${intent.account.name}`;
     case "buyload":
       return `Bought ${intent.operator.name} load`;
+    case "request":
+      return `Received from ${intent.payer.name}`;
   }
 };
 
@@ -208,6 +214,8 @@ const receiptDescription = (intent: PaymentIntent): string => {
     case "buyload":
       // The number is masked even inside the receipt copy; it never renders raw.
       return `${intent.operator.name} load for ${maskMobileNumber(intent.phoneNumber)}.`;
+    case "request":
+      return intent.note.trim() || `Payment for your money request from ${intent.payer.name}.`;
   }
 };
 
@@ -293,7 +301,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
       }
     }
 
-    if (intent.kind !== "cash-in") {
+    if (intent.kind !== "cash-in" && intent.kind !== "request") {
       const available = balances[intent.sourceCardId];
       if (available && compareMoney(quote.total, available) > 0) {
         return failed(
@@ -312,7 +320,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
     if (!current) return;
     balances = {
       ...balances,
-      [cardId]: intent.kind === "cash-in" ? addMoney(current, intent.amount) : subtractMoney(current, quote.total),
+      [cardId]: isIncomingIntent(intent) ? addMoney(current, intent.amount) : subtractMoney(current, quote.total),
     };
   };
 
@@ -433,7 +441,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
         if (rejection) return rejection;
 
         const reference = nextReference(intent.kind);
-        const signed = intent.kind === "cash-in" ? intent.amount.amount : -intent.amount.amount;
+        const signed = isIncomingIntent(intent) ? intent.amount.amount : -intent.amount.amount;
         const receipt: PaymentReceipt = {
           id: `netbank-${reference.toLowerCase()}`,
           glyph: RECEIPT_GLYPH[intent.kind],
@@ -446,7 +454,13 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
           description: receiptDescription(intent),
           sourceLabel: intentCardLabel(intent),
           recipient:
-            intent.kind === "transfer" ? intent.recipient : intent.kind === "cash-out" ? intent.account : undefined,
+            intent.kind === "transfer"
+              ? intent.recipient
+              : intent.kind === "cash-out"
+                ? intent.account
+                : intent.kind === "request"
+                  ? intent.payer
+                  : undefined,
           fee: quote.fee,
           rail: quote.rail ?? undefined,
           arrivalLabel: quote.arrivalLabel,
