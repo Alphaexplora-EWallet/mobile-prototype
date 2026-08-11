@@ -34,11 +34,19 @@ export function KycCaptureScreen() {
 
   return (
     <div className="onboarding-page kyc-capture-page">
+      <h1 className="sr-only">{vm.title}</h1>
       <PageBar title={vm.title} onBack={vm.previous} optionsLabel="Verification options" />
 
       <div className="capture-progress">
         <span className="field-label">{vm.stepLabel}</span>
-        <div className="progress-track" aria-label={vm.stepLabel}>
+        <div
+          className="progress-track"
+          role="progressbar"
+          aria-label={vm.stepLabel}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={vm.progressPercent}
+        >
           <span style={{ width: `${vm.progressPercent}%` }} />
         </div>
       </div>

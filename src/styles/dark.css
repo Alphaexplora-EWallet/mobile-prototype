@@ -91,10 +91,10 @@
   color: var(--ink);
 }
 :root[data-theme="dark"] .input-shell input::placeholder {
-  color: #71807c;
+  color: var(--muted);
 }
 :root[data-theme="dark"] .amount-input input::placeholder {
-  color: #4b5a55;
+  color: var(--muted);
 }
 :root[data-theme="dark"] .answer-icon {
   background: #1e2a26;

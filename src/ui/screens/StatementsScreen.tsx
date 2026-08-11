@@ -8,6 +8,7 @@ export function StatementsScreen() {
 
   return (
     <div className="onboarding-page statements-page">
+      <h1 className="sr-only">{vm.title}</h1>
       <PageBar title={vm.title} onBack={vm.back} optionsLabel="Statement options" />
 
       {vm.isLoading && <StateBlock tone="loading" message="Loading your statements…" />}

@@ -14,6 +14,7 @@ export function RequestEntryScreen() {
 
   return (
     <div className="onboarding-page money-page request-page">
+      <h1 className="sr-only">{vm.title}</h1>
       <PageBar title={vm.title} onBack={vm.back} optionsLabel="Request options" />
 
       <section className="money-field">

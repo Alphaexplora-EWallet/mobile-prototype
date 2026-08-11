@@ -543,7 +543,8 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
         if (rejection) return rejection;
 
         const reference = nextReference(intent.kind);
-        const signed = isIncomingIntent(intent) || intent.kind === "jar-out" ? intent.amount.amount : -intent.amount.amount;
+        const signed =
+          isIncomingIntent(intent) || intent.kind === "jar-out" ? intent.amount.amount : -intent.amount.amount;
         // For jar-out the money leaves the jar, so the "From" label is the jar,
         // not the card it lands on (intentCardLabel would name the destination).
         const sourceLabel = intent.kind === "jar-out" ? JAR_LABEL : intentCardLabel(intent);

@@ -156,7 +156,7 @@
   background: transparent;
 }
 .input-shell input::placeholder {
-  color: #9aa19f;
+  color: var(--muted);
 }
 .input-shell button {
   display: grid;

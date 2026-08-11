@@ -116,7 +116,13 @@
   letter-spacing: -1px;
 }
 .amount-input input::placeholder {
-  color: #c3c6bd;
+  color: var(--muted);
+}
+/* The amount field is borderless, so it needs its own visible focus ring. */
+.amount-input input:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 .amount-available {
   color: var(--muted);

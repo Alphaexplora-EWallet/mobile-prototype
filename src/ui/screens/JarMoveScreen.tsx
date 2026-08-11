@@ -14,6 +14,7 @@ export function JarMoveScreen() {
 
   return (
     <div className="onboarding-page money-page jar-move-page">
+      <h1 className="sr-only">{vm.title}</h1>
       <PageBar title={vm.title} onBack={vm.back} optionsLabel="Jar options" />
 
       <SourcePicker

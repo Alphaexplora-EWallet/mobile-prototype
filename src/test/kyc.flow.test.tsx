@@ -60,6 +60,8 @@ describe("KYC resubmission path", () => {
     expect(await screen.findByText("Step 4 of 5")).toBeTruthy();
     expect(screen.getByText(/Take a selfie/i)).toBeTruthy();
     expect(screen.getByRole("status", { name: /Resubmission notice/i })).toBeTruthy();
+    // The progress track is exposed as a real progressbar with a percentage.
+    expect(screen.getByRole("progressbar", { name: /Step 4 of 5/i })).toHaveAttribute("aria-valuenow", "80");
   });
 
   it("returns to the expected status after a successful re-capture", async () => {

@@ -166,12 +166,14 @@ export const intentTransactionKind = (intent: PaymentIntent): TransactionKind =>
 
 /** Which card the money moves through, whichever direction it is going. */
 export const intentCardId = (intent: PaymentIntent): CardId => {
-  if (intent.kind === "cash-in" || intent.kind === "request" || intent.kind === "jar-out") return intent.destinationCardId;
+  if (intent.kind === "cash-in" || intent.kind === "request" || intent.kind === "jar-out")
+    return intent.destinationCardId;
   return intent.sourceCardId;
 };
 
 export const intentCardLabel = (intent: PaymentIntent): string => {
-  if (intent.kind === "cash-in" || intent.kind === "request" || intent.kind === "jar-out") return intent.destinationLabel;
+  if (intent.kind === "cash-in" || intent.kind === "request" || intent.kind === "jar-out")
+    return intent.destinationLabel;
   return intent.sourceLabel;
 };
 
