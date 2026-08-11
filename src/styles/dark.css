@@ -29,6 +29,15 @@
   background: #17201d;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.025);
 }
+:root[data-theme="dark"] .home-page .theme-toggle,
+:root[data-theme="dark"] .home-page .avatar-button {
+  border-color: transparent;
+  background: var(--teal-soft);
+  box-shadow: none;
+}
+:root[data-theme="dark"] .home-page .theme-toggle:hover {
+  background: var(--teal);
+}
 :root[data-theme="dark"] .brand-mark-lockup {
   filter: brightness(0) invert(1);
 }

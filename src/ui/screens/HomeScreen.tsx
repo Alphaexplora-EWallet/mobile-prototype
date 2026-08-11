@@ -5,7 +5,6 @@ import { Icon } from "../primitives/Icon";
 import { QuickAction } from "../primitives/QuickAction";
 import { CardFace } from "../cards/CardFace";
 import { TransactionRow } from "../money/TransactionRow";
-import { IMAGERY } from "../assets";
 
 export function HomeScreen() {
   const vm = useHomeViewModel();
@@ -109,10 +108,8 @@ export function HomeScreen() {
       </section>
 
       <section className="home-section">
-        <h2>Made for your money style</h2>
+        <h2>Today's goal</h2>
         <button className="quest-card" type="button" onClick={vm.pressQuest}>
-          <img src={IMAGERY.sunsetJeepney} alt="Jeepney traveling beside the coast at sunset" />
-          <span className="quest-card-scrim" />
           <span className="quest-card-content">
             <span className="quest-heading">
               <span className="quest-icon">
@@ -135,7 +132,7 @@ export function HomeScreen() {
               <span>
                 <Icon name="clock" /> {quest.hoursLeftLabel}
               </span>
-              <span className="mini-cta">Continue quest</span>
+              <span className="mini-cta">View goal details</span>
             </span>
           </span>
         </button>

@@ -17,7 +17,7 @@
   gap: 4px;
   padding: 0;
   border: 0;
-  color: #697174;
+  color: var(--muted);
   background: transparent;
   font-size: 11px;
   cursor: pointer;
@@ -26,12 +26,13 @@
   width: 23px;
   height: 23px;
 }
+/* A single brand accent for the active tab. */
 .bottom-nav button.is-active {
   color: var(--teal);
   font-weight: 800;
 }
 .bottom-nav button.is-active svg {
-  fill: rgba(8, 126, 121, 0.14);
+  fill: rgba(8, 126, 121, 0.16);
   stroke-width: 2.2;
 }
 .sheet-backdrop {

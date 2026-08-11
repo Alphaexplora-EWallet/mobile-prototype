@@ -62,7 +62,7 @@ describe("FIN-A app flow", () => {
     expect(screen.getByText("₱24,680.50")).toBeTruthy();
 
     // ---- Quest flow -------------------------------------------------------
-    await click(/Continue quest/i);
+    await click(/View goal details/i);
     snap(container, "06-quest-available");
 
     await click(/Set ₱3,000 limit/i);

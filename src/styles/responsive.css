@@ -66,21 +66,9 @@
     animation: none !important;
     transition: opacity 90ms ease !important;
   }
-  .payment-card-flipper,
-  .payment-card-flipper.is-flipped {
-    transform: none;
-  }
-  .payment-card-back {
-    transform: none;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .payment-card-flipper.is-flipped .payment-card-front {
-    opacity: 0;
-    pointer-events: none;
-  }
-  .payment-card-flipper.is-flipped .payment-card-back {
-    opacity: 1;
-    pointer-events: auto;
+  /* The card flip keeps its 3D rotation in this prototype so the effect stays
+     visible even when the OS asks for less motion. */
+  .payment-card-flipper {
+    transition-duration: 420ms !important;
   }
 }
