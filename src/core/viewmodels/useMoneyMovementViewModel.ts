@@ -1,12 +1,19 @@
 import type { CardId } from "../domain/card";
 import type { Biller, DepositMethod, Recipient } from "../domain/payments";
-import { MOCK_AMOUNT_PRESETS, MOCK_BILLERS, MOCK_DEPOSIT_METHODS } from "../data/mock/payments.mock";
+import type { LoadOperator } from "../domain/load";
+import {
+  MOCK_AMOUNT_PRESETS,
+  MOCK_BILLERS,
+  MOCK_DEPOSIT_METHODS,
+  MOCK_LOAD_OPERATORS,
+} from "../data/mock/payments.mock";
 import { findBank } from "../data/mock/banks.mock";
 import { defaultRailFor } from "../domain/rails";
 import { SIMULATED_NOTE } from "../domain/simulation";
 import { formatMoney, parseMoneyInput } from "../money/format";
-import { isZero } from "../money/money";
+import { isZero, type Money } from "../money/money";
 import { billsActions, useBillsStore } from "../stores/bills.store";
+import { buyloadActions } from "../stores/buyload.store";
 import { depositActions, useDepositStore } from "../stores/deposit.store";
 import type { Screen } from "../navigation/screens";
 import { useNavigation } from "../navigation/useNavigation";
@@ -50,20 +57,26 @@ export type PresetVM = { id: string; label: string };
 /**
  * Presets are matched on parsed value, not on string equality. Typing "500.00"
  * previously failed to highlight the ₱500 preset because "500.00" !== "500".
- * Exported so the cash-out screen composes the same amount field.
+ * Exported so the cash-out screen composes the same amount field. Load uses
+ * smaller denominations, so the preset list is a parameter with the transfer
+ * presets as the default.
  */
-export function createAmountDraft(amount: string, setAmount: (value: string) => void) {
+export function createAmountDraft(
+  amount: string,
+  setAmount: (value: string) => void,
+  presets: readonly Money[] = MOCK_AMOUNT_PRESETS,
+) {
   const parsed = parseMoneyInput(amount);
-  const presets: PresetVM[] = MOCK_AMOUNT_PRESETS.map((preset) => ({
+  const presetViews: PresetVM[] = presets.map((preset) => ({
     id: formatMoney(preset, { symbol: false, fractionDigits: 0 }),
     label: formatMoney(preset, { fractionDigits: 0 }),
   }));
   const selectedPresetId =
-    MOCK_AMOUNT_PRESETS.reduce<string | null>(
-      (found, preset, index) => found ?? (parsed && parsed.amount === preset.amount ? presets[index].id : null),
+    presets.reduce<string | null>(
+      (found, preset, index) => found ?? (parsed && parsed.amount === preset.amount ? presetViews[index].id : null),
       null,
     ) ?? null;
-  return { amount, setAmount, presets, selectedPresetId, selectPreset: setAmount };
+  return { amount, setAmount, presets: presetViews, selectedPresetId, selectPreset: setAmount };
 }
 
 /**
@@ -192,9 +205,11 @@ export function useDepositViewModel(): DepositViewModel {
 export type PaymentsViewModel = MoneyBase & {
   scheduledLabels: readonly { id: string; glyph: string; name: string; when: string; amountLabel: string }[];
   billers: readonly Biller[];
+  loadOperators: readonly LoadOperator[];
   scanToPay(): void;
   showMyQr(): void;
   payBill(billerId: string): void;
+  buyLoad(operatorId: string): void;
   openAutopay(id: string): void;
 };
 
@@ -207,6 +222,7 @@ export function usePaymentsViewModel(): PaymentsViewModel {
     scanToPay: () => navigation.navigate("qr-scan"),
     showMyQr: () => navigation.navigate("qr-receive"),
     billers: MOCK_BILLERS,
+    loadOperators: MOCK_LOAD_OPERATORS,
     /**
      * From the store, so a paused schedule stays paused. Every enrollment starts
      * active, so these read exactly as the fixture-backed rows did.
@@ -221,6 +237,10 @@ export function usePaymentsViewModel(): PaymentsViewModel {
     payBill: (billerId: string) => {
       billsActions.startBill(billerId);
       navigation.navigate("bill-entry");
+    },
+    buyLoad: (operatorId: string) => {
+      buyloadActions.startLoad(operatorId);
+      navigation.navigate("load-entry");
     },
     openAutopay: (id: string) => {
       billsActions.selectEnrollment(id);

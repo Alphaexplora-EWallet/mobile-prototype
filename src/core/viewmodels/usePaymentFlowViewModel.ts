@@ -15,6 +15,7 @@ import { pesos } from "../money/money";
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
 import { activityActions } from "../stores/activity.store";
+import { buyloadActions } from "../stores/buyload.store";
 import { cashOutActions } from "../stores/cashout.store";
 import { paymentActions, usePaymentStore } from "../stores/payment.store";
 import { transferActions } from "../stores/transfer.store";
@@ -67,6 +68,14 @@ const COPY = {
     pendingTitle: "Withdrawal on its way",
     action: "Confirm and withdraw",
     submitting: "Withdrawing securely…",
+  },
+  buyload: {
+    reviewTitle: "Review load",
+    reviewLead: "You’re buying",
+    receiptTitle: "Load purchased",
+    pendingTitle: "Load on its way",
+    action: "Confirm and buy",
+    submitting: "Buying securely…",
   },
 } as const;
 
@@ -264,6 +273,7 @@ export function usePaymentReceiptViewModel() {
       paymentActions.reset();
       transferActions.reset();
       cashOutActions.reset();
+      buyloadActions.reset();
       navigation.resetTo("home");
     },
   };
@@ -351,6 +361,8 @@ const receiptKind = (receipt: PaymentReceipt): keyof typeof COPY => {
       return "bill";
     case "qr-payment":
       return "qr";
+    case "load-purchase":
+      return "buyload";
     default:
       return "transfer";
   }

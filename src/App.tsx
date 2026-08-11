@@ -35,6 +35,7 @@ import { QrScanScreen } from "@/ui/screens/QrScanScreen";
 import { QrReceiveScreen } from "@/ui/screens/QrReceiveScreen";
 import { BillEntryScreen } from "@/ui/screens/BillEntryScreen";
 import { AutopayDetailScreen } from "@/ui/screens/AutopayDetailScreen";
+import { LoadEntryScreen } from "@/ui/screens/LoadEntryScreen";
 import { SettingsScreen } from "@/ui/screens/SettingsScreen";
 import { NotificationsScreen } from "@/ui/screens/NotificationsScreen";
 import { SecuritySettingsScreen } from "@/ui/screens/SecuritySettingsScreen";
@@ -75,6 +76,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   "qr-receive": QrReceiveScreen,
   "bill-entry": BillEntryScreen,
   "autopay-detail": AutopayDetailScreen,
+  "load-entry": LoadEntryScreen,
   payments: PaymentsScreen,
   activity: ActivityScreen,
   "transaction-detail": TransactionDetailScreen,
