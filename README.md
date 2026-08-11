@@ -30,10 +30,12 @@ src/
     money/       Money type, arithmetic, formatting
     domain/      Entities and pure derivations (deriveCardViews, isIncoming, …)
     data/        Repositories and mock fixtures
-    stores/      Zustand: preferences, wallet, quest, ui
+    stores/      Zustand: preferences, wallet, quest, ui, payment, transfer,
+                 kyc, activity, bills, qr, recipients, settings, deposit
     navigation/  Screen map, navigation stack, useNavigation()
     platform/    Port interfaces — the seam to the device
     viewmodels/  One use*ViewModel per screen
+    app/         Web-free app logic (resetStores, syncBalances)
   ui/          View. Rewritten for RN.
     primitives/ layout/ cards/ money/ overlays/ screens/ theme/ assets/
   platform/web/  Web implementations of the ports
@@ -48,7 +50,9 @@ logic, and return render-ready data plus named commands. **Views** render and no
 ### Two invariants, both machine-enforced
 
 1. **No web APIs outside `platform/` and `app/bridges/`.** `window`, `document`, `localStorage`,
-   `matchMedia` and `navigator` are banned everywhere else by ESLint `no-restricted-globals`.
+   `sessionStorage`, `matchMedia` and `navigator` are banned everywhere else by ESLint
+   `no-restricted-globals` (the config exempts only `src/platform/`, `src/app/bridges/`,
+   `src/main.tsx` and `src/test/`).
    Anything the device answers differently goes behind a port in `core/platform/ports.ts`.
    Ports are async and push-based even where the web could answer synchronously, because
    `AsyncStorage` and `AccessibilityInfo` are async on device.
@@ -60,7 +64,7 @@ logic, and return render-ready data plus named commands. **Views** render and no
 Verify both with `npm run lint`, or directly:
 
 ```bash
-grep -rE "window|document|localStorage|matchMedia" src/core src/ui   # expect no matches
+grep -rE "window\.|document\.|localStorage|sessionStorage|matchMedia|navigator\." src/core src/ui   # expect no matches
 ```
 
 ### Money
@@ -81,9 +85,12 @@ rather than `Intl.NumberFormat` — see the comment in `core/money/format.ts` fo
 
 ### Testing
 
-`src/test/app.flow.test.tsx` is a **golden snapshot** of all 12 screens plus the full quest flow,
-captured against the original single-file version before the restructure began. It is the proof
-that the whole restructure did not change what the app renders.
+`src/test/app.flow.test.tsx` is a **golden snapshot** of the app's whole journey — 15 snapshot
+stops covering onboarding, the full quest flow, the money screens, and all five tabs — captured
+against the original single-file version before the restructure began. It is the proof that the
+whole restructure did not change what the app renders. The screen map has since grown to 39
+screens (`ScreenParams` in `core/navigation/screens.ts`); the golden test is a representative
+walk, not an exhaustive one.
 
 > **Do not run `vitest -u` to make it pass.** A red snapshot means behaviour changed. Regenerating
 > it discards the only evidence that it did not. If a change is genuinely intended, say so in the
@@ -96,13 +103,17 @@ Stores are module singletons, so `src/test/setup.ts` resets them between tests a
 
 These are deliberate, and each would need a real decision before changing:
 
-- **The quest ring's 41% is hardcoded in two places** — the JSX label and a `conic-gradient` in
-  `styles/quest.css`. Deriving it from the amounts gives 41.33% in the label while the ring stays
-  at 41. Both stay literal until the gradient is driven by a CSS custom property.
+- **The quest ring's 41% is hardcoded in three places** — `progressPercent: 41` in
+  `core/stores/quest.store.ts` (drives the ring's percentage label and the progress-track width)
+  and the `41%` stops in the `conic-gradient` in both `styles/quest.css` and `styles/dark.css`.
+  Deriving it from the amounts gives 41.33% in the label while the ring stays at 41. All stay
+  literal until the gradient is driven by a CSS custom property.
 - **The quiz answer is captured but never scored.** The result is always "The Free Spirit".
 - **Dates are display strings** (`"Today, 8:23 AM"`). Introducing `Date` means timezone and locale
   requirements that do not exist for frozen fixtures.
 - **Level progress reads 75% on Home and Profile but 76% on Reward.** Present before the
   restructure; left alone because it plausibly reflects XP just earned.
-- **`goBack()` exists but no screen uses it.** Back buttons still navigate to explicit
-  destinations, matching the original behaviour. Adopting true back navigation is a UX change.
+- **Back buttons now pop the stack (`goBack()`), except the money-entry screens**
+  (`Send money`, `Add money`, `Fund wallet`), whose back buttons still navigate to an explicit
+  destination to preserve the original behaviour — see the comment in
+  `useMoneyMovementViewModel.ts`.
