@@ -8,8 +8,11 @@ import App from "../App";
 /**
  * Golden snapshot of the pre-restructure monolith.
  *
- * This walks every screen and the complete quest flow, snapshotting the
- * rendered DOM at each stop. It is the ground truth for the MVVM migration:
+ * A representative walk, not an exhaustive one: 15 snapshot stops across 12
+ * screens — onboarding, the full quest flow, the money screens, and four of
+ * the five tabs (the Quest tab is covered by the quest-flow stops). The screen
+ * map has since grown to 47 screens (ScreenParams in core/navigation/screens.ts).
+ * It is the ground truth for the MVVM migration:
  * every subsequent step must keep these green WITHOUT regenerating them.
  * Running `vitest -u` discards the only proof that the restructure preserved
  * behaviour. Don't.

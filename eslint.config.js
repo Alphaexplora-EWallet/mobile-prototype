@@ -33,9 +33,9 @@ export default tseslint.config(
     plugins: { "react-hooks": reactHooks, "react-refresh": reactRefresh },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      // Fires on PaymentCard's reset-on-deselect effect (App.tsx:778). A real
-      // anti-pattern, but fixing it changes behaviour, so it waits for the
-      // baseline snapshot and is resolved in usePaymentCardViewModel.
+      // Fires on the async data-refresh effects in useActivityViewModel.ts and
+      // useSpendingInsightsViewModel.ts. A real anti-pattern, but fixing it
+      // changes behaviour, so it stays a warning for now.
       "react-hooks/set-state-in-effect": "warn",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
@@ -46,12 +46,12 @@ export default tseslint.config(
       eqeqeq: ["error", "smart"],
     },
   },
-  // The React Native portability fence. Live for all new code; src/App.tsx is
-  // exempt only until the monolith is dismantled and its web APIs move behind
-  // ports (migration step 7), at which point that entry comes out.
+  // The React Native portability fence. Live for all new code. src/App.tsx is
+  // no longer exempt — its web APIs moved behind ports (migration step 7), so
+  // the exemption entry was removed.
   {
     files: ["src/**/*.{ts,tsx}"],
-    // Only three kinds of file may name a web API: the adapters that implement
+    // Only four kinds of file may name a web API: the adapters that implement
     // the ports, the web entry point that selects them, the bridges that carry
     // web-only side effects, and the tests that stub them.
     ignores: ["src/platform/**", "src/app/bridges/**", "src/main.tsx", "src/test/**"],

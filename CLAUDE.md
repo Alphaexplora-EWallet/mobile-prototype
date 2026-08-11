@@ -3,7 +3,8 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 FIN-A Wallet — a simulated Philippine e-wallet prototype (Vite + React 19 + TypeScript + Zustand, no
-backend). `README.md` carries the narrative rationale and a list of deliberate shortcuts; read it
+backend yet; the planned NetBank-based backend is designed in `docs/backend-architecture.md`).
+`README.md` carries the narrative rationale and a list of deliberate shortcuts; read it
 before proposing changes to money handling, the quest ring, or navigation.
 
 ## Commands
@@ -99,6 +100,7 @@ combination. Snapshots are `.prettierignore`d.
 
 ## Known exemptions in the lint config
 
-`react-hooks/set-state-in-effect` is `warn`, not `error`, for a legacy reset-on-deselect effect;
-`src/App.tsx` is no longer exempt from the web-API fence. Prefer resolving these over widening the
-exemptions.
+`react-hooks/set-state-in-effect` is `warn`, not `error`, for the async data-refresh effects in
+`useActivityViewModel.ts` and `useSpendingInsightsViewModel.ts` (the legacy reset-on-deselect
+effect it once guarded is gone); `src/App.tsx` is no longer exempt from the web-API fence. Prefer
+resolving these over widening the exemptions.

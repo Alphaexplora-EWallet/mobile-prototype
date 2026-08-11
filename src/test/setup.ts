@@ -11,8 +11,9 @@ afterEach(() => {
 });
 
 // Node 26 gates its own localStorage behind --localstorage-file, so
-// window.localStorage is undefined here. App.tsx reads it in a useState
-// initialiser, which throws before anything renders.
+// window.localStorage is undefined here. The web StoragePort adapter
+// (src/platform/web/createWebPlatform.ts) reads it on mount, which throws
+// before anything renders.
 if (!window.localStorage) {
   const store = new Map<string, string>();
   Object.defineProperty(window, "localStorage", {
@@ -31,7 +32,8 @@ if (!window.localStorage) {
 }
 
 // jsdom implements neither of these, and the app touches both on mount:
-// App.tsx calls matchMedia inside a useState initialiser, and navigate()
+// the web platform adapters (AppearancePort/AccessibilityPort in
+// src/platform/web/createWebPlatform.ts) call matchMedia, and navigate()
 // calls scrollTo. Without these stubs the very first render throws.
 if (!window.matchMedia) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({

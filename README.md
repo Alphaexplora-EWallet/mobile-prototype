@@ -2,7 +2,17 @@
 
 A personality-powered e-wallet prototype for the Philippine market — pesos, quests, XP, and a
 "money style" quiz. Vite + React 19 + TypeScript. All financial actions are simulated; there is
-no backend.
+no backend today — `docs/backend-architecture.md` (draft, ALP-6) and `docs/multi-user-model.md`
+(decision, ALP-7) design the NetBank-based backend that will eventually replace the mock.
+
+## Docs
+
+| File                           | Status          | Content                                                             |
+| ------------------------------ | --------------- | ------------------------------------------------------------------- |
+| `README.md` (this file)        | Current         | What the prototype is, how to run it, architecture overview         |
+| `docs/backend-architecture.md` | Draft (ALP-6)   | The planned backend: schemas, NetBank BaaS mapping, migration path  |
+| `docs/multi-user-model.md`     | Decided (ALP-7) | How FIN-A users map to NetBank accounts (the decision behind ALP-6) |
+| `AGENTS.md` / `CLAUDE.md`      | Current         | Working guidelines for agents / Claude Code                         |
 
 ```bash
 npm install
@@ -30,8 +40,9 @@ src/
     money/       Money type, arithmetic, formatting
     domain/      Entities and pure derivations (deriveCardViews, isIncoming, …)
     data/        Repositories and mock fixtures
-    stores/      Zustand: preferences, wallet, quest, ui, payment, transfer,
-                 kyc, activity, bills, qr, recipients, settings, deposit
+    stores/      Zustand: accounts, activity, billerCatalog, bills, buyload,
+                 cashout, deposit, jar, kyc, payment, preferences, qr, quest,
+                 recipients, requests, settings, statement, transfer, ui, wallet
     navigation/  Screen map, navigation stack, useNavigation()
     platform/    Port interfaces — the seam to the device
     viewmodels/  One use*ViewModel per screen
@@ -64,7 +75,7 @@ logic, and return render-ready data plus named commands. **Views** render and no
 Verify both with `npm run lint`, or directly:
 
 ```bash
-grep -rE "window\.|document\.|localStorage|sessionStorage|matchMedia|navigator\." src/core src/ui   # expect no matches
+grep -rE "window\.|document\.|localStorage|sessionStorage|matchMedia|navigator\." src/core src/ui   # expect no matches in code (comment mentions aside)
 ```
 
 ### Money
@@ -88,7 +99,7 @@ rather than `Intl.NumberFormat` — see the comment in `core/money/format.ts` fo
 `src/test/app.flow.test.tsx` is a **golden snapshot** of the app's whole journey — 15 snapshot
 stops covering onboarding, the full quest flow, the money screens, and all five tabs — captured
 against the original single-file version before the restructure began. It is the proof that the
-whole restructure did not change what the app renders. The screen map has since grown to 39
+whole restructure did not change what the app renders. The screen map has since grown to 47
 screens (`ScreenParams` in `core/navigation/screens.ts`); the golden test is a representative
 walk, not an exhaustive one.
 
@@ -113,7 +124,7 @@ These are deliberate, and each would need a real decision before changing:
   requirements that do not exist for frozen fixtures.
 - **Level progress reads 75% on Home and Profile but 76% on Reward.** Present before the
   restructure; left alone because it plausibly reflects XP just earned.
-- **Back buttons now pop the stack (`goBack()`), except the money-entry screens**
-  (`Send money`, `Add money`, `Fund wallet`), whose back buttons still navigate to an explicit
-  destination to preserve the original behaviour — see the comment in
-  `useMoneyMovementViewModel.ts`.
+- **Back buttons now pop the stack (`goBack()`), except `Send money` and `Add money`,**
+  whose back buttons still navigate to an explicit destination (`home`) to preserve the
+  original behaviour — see the comment in `useMoneyMovementViewModel.ts`. `Fund wallet`
+  now pops the stack like the rest.

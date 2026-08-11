@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This is a Vite-powered React 19 and TypeScript wallet prototype with simulated data and no backend. Keep portable application code in `src/core/`: domain types and derivations belong in `domain/`, integer-centavo utilities in `money/`, Zustand state in `stores/`, platform contracts in `platform/`, and one `use*ViewModel` hook per screen in `viewmodels/`. React views live in `src/ui/`, grouped into screens, layout, reusable primitives, and assets. Web adapters belong in `src/platform/web/`; renderless browser side effects belong in `src/app/bridges/`. Global CSS is split by cascade layer under `src/styles/`. Tests and shared jsdom setup are under `src/test/`, with focused unit tests beside their modules.
+This is a Vite-powered React 19 and TypeScript wallet prototype with simulated data and no backend today; the planned NetBank-based backend is designed in `docs/backend-architecture.md` and `docs/multi-user-model.md`. Keep portable application code in `src/core/`: domain types and derivations belong in `domain/`, integer-centavo utilities in `money/`, Zustand state in `stores/`, platform contracts in `platform/`, and one `use*ViewModel` hook per screen in `viewmodels/`. React views live in `src/ui/`, grouped into screens, layout, reusable primitives, and assets. Web adapters belong in `src/platform/web/`; renderless browser side effects belong in `src/app/bridges/`. Global CSS is split by cascade layer under `src/styles/`. Tests and shared jsdom setup are under `src/test/`, with focused unit tests beside their modules.
 
 ## Build, Test, and Development Commands
 
