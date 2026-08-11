@@ -35,6 +35,7 @@ import { QrReceiveScreen } from "@/ui/screens/QrReceiveScreen";
 import { BillEntryScreen } from "@/ui/screens/BillEntryScreen";
 import { AutopayDetailScreen } from "@/ui/screens/AutopayDetailScreen";
 import { SettingsScreen } from "@/ui/screens/SettingsScreen";
+import { BankAccountsScreen } from "@/ui/screens/BankAccountsScreen";
 import { NotificationsScreen } from "@/ui/screens/NotificationsScreen";
 import { SecuritySettingsScreen } from "@/ui/screens/SecuritySettingsScreen";
 import { AccountDetailsScreen } from "@/ui/screens/AccountDetailsScreen";
@@ -80,6 +81,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   reward: RewardScreen,
   profile: ProfileScreen,
   settings: SettingsScreen,
+  "bank-accounts": BankAccountsScreen,
   notifications: NotificationsScreen,
   "security-settings": SecuritySettingsScreen,
   "account-details": AccountDetailsScreen,
