@@ -178,7 +178,7 @@ describe("limits and statements", () => {
     await press(user, /Profile options/i);
     await press(user, /StatementsMonthly summaries/i);
 
-    expect(await screen.findByRole("button", { name: /July 202634 transactions/i })).toBeTruthy();
+    expect(await screen.findByRole("button", { name: /July 202612 transactions/i })).toBeTruthy();
   });
 });
 

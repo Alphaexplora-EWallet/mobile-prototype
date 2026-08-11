@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import type { KycStatus, Statement, TierLimits } from "../domain/compliance";
+import type { KycStatus, TierLimits } from "../domain/compliance";
+import type { Statement } from "../domain/statement";
 import { ID_DOCUMENTS, KYC_TIERS, nextKycTier } from "../domain/compliance";
 import { railName } from "../domain/rails";
 import { formatMoney } from "../money/format";
@@ -7,7 +8,7 @@ import { subtractMoney } from "../money/money";
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
 import { KYC_STEPS, kycActions, useKycStore } from "../stores/kyc.store";
-import { uiActions } from "../stores/ui.store";
+import { statementActions } from "../stores/statement.store";
 
 export function useKycStatusViewModel() {
   const navigation = useNavigation();
@@ -214,8 +215,11 @@ export function useStatementsViewModel() {
       detail: `${statement.transactionCount} transactions · ${statement.generatedLabel}`,
       closingLabel: formatMoney(statement.closingBalance),
     })),
-    /** Writing a file needs a filesystem port this prototype does not ship. */
-    download: (period: string) => uiActions.showSimulated(`Download ${period} statement`),
+    /** Each month opens the real month view, where the export lives. */
+    openStatement: (id: string) => {
+      statementActions.selectStatement(id);
+      navigation.navigate("statement-month");
+    },
     back: navigation.goBack,
   };
 }

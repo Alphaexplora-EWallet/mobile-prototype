@@ -4,6 +4,7 @@ import { usePreferencesStore } from "../stores/preferences.store";
 import { useQuestStore } from "../stores/quest.store";
 import { useUiStore } from "../stores/ui.store";
 import { useActivityStore } from "../stores/activity.store";
+import { useStatementStore } from "../stores/statement.store";
 import { INITIAL_BILLS, useBillsStore } from "../stores/bills.store";
 import { INITIAL_BUYLOAD_DRAFT, useBuyloadStore } from "../stores/buyload.store";
 import { INITIAL_CASHOUT_DRAFT, useCashOutStore } from "../stores/cashout.store";
@@ -32,6 +33,7 @@ export function resetStores(): void {
   useQuestStore.setState({ phase: "available", limitSetupActive: false, rewardStyleApplied: false });
   useUiStore.setState({ sheet: null });
   useActivityStore.setState({ selectedTransactionId: null });
+  useStatementStore.setState({ selectedStatementId: null });
   useTransferStore.setState(INITIAL_TRANSFER_DRAFT);
   useBillsStore.setState(INITIAL_BILLS);
   useBuyloadStore.setState(INITIAL_BUYLOAD_DRAFT);

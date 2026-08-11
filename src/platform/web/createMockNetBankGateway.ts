@@ -8,7 +8,8 @@ import type {
 } from "@/core/domain/banking";
 import { railName } from "@/core/domain/banking";
 import type { CardId } from "@/core/domain/card";
-import type { KycStatus, KycTier, Statement, TierLimits } from "@/core/domain/compliance";
+import type { KycStatus, KycTier, TierLimits } from "@/core/domain/compliance";
+import type { Statement } from "@/core/domain/statement";
 import { nextKycTier } from "@/core/domain/compliance";
 import { failed, type GatewayErrorCode, type GatewayResult, ok } from "@/core/domain/gatewayResult";
 import {

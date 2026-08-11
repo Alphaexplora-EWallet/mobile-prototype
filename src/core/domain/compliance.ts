@@ -92,12 +92,3 @@ export type TierLimits = {
   tier: KycTier;
   rails: readonly RailLimit[];
 };
-
-export type Statement = {
-  id: string;
-  periodLabel: string;
-  generatedLabel: string;
-  openingBalance: Money;
-  closingBalance: Money;
-  transactionCount: number;
-};

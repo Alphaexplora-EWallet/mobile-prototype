@@ -55,6 +55,7 @@ export type ScreenParams = {
   "kyc-status": undefined;
   "kyc-capture": undefined;
   statements: undefined;
+  "statement-month": undefined;
   help: undefined;
   dispute: undefined;
   "sign-in-otp": undefined;

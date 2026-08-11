@@ -48,6 +48,7 @@ import { LimitsScreen } from "@/ui/screens/LimitsScreen";
 import { KycStatusScreen } from "@/ui/screens/KycStatusScreen";
 import { KycCaptureScreen } from "@/ui/screens/KycCaptureScreen";
 import { StatementsScreen } from "@/ui/screens/StatementsScreen";
+import { StatementMonthScreen } from "@/ui/screens/StatementMonthScreen";
 import { HelpScreen } from "@/ui/screens/HelpScreen";
 import { DisputeScreen } from "@/ui/screens/DisputeScreen";
 import { SignInOtpScreen } from "@/ui/screens/SignInOtpScreen";
@@ -97,6 +98,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   "kyc-status": KycStatusScreen,
   "kyc-capture": KycCaptureScreen,
   statements: StatementsScreen,
+  "statement-month": StatementMonthScreen,
   help: HelpScreen,
   dispute: DisputeScreen,
   "sign-in-otp": SignInOtpScreen,

@@ -8,6 +8,7 @@ import type {
   ColorScheme,
   Platform,
   ScrollPort,
+  StatementExportPort,
   StoragePort,
 } from "@/core/platform/ports";
 
@@ -123,6 +124,30 @@ function createWebClipboard(): ClipboardPort {
   };
 }
 
+/**
+ * Hands the CSV bytes to the browser through a temporary download anchor. The
+ * object URL is revoked on the next tick so repeated exports do not leak blob
+ * handles. `URL.createObjectURL` is missing in jsdom and can be missing in
+ * embedded webviews, so absence reports failure instead of throwing.
+ */
+function createWebStatementExport(): StatementExportPort {
+  return {
+    async saveCsv(filename, content) {
+      if (typeof URL.createObjectURL !== "function") return false;
+      const blob = new Blob([content], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+      return true;
+    },
+  };
+}
+
 export function createWebPlatform(): Platform {
   return {
     storage: createWebStorage(),
@@ -132,5 +157,6 @@ export function createWebPlatform(): Platform {
     scroll: createWebScroll(),
     backGesture: createWebBackGesture(),
     clipboard: createWebClipboard(),
+    statementExport: createWebStatementExport(),
   };
 }
