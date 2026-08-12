@@ -1,0 +1,104 @@
+import type { CardView } from "@/core/domain/card";
+import { maskCardNumber } from "@/core/domain/card";
+import type { CardPrivacy } from "@/core/viewmodels/useCardPrivacy";
+import { Icon } from "../primitives/Icon";
+import { BrandMark } from "../layout/BrandMark";
+import { CardFace } from "./CardFace";
+
+export function CardFlipper({
+  card,
+  privacy,
+  onFreeze,
+}: {
+  card: CardView;
+  privacy: CardPrivacy;
+  onFreeze: () => void;
+}) {
+  const { flipped, revealed, authOpen, toggleFlip, requestReveal, confirmReveal, cancelReveal, hideNumber } = privacy;
+
+  return (
+    <div className={`payment-card-flipper ${flipped ? "is-flipped" : ""}`}>
+      <section className={`payment-card payment-card-front payment-card-${card.variant}`} aria-hidden={flipped}>
+        <CardFace card={card} />
+
+        <aside className="card-utility-rail" aria-label={`${card.displayLabel} quick actions`}>
+          <button
+            type="button"
+            onClick={onFreeze}
+            tabIndex={flipped ? -1 : 0}
+            aria-pressed={card.frozen}
+            aria-label={`${card.frozen ? "Unfreeze" : "Freeze"} ${card.displayLabel} card`}
+          >
+            <Icon name="snow" />
+            <span>{card.frozen ? "Unfreeze" : "Freeze"}</span>
+          </button>
+          <i />
+          <button
+            type="button"
+            onClick={toggleFlip}
+            tabIndex={flipped ? -1 : 0}
+            aria-label={`View secure details for ${card.displayLabel} card`}
+          >
+            <Icon name="eye" />
+            <span>Details</span>
+          </button>
+        </aside>
+      </section>
+
+      <section className="payment-card payment-card-back" aria-hidden={!flipped}>
+        <div className="card-back-top">
+          <span className="card-back-number" aria-live="polite">
+            {revealed ? card.fullNumber : maskCardNumber(card.last4)}
+          </span>
+          <button
+            className="card-reveal-button"
+            type="button"
+            onClick={() => (revealed ? hideNumber() : requestReveal())}
+            tabIndex={flipped ? 0 : -1}
+            aria-label={revealed ? "Hide card number" : "Reveal full card number"}
+            aria-pressed={revealed}
+          >
+            <Icon name={revealed ? "eye-off" : "eye"} />
+          </button>
+        </div>
+        <div className="card-back-meta">
+          <span>
+            <small>Account opened</small>
+            <strong>{card.openedLabel}</strong>
+          </span>
+          <span>
+            <small>Expires</small>
+            <strong>{card.expiry}</strong>
+          </span>
+          <span>
+            <small>Security code</small>
+            <strong>{revealed ? card.securityCode : "•••"}</strong>
+          </span>
+        </div>
+        <div className="signature-line">
+          <small>Signature</small>
+          <strong>{card.holderName}</strong>
+        </div>
+        <div className="card-back-brand">
+          <span>{card.displayLabel}</span>
+          <BrandMark compact light />
+        </div>
+
+        {authOpen && (
+          <div className="card-auth-panel" role="dialog" aria-modal="true" aria-label="Confirm your identity">
+            <strong>Confirm it’s you</strong>
+            <small>This prototype simulates biometric verification.</small>
+            <div>
+              <button autoFocus type="button" onClick={confirmReveal}>
+                Use demo Face ID
+              </button>
+              <button type="button" onClick={cancelReveal}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}

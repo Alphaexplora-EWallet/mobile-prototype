@@ -31,7 +31,7 @@
   margin-top: 36px;
   padding: 22px;
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   color: var(--muted);
   text-align: center;
   background: var(--surface);
@@ -145,7 +145,7 @@
 .detail-card {
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   background: var(--surface);
 }
 .detail-card > div {
@@ -194,7 +194,7 @@
   margin-top: 16px;
   padding: 6px 14px 14px;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   background: var(--surface);
 }
 .request-list-heading {

@@ -3,10 +3,14 @@ import { Icon } from "../primitives/Icon";
 import { ControlRow } from "../primitives/ControlRow";
 import { LinkRow } from "../primitives/LinkRow";
 import { Toggle } from "../primitives/Toggle";
-import { PaymentCard } from "../cards/PaymentCard";
+import { CardDeck } from "../cards/CardDeck";
 
 export function WalletScreen() {
   const vm = useWalletViewModel();
+  const { deck } = vm;
+  const front = deck.cards.find((card) => card.id === deck.frontId) ?? deck.cards[0];
+  const rear = deck.cards.find((card) => card.id === deck.rearId) ?? null;
+
   return (
     <div className="tab-page wallet-page">
       <header className="centered-app-bar page-app-bar">
@@ -27,16 +31,15 @@ export function WalletScreen() {
         </div>
       )}
 
-      <section className="card-stack" aria-label="Your cards">
-        {vm.cards.map((card) => (
-          <PaymentCard
-            key={card.id}
-            card={card}
-            selected={vm.selectedCardId === card.id}
-            onClick={() => vm.selectCard(card.id)}
-            onFreeze={() => vm.toggleFrozen(card.id)}
-          />
-        ))}
+      <section className="card-deck-block" aria-label="Your cards">
+        <CardDeck
+          front={front}
+          rear={rear}
+          stackingId={deck.stackingId}
+          onPromote={vm.pressCard}
+          onFreeze={vm.toggleFrozen}
+          onEndStacking={vm.endStacking}
+        />
       </section>
 
       {vm.jar.opened && (

@@ -21,6 +21,20 @@
   --danger-ink: #a64c32;
   --danger-line: rgba(204, 97, 70, 0.35);
   --shadow: 0 16px 38px rgba(28, 46, 45, 0.12);
+  /* Radius scale (DESIGN.md §17): small controls / buttons / cards & nav. */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  /* Elevation scale (DESIGN.md §18): low-opacity only, no strong black shadows. */
+  --shadow-surface: var(--shadow);
+  --shadow-floating: 0 12px 28px rgba(20, 33, 38, 0.14);
+  --shadow-primary: 0 20px 40px rgba(0, 75, 71, 0.22);
+  /* Typography scale (DESIGN.md §20), levels 1 (hero) through 5 (meta). */
+  --text-hero: 34px;
+  --text-title: 22px;
+  --text-body: 15px;
+  --text-caption: 13px;
+  --text-meta: 11px;
 }
 
 :root[data-theme="dark"] {
@@ -41,4 +55,7 @@
   --danger-ink: #f0a08c;
   --danger-line: rgba(239, 130, 107, 0.4);
   --shadow: 0 16px 38px rgba(0, 4, 3, 0.5);
+  --shadow-surface: var(--shadow);
+  --shadow-floating: 0 12px 28px rgba(0, 4, 3, 0.55);
+  --shadow-primary: 0 20px 40px rgba(0, 4, 3, 0.65);
 }

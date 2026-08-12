@@ -9,7 +9,7 @@
   margin: 4px 0 22px;
   padding: 15px 16px;
   border: 1.5px solid var(--teal);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   color: var(--ink);
   text-align: left;
   background: var(--teal-soft);
@@ -20,7 +20,7 @@
   place-items: center;
   width: 38px;
   height: 38px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   color: var(--cream);
   background: var(--teal);
 }
@@ -38,7 +38,7 @@
   gap: 8px;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   padding: 6px;
   background: var(--surface);
 }
@@ -131,7 +131,7 @@
   gap: 3px;
   padding: 13px 15px;
   border: 1.5px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   color: var(--ink);
   text-align: left;
   background: var(--surface);
@@ -192,7 +192,7 @@
 .pin-field input {
   padding: 16px 18px;
   border: 1.5px solid var(--line);
-  border-radius: 17px;
+  border-radius: var(--radius-md);
   color: var(--ink);
   font-size: 24px;
   font-weight: 800;
@@ -308,7 +308,7 @@
   margin-bottom: 18px;
   padding: 20px;
   border: 1.5px solid var(--teal);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   text-align: center;
   background: var(--teal-soft);
 }

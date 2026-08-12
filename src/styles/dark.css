@@ -109,7 +109,7 @@
 :root[data-theme="dark"] .sticky-action {
   background: linear-gradient(transparent, var(--cream) 24%);
 }
-:root[data-theme="dark"] .home-stack-next {
+:root[data-theme="dark"] .deck-next {
   border-color: var(--cream);
 }
 :root[data-theme="dark"] .home-card-actions button {
@@ -168,7 +168,7 @@
 }
 :root[data-theme="dark"] .bottom-nav {
   background: rgba(16, 22, 20, 0.98);
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-floating);
 }
 :root[data-theme="dark"] .bottom-nav button {
   color: #8f9e9a;

@@ -1,25 +1,13 @@
-import { Fragment, type AnimationEvent as ReactAnimationEvent } from "react";
+import { Fragment } from "react";
 import { useHomeViewModel } from "@/core/viewmodels/useHomeViewModel";
 import { BrandMark } from "../layout/BrandMark";
 import { Icon } from "../primitives/Icon";
 import { QuickAction } from "../primitives/QuickAction";
-import { CardFace } from "../cards/CardFace";
 import { TransactionRow } from "../money/TransactionRow";
 
 export function HomeScreen() {
   const vm = useHomeViewModel();
-  const { deck, balance, quest, styleProgress } = vm;
-  const stackingCard = deck.stackingId;
-  const activeCard = deck.cards.find((card) => card.id === deck.activeId) ?? deck.cards[0];
-  const rearCard = deck.cards.find((card) => card.id === deck.rearId);
-
-  // The View owns the CSS-animation detail; the ViewModel only learns that the
-  // promotion finished. Under React Native this becomes an Animated callback.
-  const finishPromotion = (event: ReactAnimationEvent<HTMLButtonElement>) => {
-    if (event.animationName === "home-card-stack-forward") vm.endStacking();
-  };
-
-  const handleCardPress = (card: { id: typeof deck.activeId }) => vm.pressCard(card.id);
+  const { balance, quest, styleProgress } = vm;
 
   return (
     <div className="tab-page home-page">
@@ -46,53 +34,11 @@ export function HomeScreen() {
         <div className="home-balance-heading">
           <span>{balance.heading}</span>
           <div>
-            <strong key={activeCard.id} className={stackingCard ? "is-changing" : ""} aria-live="polite">
-              {balance.label}
-            </strong>
+            <strong aria-live="polite">{balance.label}</strong>
             <button type="button" onClick={vm.toggleBalance} aria-label={balance.toggleLabel}>
               <Icon name={balance.visible ? "eye" : "eye-off"} />
             </button>
           </div>
-        </div>
-
-        <div
-          className={`home-card-deck ${stackingCard ? "is-switching" : ""}`}
-          aria-label="Wallet cards"
-          aria-busy={stackingCard ? true : undefined}
-        >
-          {deck.cards.map((card) => {
-            const isActive = card.id === activeCard.id;
-            const isStacking = stackingCard === card.id;
-            return (
-              <button
-                className={`home-stack-card payment-card-${card.variant} ${isActive ? "is-active" : "is-rear"} ${isStacking ? "is-stacking" : ""}`}
-                type="button"
-                key={card.id}
-                onClick={() => handleCardPress(card)}
-                onAnimationEnd={isStacking ? finishPromotion : undefined}
-                aria-label={
-                  isActive
-                    ? `Open ${card.displayLabel} card ending in ${card.last4}`
-                    : `Bring ${card.displayLabel} card to front`
-                }
-                aria-pressed={isActive}
-                aria-disabled={stackingCard ? true : undefined}
-              >
-                <CardFace card={card} />
-              </button>
-            );
-          })}
-          {rearCard && (
-            <button
-              className="home-stack-next"
-              type="button"
-              onClick={() => handleCardPress(rearCard)}
-              aria-label={`Show next card, ${rearCard.displayLabel}`}
-              aria-disabled={stackingCard ? true : undefined}
-            >
-              <Icon name="chevron-right" />
-            </button>
-          )}
         </div>
 
         <div className="quick-actions home-card-actions">

@@ -6,9 +6,9 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   padding: 9px 12px 10px;
-  border-top: 1px solid var(--line);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   background: rgba(251, 247, 239, 0.97);
-  box-shadow: 0 -8px 24px rgba(58, 50, 37, 0.05);
+  box-shadow: var(--shadow-floating);
 }
 .bottom-nav button {
   display: grid;

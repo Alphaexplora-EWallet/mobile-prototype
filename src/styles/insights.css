@@ -12,7 +12,7 @@
   margin-bottom: 22px;
   padding: 20px;
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   background: var(--surface);
 }
 .insights-total strong {
@@ -32,7 +32,7 @@
 .insight-list {
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   background: var(--surface);
 }
 .insight-row {

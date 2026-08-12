@@ -61,8 +61,7 @@
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
-  .home-stack-card,
-  .home-balance-heading strong.is-changing {
+  .deck-card {
     animation: none !important;
     transition: opacity 90ms ease !important;
   }
