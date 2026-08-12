@@ -1,7 +1,7 @@
 import { useNavigationStore } from "../navigation/navigation.store";
 import { INITIAL_SCREEN } from "../navigation/screens";
 import { usePreferencesStore } from "../stores/preferences.store";
-import { useQuestStore } from "../stores/quest.store";
+import { INITIAL_QUEST_XP, useQuestStore } from "../stores/quest.store";
 import { useUiStore } from "../stores/ui.store";
 import { useActivityStore } from "../stores/activity.store";
 import { useStatementStore } from "../stores/statement.store";
@@ -19,6 +19,7 @@ import { INITIAL_REQUESTS, useRequestsStore } from "../stores/requests.store";
 import { INITIAL_SETTINGS, useSettingsStore } from "../stores/settings.store";
 import { INITIAL_RECIPIENTS, useRecipientsStore } from "../stores/recipients.store";
 import { INITIAL_TRANSFER_DRAFT, useTransferStore } from "../stores/transfer.store";
+import { INITIAL_USER, useUserStore } from "../stores/user.store";
 import { useWalletStore } from "../stores/wallet.store";
 import { INITIAL_FROZEN, MOCK_CARDS } from "../data/mock/cards.mock";
 import { pesos } from "../money/money";
@@ -29,11 +30,21 @@ import { pesos } from "../money/money";
  * Stores are module singletons, which is what makes them reachable without
  * providers — and also what makes state leak between tests. Any test that
  * renders the app must start from a known state.
+ *
+ * Signing out needs exactly the same guarantee for the same reason, so this is
+ * no longer a test-only helper: `useProfileViewModel.signOut` calls it before
+ * resetting navigation to Welcome. Anything a new store holds on behalf of the
+ * signed-in user must therefore be restored here, or it survives the logout.
  */
 export function resetStores(): void {
   useNavigationStore.setState({ stack: [INITIAL_SCREEN] });
   usePreferencesStore.setState({ theme: "light", balanceVisible: true });
-  useQuestStore.setState({ phase: "available", limitSetupActive: false, rewardStyleApplied: false });
+  useQuestStore.setState({
+    phase: "available",
+    limitSetupActive: false,
+    rewardStyleApplied: false,
+    xpTotal: INITIAL_QUEST_XP,
+  });
   useUiStore.setState({ sheet: null });
   useActivityStore.setState({ selectedTransactionId: null });
   useStatementStore.setState({ selectedStatementId: null });
@@ -51,6 +62,7 @@ export function resetStores(): void {
   useKycStore.setState(INITIAL_KYC);
   useSettingsStore.setState(INITIAL_SETTINGS);
   useRecipientsStore.setState(INITIAL_RECIPIENTS);
+  useUserStore.setState(INITIAL_USER);
   useWalletStore.setState({
     // `cards` used to be safe to omit because nothing mutated it. Settling a
     // payment now writes balances back here, so it has to be restored too.

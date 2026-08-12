@@ -177,12 +177,34 @@
   margin: 0;
   color: var(--muted);
 }
+/* The verification tier, which had nowhere to be read outside the KYC screen. */
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 5px 12px 5px 9px;
+  border-radius: 999px;
+  color: var(--teal-dark);
+  background: var(--teal-soft);
+  font-size: var(--text-caption);
+  font-weight: 700;
+}
+.profile-badge svg {
+  width: 15px;
+  height: 15px;
+}
 .profile-level {
   width: 180px;
   height: 7px;
   margin-top: 15px;
   border-radius: 10px;
   background: #dce8e3;
+}
+.profile-level-label {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: var(--text-caption);
 }
 .profile-level span {
   display: block;
@@ -201,4 +223,27 @@
   margin: 0;
   color: var(--muted);
   line-height: 1.55;
+}
+.profile-section .text-button {
+  margin-top: 10px;
+  padding: 0;
+}
+/* Last thing on the page, and set apart from the rows above it. */
+.profile-signout {
+  margin: 22px 0 8px;
+}
+.profile-signout button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+.secondary-button.is-destructive {
+  color: var(--danger-ink);
+  border-color: var(--danger-line);
+}
+.secondary-button.is-destructive svg {
+  width: 18px;
+  height: 18px;
 }

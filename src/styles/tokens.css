@@ -20,6 +20,10 @@
   /* Error text and border. --coral is tuned for fills, not for reading against. */
   --danger-ink: #a64c32;
   --danger-line: rgba(204, 97, 70, 0.35);
+  /* Filled destructive button. The pair is picked together: --coral itself is
+     too light to carry white text at AA, so the fill is darkened here. */
+  --danger-fill: #c4442c;
+  --danger-fill-ink: #fff;
   --shadow: 0 16px 38px rgba(28, 46, 45, 0.12);
   /* Radius scale (DESIGN.md §17): small controls / buttons / cards & nav. */
   --radius-sm: 12px;
@@ -54,6 +58,9 @@
   --surface: rgba(23, 32, 29, 0.6);
   --danger-ink: #f0a08c;
   --danger-line: rgba(239, 130, 107, 0.4);
+  /* Inverted on dark: a light fill with dark ink reads better than the reverse. */
+  --danger-fill: #ef826b;
+  --danger-fill-ink: #16110f;
   --shadow: 0 16px 38px rgba(0, 4, 3, 0.5);
   --shadow-surface: var(--shadow);
   --shadow-floating: 0 12px 28px rgba(0, 4, 3, 0.55);

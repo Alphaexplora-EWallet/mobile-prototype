@@ -3,7 +3,7 @@ import { IMAGERY } from "../assets";
 import { useRewardViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
 export function RewardScreen() {
-  const { apply, home } = useRewardViewModel();
+  const { xpEarned, limitLabel, levelLabel, nextLevelLabel, levelPercent, apply, home } = useRewardViewModel();
 
   return (
     <div className="onboarding-page reward-page">
@@ -18,19 +18,19 @@ export function RewardScreen() {
         </div>
         <p className="eyebrow">Quest complete</p>
         <h1>You kept it intentional</h1>
-        <p>You stayed within your ₱3,000 limit today.</p>
+        <p>You stayed within your {limitLabel} limit today.</p>
         <div className="xp-earned">
-          <strong>80</strong>
+          <strong>{xpEarned}</strong>
           <b>XP</b>
           <span>earned</span>
         </div>
         <div className="level-progress">
           <span>
-            <b>Level 3</b>
-            <b>Level 4</b>
+            <b>{levelLabel}</b>
+            <b>{nextLevelLabel}</b>
           </span>
           <div className="progress-track">
-            <i style={{ width: "76%" }} />
+            <i style={{ width: `${levelPercent}%` }} />
           </div>
         </div>
 

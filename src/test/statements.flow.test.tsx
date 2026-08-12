@@ -28,7 +28,6 @@ const openStatements = async (user: ReturnType<typeof userEvent.setup>) => {
   await openHome(user);
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user.click(within(nav).getByRole("button", { name: /^Profile$/ }));
-  await press(user, /Profile options/i);
   await press(user, /^Statements/);
 };
 

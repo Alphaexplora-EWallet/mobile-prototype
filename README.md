@@ -122,8 +122,11 @@ These are deliberate, and each would need a real decision before changing:
 - **The quiz answer is captured but never scored.** The result is always "The Free Spirit".
 - **Dates are display strings** (`"Today, 8:23 AM"`). Introducing `Date` means timezone and locale
   requirements that do not exist for frozen fixtures.
-- **Level progress reads 75% on Home and Profile but 76% on Reward.** Present before the
-  restructure; left alone because it plausibly reflects XP just earned.
+- ~~**Level progress reads 75% on Home and Profile but 76% on Reward.**~~ Fixed. Level and
+  progress are derived from one `xpTotal` in `core/stores/quest.store.ts` through
+  `levelFromXp` in `core/domain/progress.ts`. The guess behind the old 76% turned out to be
+  right — Reward does show XP just earned — so completing a quest now actually pays the XP
+  out, and every bar in the app moves together.
 - **Back buttons now pop the stack (`goBack()`), except `Send money` and `Add money`,**
   whose back buttons still navigate to an explicit destination (`home`) to preserve the
   original behaviour — see the comment in `useMoneyMovementViewModel.ts`. `Fund wallet`

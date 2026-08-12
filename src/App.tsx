@@ -21,6 +21,7 @@ import { DepositScreen } from "@/ui/screens/DepositScreen";
 import { PaymentsScreen } from "@/ui/screens/PaymentsScreen";
 import { RewardScreen } from "@/ui/screens/RewardScreen";
 import { ProfileScreen } from "@/ui/screens/ProfileScreen";
+import { PersonalDetailsScreen } from "@/ui/screens/PersonalDetailsScreen";
 import { ActivityScreen } from "@/ui/screens/ActivityScreen";
 import { TransactionDetailScreen } from "@/ui/screens/TransactionDetailScreen";
 import { RecipientsScreen } from "@/ui/screens/RecipientsScreen";
@@ -92,6 +93,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   quest: QuestScreen,
   reward: RewardScreen,
   profile: ProfileScreen,
+  "personal-details": PersonalDetailsScreen,
   settings: SettingsScreen,
   "bank-accounts": BankAccountsScreen,
   notifications: NotificationsScreen,
@@ -112,7 +114,7 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
 };
 
 function App() {
-  const { theme, screen, activeTab, sheet, selectTab, dismissSheet } = useAppShellViewModel();
+  const { theme, screen, activeTab, sheet, selectTab, dismissSheet, confirmSheet } = useAppShellViewModel();
   const CurrentScreen = SCREENS[screen];
 
   return (
@@ -125,7 +127,7 @@ function App() {
             <CurrentScreen />
           </div>
           {activeTab && <BottomNav active={activeTab} onNavigate={selectTab} />}
-          {sheet && <ActionSheet result={sheet} onClose={dismissSheet} />}
+          {sheet && <ActionSheet result={sheet} onClose={dismissSheet} onConfirm={confirmSheet} />}
         </section>
       </main>
     </ThemeProvider>

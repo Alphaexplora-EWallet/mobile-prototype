@@ -16,6 +16,13 @@ export type QuestState = {
   limitSetupActive: boolean;
   /** Applying the unlocked card style is a separate, optional choice. */
   rewardStyleApplied: boolean;
+  /**
+   * Lifetime XP. Home, Profile and Reward all derive their level and progress
+   * bar from this one number through `levelFromXp`, instead of each carrying its
+   * own literal. 1,375 is chosen so the displayed level and percentage are
+   * unchanged from the values those screens used to hardcode: level 3, 75%.
+   */
+  xpTotal: number;
   quest: {
     title: string;
     /** The home card sets this title over two lines; the break is content, not styling. */
@@ -41,10 +48,19 @@ export type QuestState = {
   };
 };
 
+/**
+ * Chosen so `levelFromXp` reproduces exactly what Home, Profile and Reward used
+ * to hardcode: level 3, three quarters of the way to level 4. Exported because
+ * `resetStores` has to restore it, and a second copy of the number here would be
+ * the very drift this change removes.
+ */
+export const INITIAL_QUEST_XP = 1_375;
+
 export const useQuestStore = create<QuestState>()((set) => ({
   phase: "available",
   limitSetupActive: false,
   rewardStyleApplied: false,
+  xpTotal: INITIAL_QUEST_XP,
   quest: {
     title: "Keep today intentional",
     titleLines: ["Keep today", "intentional"],
@@ -60,7 +76,15 @@ export const useQuestStore = create<QuestState>()((set) => ({
     beginLimitSetup: () => set({ limitSetupActive: true }),
     cancelLimitSetup: () => set({ limitSetupActive: false }),
     confirmLimit: () => set({ limitSetupActive: false, phase: "tracking" }),
-    complete: () => set({ phase: "completed" }),
+    /**
+     * Finishing the quest is what pays the XP out, so the Reward screen and
+     * every level bar in the app agree without anyone adding the reward on by
+     * hand. Guarded on phase: completing twice would pay twice.
+     */
+    complete: () =>
+      set((state) =>
+        state.phase === "completed" ? state : { phase: "completed", xpTotal: state.xpTotal + state.quest.xpReward },
+      ),
     applyRewardStyle: () => set({ rewardStyleApplied: true }),
   },
 }));

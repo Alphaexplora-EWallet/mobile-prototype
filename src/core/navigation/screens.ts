@@ -45,7 +45,9 @@ export type ScreenParams = {
   quest: undefined;
   reward: undefined;
   profile: undefined;
-  /** The account layer, reached from the Settings and Account hubs. */
+  /** Name, mobile and email — the user's own details, edited behind an OTP. */
+  "personal-details": undefined;
+  /** App preferences. The account layer now hangs off Profile, not off here. */
   settings: undefined;
   /** Linked bank accounts management (GAP-09): add / remove / set default. */
   "bank-accounts": undefined;

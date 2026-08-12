@@ -27,20 +27,19 @@ const start = (options: MockGatewayOptions = {}) => {
 const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
   user.click(screen.getByRole("button", { name }));
 
-/** Onboards to Home and opens the Settings hub via Profile. */
-const openSettings = async (user: ReturnType<typeof userEvent.setup>) => {
+/** Onboards to Home and opens the Profile hub, where Verification now lives. */
+const openProfile = async (user: ReturnType<typeof userEvent.setup>) => {
   await press(user, /Start my journey/i);
   await press(user, /^Continue$/);
   await press(user, /Build my plan/i);
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user.click(within(nav).getByRole("button", { name: /^Profile$/ }));
-  await press(user, /Profile options/i);
 };
 
 describe("KYC resubmission path", () => {
   it("shows the rejection reason with a resubmit action", async () => {
     const user = start({ kycRejection: REJECTION });
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /VerificationYour tier/i);
 
     expect(await screen.findByRole("alert")).toHaveTextContent(/too dark/i);
@@ -52,7 +51,7 @@ describe("KYC resubmission path", () => {
 
   it("restarts capture at the failed step on resubmit", async () => {
     const user = start({ kycRejection: REJECTION });
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /VerificationYour tier/i);
     await press(user, /Resubmit/i);
 
@@ -66,7 +65,7 @@ describe("KYC resubmission path", () => {
 
   it("returns to the expected status after a successful re-capture", async () => {
     const user = start({ kycRejection: REJECTION });
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /VerificationYour tier/i);
     await press(user, /Resubmit/i);
 

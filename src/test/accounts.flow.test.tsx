@@ -24,14 +24,13 @@ const start = () => {
 const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
   user.click(screen.getByRole("button", { name }));
 
-/** Onboarding → home → Profile → Settings → Linked accounts. */
+/** Onboarding → home → Profile → Linked accounts. */
 const openLinkedAccounts = async (user: ReturnType<typeof userEvent.setup>) => {
   await press(user, /Start my journey/i);
   await press(user, /^Continue$/);
   await press(user, /Build my plan/i);
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user.click(within(nav).getByRole("button", { name: /^Profile$/ }));
-  await press(user, /Profile options/i);
   await press(user, /Linked accounts/i);
 };
 

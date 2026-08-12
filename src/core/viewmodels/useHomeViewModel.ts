@@ -1,7 +1,9 @@
 import { formatMoney, formatSignedMoney, maskMoney } from "../money/format";
 import type { IconName } from "../domain/icons";
+import { levelFromXp } from "../domain/progress";
 import { isIncoming } from "../domain/transaction";
 import { MOCK_TRANSACTIONS } from "../data/mock/payments.mock";
+import { MOCK_MONEY_STYLE } from "../data/mock/quiz.mock";
 import type { Screen } from "../navigation/screens";
 import { useNavigation } from "../navigation/useNavigation";
 import { preferencesActions, usePreferencesStore } from "../stores/preferences.store";
@@ -52,6 +54,7 @@ export function useHomeViewModel(): HomeViewModel {
   const theme = usePreferencesStore((state) => state.theme);
   const balanceVisible = usePreferencesStore((state) => state.balanceVisible);
   const quest = useQuestStore((state) => state.quest);
+  const level = levelFromXp(useQuestStore((state) => state.xpTotal));
 
   return {
     theme,
@@ -69,7 +72,11 @@ export function useHomeViewModel(): HomeViewModel {
       progressPercent: quest.progressPercent,
       hoursLeftLabel: quest.hoursLeftLabel,
     },
-    styleProgress: { title: "The Free Spirit · Level 3", percent: 75, percentLabel: "75%" },
+    styleProgress: {
+      title: `${MOCK_MONEY_STYLE.name} · Level ${level.level}`,
+      percent: level.percent,
+      percentLabel: `${level.percent}%`,
+    },
     transactions: MOCK_TRANSACTIONS.map((transaction) => ({
       id: transaction.id,
       glyph: transaction.glyph,

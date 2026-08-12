@@ -1,37 +1,79 @@
+import { useProfileViewModel } from "@/core/viewmodels/useProfileViewModel";
 import { Icon } from "../primitives/Icon";
-import { useProfileViewModel } from "@/core/viewmodels/useOnboardingViewModel";
+import { LinkRow } from "../primitives/LinkRow";
 
 export function ProfileScreen() {
-  const { name, retakeQuiz, openSettings } = useProfileViewModel();
+  const {
+    title,
+    name,
+    styleLine,
+    styleBlurb,
+    levelPercent,
+    levelLabel,
+    verificationBadge,
+    sections,
+    open,
+    retakeQuiz,
+    signOut,
+  } = useProfileViewModel();
 
   return (
     <div className="tab-page profile-page">
       <header className="centered-app-bar page-app-bar">
         <span />
-        <strong>Profile</strong>
-        {/* Was decorative with no handler; the settings hub hangs off it. */}
-        <button className="icon-button clear-button" type="button" aria-label="Profile options" onClick={openSettings}>
-          <Icon name="more" />
-        </button>
+        <strong>{title}</strong>
+        <span />
       </header>
+
       <section className="profile-hero">
         <span className="profile-avatar">
           <Icon name="user" />
         </span>
         <h1>{name}</h1>
-        <p>The Free Spirit · Level 3</p>
-        <div className="profile-level">
-          <span style={{ width: "75%" }} />
+        <p>{styleLine}</p>
+        {verificationBadge && (
+          <span className="profile-badge">
+            <Icon name="shield" />
+            {verificationBadge}
+          </span>
+        )}
+        {/* The bar is decorative; the percentage it encodes is read out beside it. */}
+        <div className="profile-level" aria-hidden="true">
+          <span style={{ width: `${levelPercent}%` }} />
         </div>
+        <small className="profile-level-label">{levelLabel}</small>
       </section>
+
       <section className="profile-section">
         <h2>Your money style</h2>
-        <p>You value freedom, experiences, and generosity. Your plan focuses on spending with intention.</p>
+        <p>{styleBlurb}</p>
+        <button className="text-button" type="button" onClick={retakeQuiz}>
+          Retake the quiz
+        </button>
       </section>
-      <section className="profile-section">
-        <h2>Prototype controls</h2>
-        <button className="secondary-button" type="button" onClick={retakeQuiz}>
-          Retake money style quiz
+
+      {sections.map((section) => (
+        <section className="money-field" key={section.id}>
+          <span className="field-label">{section.label}</span>
+          <div className="control-list">
+            {section.rows.map((row) => (
+              <LinkRow
+                key={row.id}
+                icon={row.icon}
+                title={row.title}
+                detail={row.detail}
+                meta={row.meta}
+                onClick={() => open(row.id)}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+
+      <section className="profile-signout">
+        <button className="secondary-button is-destructive" type="button" onClick={signOut}>
+          <Icon name="log-out" />
+          Sign out
         </button>
       </section>
     </div>

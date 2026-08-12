@@ -91,6 +91,12 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
       <path d="M8 10V7a4 4 0 018 0v3M12 14v3" />
     </>
   ),
+  "log-out": (
+    <>
+      <path d="M15 21H6a2 2 0 01-2-2V5a2 2 0 012-2h9" />
+      <path d="M11 12h10M17 8l4 4-4 4" />
+    </>
+  ),
   mail: (
     <>
       <rect x="3" y="5" width="18" height="14" rx="2" />
@@ -143,6 +149,12 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
   send: (
     <>
       <path d="M22 2L9.5 14.5M22 2l-7 20-4.5-7.5L3 10l19-8z" />
+    </>
+  ),
+  shield: (
+    <>
+      <path d="M12 3l7.5 3v5.5c0 4.6-3.1 8.4-7.5 9.5-4.4-1.1-7.5-4.9-7.5-9.5V6L12 3z" />
+      <path d="M8.8 12.2l2.2 2.2 4.2-4.4" />
     </>
   ),
   snow: (

@@ -81,6 +81,22 @@
 .action-sheet .primary-button {
   margin-top: 8px;
 }
+/* The confirm variant stacks its two answers; the way out sits below the way through. */
+.sheet-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+.sheet-actions .primary-button,
+.sheet-actions .secondary-button {
+  margin-top: 0;
+}
+/* Destructive, but still the primary answer: colour carries the warning, not weight. */
+.primary-button.is-destructive {
+  color: var(--danger-fill-ink);
+  background: var(--danger-fill);
+  box-shadow: none;
+}
 @keyframes sheet-rise {
   from {
     transform: translateY(30px);

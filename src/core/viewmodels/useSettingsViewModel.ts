@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { DeviceSession } from "../domain/security";
-import { unreadCount } from "../domain/notification";
-import type { Screen } from "../navigation/screens";
+import { NOTIFICATION_PREFERENCES, unreadCount, visibleNotifications } from "../domain/notification";
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
 import { activityActions } from "../stores/activity.store";
@@ -9,56 +8,53 @@ import { preferencesActions, usePreferencesStore } from "../stores/preferences.s
 import { settingsActions, useSettingsStore } from "../stores/settings.store";
 import { uiActions } from "../stores/ui.store";
 
-export type SettingsRow = { id: string; icon: string; title: string; detail: string; meta?: string };
-
 /**
- * The hub the app never had. Theme lived as a one-off toggle on Home and there
- * was nowhere at all to reach verification, limits, statements or sessions.
+ * App preferences, and only those.
+ *
+ * This screen used to be the whole account hub, because Profile offered no way
+ * in and something had to. Profile now carries the account and security rows
+ * directly, so what is left here is what the title actually promises: how the
+ * app looks and what it shows.
  */
 export function useSettingsViewModel() {
   const navigation = useNavigation();
   const theme = usePreferencesStore((state) => state.theme);
   const balanceVisible = usePreferencesStore((state) => state.balanceVisible);
-  const notifications = useSettingsStore((state) => state.notifications);
-  const unread = unreadCount(notifications);
-
-  const go = (screen: Screen) => () => navigation.navigate(screen);
 
   return {
     title: "Settings",
-    unreadLabel: unread > 0 ? String(unread) : undefined,
     darkMode: theme === "dark",
     setDarkMode: (enabled: boolean) => preferencesActions.setTheme(enabled ? "dark" : "light"),
     balanceVisible,
     // The store exposes a toggle, not a setter; the Toggle hands back the value
     // it wants, which for a two-state control is always the opposite of now.
     setBalanceVisible: () => preferencesActions.toggleBalanceVisibility(),
-    accountRows: [
-      { id: "account-details", icon: "bank", title: "Account details", detail: "Number, status, and funding" },
-      { id: "bank-accounts", icon: "bank", title: "Linked accounts", detail: "Bank accounts you can send from" },
-      { id: "limits", icon: "limit", title: "Limits and fees", detail: "What each rail costs and allows" },
-      { id: "kyc-status", icon: "user", title: "Verification", detail: "Your tier and what it unlocks" },
-      { id: "statements", icon: "receipt", title: "Statements", detail: "Monthly summaries to download" },
-    ],
-    appRows: [
-      { id: "notifications", icon: "mail", title: "Notifications", detail: "Payments, security, and quests" },
-      { id: "security-settings", icon: "lock", title: "Security", detail: "PIN, biometrics, and devices" },
-      { id: "help", icon: "heart", title: "Help and disputes", detail: "Common questions and how to dispute" },
-    ],
-    open: (id: string) => navigation.navigate(id as Screen),
-    openNotifications: go("notifications"),
     back: navigation.goBack,
   };
 }
 
 export function useNotificationsViewModel() {
   const navigation = useNavigation();
-  const notifications = useSettingsStore((state) => state.notifications);
+  const all = useSettingsStore((state) => state.notifications);
+  const preferences = useSettingsStore((state) => state.notificationPreferences);
+
+  /**
+   * The preferences filter the feed rather than sitting beside it. A toggle that
+   * changed nothing on screen would be asking the user to take it on trust.
+   */
+  const notifications = visibleNotifications(all, preferences);
 
   return {
     title: "Notifications",
     isEmpty: notifications.length === 0,
+    /** Distinguishes "nothing has happened" from "you switched it all off". */
+    isFiltered: notifications.length < all.length,
     unread: unreadCount(notifications),
+    preferences: NOTIFICATION_PREFERENCES.map((preference) => ({
+      ...preference,
+      enabled: preferences[preference.kind],
+    })),
+    setPreference: settingsActions.setNotificationPreference,
     items: notifications.map((notification) => ({
       id: notification.id,
       icon: notification.icon,

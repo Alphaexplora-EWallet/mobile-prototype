@@ -30,30 +30,42 @@ const openHome = async (user: ReturnType<typeof userEvent.setup>) => {
   await press(user, /Build my plan/i);
 };
 
-/** Profile's options button used to be decorative; it is the settings entry. */
-const openSettings = async (user: ReturnType<typeof userEvent.setup>, options?: MockGatewayOptions) => {
+/**
+ * Profile is the account hub. It used to hide all of this behind an unlabelled
+ * `⋯` button, so every one of these journeys began with a glyph nobody could
+ * find; they now begin on a labelled row.
+ */
+const openProfile = async (user: ReturnType<typeof userEvent.setup>, options?: MockGatewayOptions) => {
   const user2 = options ? start(options) : user;
   await openHome(user2);
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user2.click(within(nav).getByRole("button", { name: /^Profile$/ }));
-  await press(user2, /Profile options/i);
   return user2;
 };
 
-describe("settings hub", () => {
-  it("opens from the profile options button and reaches the account screens", async () => {
+describe("profile hub", () => {
+  it("reaches the account screens from labelled rows, not a hidden glyph", async () => {
     const user = start();
-    await openSettings(user);
+    await openProfile(user);
 
-    expect(await screen.findByText("Settings")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Profile options/i })).toBeNull();
     expect(screen.getByRole("button", { name: /Account detailsNumber/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /Limits and fees/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /VerificationYour tier/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Personal detailsName, mobile/i })).toBeTruthy();
+  });
+
+  it("shows the verification tier as a badge in the hero", async () => {
+    const user = start();
+    await openProfile(user);
+
+    expect(await screen.findByText(/Verified · one tier left/i)).toBeTruthy();
   });
 
   it("toggles dark mode from settings rather than only from Home", async () => {
     const user = start();
-    await openSettings(user);
+    await openProfile(user);
+    await press(user, /SettingsAppearance and privacy/i);
 
     const darkMode = screen.getByRole("switch", { name: /Dark mode/i });
     expect(darkMode).toHaveAttribute("aria-checked", "false");
@@ -62,10 +74,116 @@ describe("settings hub", () => {
   });
 });
 
+describe("sign out", () => {
+  it("asks first, and cancelling leaves you where you were", async () => {
+    const user = start();
+    await openProfile(user);
+    await press(user, /^Sign out$/);
+
+    expect(await screen.findByRole("dialog")).toHaveTextContent(/Sign out\?/i);
+    await press(user, /^Cancel$/);
+
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.getByRole("button", { name: /Personal detailsName, mobile/i })).toBeTruthy();
+  });
+
+  it("returns to welcome and clears state that belonged to the session", async () => {
+    const user = start();
+    await openProfile(user);
+
+    // Move a preference off its default so the reset has something to undo.
+    await press(user, /SettingsAppearance and privacy/i);
+    await user.click(screen.getByRole("switch", { name: /Show balances/i }));
+    expect(screen.getByRole("switch", { name: /Show balances/i })).toHaveAttribute("aria-checked", "false");
+    await press(user, /Back to home/i);
+
+    await press(user, /^Sign out$/);
+    await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: /^Sign out$/ }));
+
+    expect(await screen.findByRole("button", { name: /Start my journey/i })).toBeTruthy();
+
+    // Signing back in finds the balance visible again, not still hidden.
+    await openHome(user);
+    expect(screen.getByText("₱24,680.50")).toBeTruthy();
+  });
+});
+
+describe("personal details", () => {
+  it("saves a name change without asking for a code", async () => {
+    const user = start();
+    await openProfile(user);
+    await press(user, /Personal detailsName, mobile/i);
+    await press(user, /Full nameMaya Santos/i);
+
+    const field = screen.getByRole("textbox", { name: /Full name/i });
+    await user.clear(field);
+    await user.type(field, "Maya R. Santos");
+    await press(user, /^Save$/);
+
+    expect(await screen.findByText(/Full name updated/i)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Full nameMaya R. Santos/i })).toBeTruthy();
+  });
+
+  it("steps up through a one-time code before moving where codes are sent", async () => {
+    const user = start();
+    await openProfile(user);
+    await press(user, /Personal detailsName, mobile/i);
+    await press(user, /Email address/i);
+
+    const field = screen.getByRole("textbox", { name: /Email address/i });
+    await user.clear(field);
+    await user.type(field, "maya@newmail.ph");
+    await press(user, /^Save$/);
+
+    // The change is not committed yet — a code has to prove it first.
+    expect(await screen.findByRole("heading", { name: /Confirm it is you/i })).toBeTruthy();
+    await user.type(screen.getByRole("textbox", { name: /One-time code/i }), "135790");
+    await press(user, /Save email address/i);
+
+    expect(await screen.findByText(/Email address updated/i)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Email addressmaya@newmail.ph/i })).toBeTruthy();
+  });
+
+  it("keeps the old address when the code is wrong", async () => {
+    const user = start();
+    await openProfile(user);
+    await press(user, /Personal detailsName, mobile/i);
+    await press(user, /Email address/i);
+
+    const field = screen.getByRole("textbox", { name: /Email address/i });
+    await user.clear(field);
+    await user.type(field, "attacker@example.com");
+    await press(user, /^Save$/);
+
+    await user.type(await screen.findByRole("textbox", { name: /One-time code/i }), "000000");
+    await press(user, /Save email address/i);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/code is not right/i);
+    await press(user, /^Cancel$/);
+    expect(screen.getByRole("button", { name: /Email addressmaya.santos@example.ph/i })).toBeTruthy();
+  });
+});
+
+describe("notification preferences", () => {
+  it("switching a category off removes it from the feed", async () => {
+    const user = start();
+    await openProfile(user);
+    await press(user, /NotificationsPayments, security/i);
+
+    expect(await screen.findByText(/You received ₱2,000.00/i)).toBeTruthy();
+
+    await user.click(screen.getByRole("switch", { name: /Payments notifications/i }));
+    expect(screen.queryByText(/You received ₱2,000.00/i)).toBeNull();
+
+    await user.click(screen.getByRole("switch", { name: /Payments notifications/i }));
+    expect(screen.getByText(/You received ₱2,000.00/i)).toBeTruthy();
+  });
+});
+
 describe("notifications", () => {
   it("shows unread notifications and marks them read", async () => {
     const user = start();
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /NotificationsPayments, security/i);
 
     expect(await screen.findByText(/You received ₱2,000.00/i)).toBeTruthy();
@@ -77,7 +195,7 @@ describe("notifications", () => {
 
   it("opens the transaction a payment notification points at", async () => {
     const user = start();
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /NotificationsPayments, security/i);
     await press(user, /You received ₱2,000.00/i);
 
@@ -88,7 +206,7 @@ describe("notifications", () => {
 describe("verification", () => {
   it("shows the current tier and what the next one unlocks", async () => {
     const user = start();
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /VerificationYour tier/i);
 
     expect(await screen.findByRole("heading", { name: "Verified" })).toBeTruthy();
@@ -98,7 +216,7 @@ describe("verification", () => {
 
   it("walks the capture flow and promotes the tier", async () => {
     const user = start();
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /VerificationYour tier/i);
     await press(user, /Start verification/i);
 
@@ -130,7 +248,7 @@ describe("verification", () => {
 
   it("skips the back-of-card step for a passport", async () => {
     const user = start();
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /VerificationYour tier/i);
     await press(user, /Start verification/i);
 
@@ -147,7 +265,7 @@ describe("verification", () => {
 describe("limits and statements", () => {
   it("shows per-rail limits and locks what the tier does not allow", async () => {
     const user = start();
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /Limits and fees/i);
 
     const pesonet = await screen.findByRole("region", { name: "PESONet" });
@@ -162,7 +280,7 @@ describe("limits and statements", () => {
 
   it("gates statements behind full verification, and offers the way out", async () => {
     const user = start();
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /StatementsMonthly summaries/i);
 
     expect(await screen.findByRole("alert")).toHaveTextContent(/unlock once you are fully verified/i);
@@ -175,7 +293,6 @@ describe("limits and statements", () => {
     await openHome(user);
     const nav = screen.getByRole("navigation", { name: /primary navigation/i });
     await user.click(within(nav).getByRole("button", { name: /^Profile$/ }));
-    await press(user, /Profile options/i);
     await press(user, /StatementsMonthly summaries/i);
 
     expect(await screen.findByRole("button", { name: /July 202612 transactions/i })).toBeTruthy();
@@ -185,7 +302,7 @@ describe("limits and statements", () => {
 describe("security settings", () => {
   it("lists sessions and signs out another device but not this one", async () => {
     const user = start();
-    await openSettings(user);
+    await openProfile(user);
     await press(user, /SecurityPIN, biometrics/i);
 
     expect(await screen.findByText(/Chrome on macOS/i)).toBeTruthy();
@@ -269,7 +386,7 @@ describe("wired-up dead controls", () => {
     const user = start();
     await openHome(user);
     await press(user, /Open profile/i);
-    expect(await screen.findByRole("button", { name: /Retake money style quiz/i })).toBeTruthy();
+    expect(await screen.findByRole("button", { name: /Retake the quiz/i })).toBeTruthy();
   });
 
   it("opens the add-card screen from Wallet", async () => {

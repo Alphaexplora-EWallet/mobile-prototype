@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { QuizQuestion } from "../domain/quiz";
 import { quizProgressPercent } from "../domain/quiz";
-import { MOCK_QUIZ_QUESTION } from "../data/mock/quiz.mock";
-import { MOCK_CARDHOLDER } from "../data/mock/cards.mock";
+import { levelFromXp } from "../domain/progress";
+import { MOCK_MONEY_STYLE, MOCK_QUIZ_QUESTION } from "../data/mock/quiz.mock";
 import { formatMoney } from "../money/format";
 import { useNavigation } from "../navigation/useNavigation";
 import { questActions, useQuestStore } from "../stores/quest.store";
@@ -65,7 +65,7 @@ export function useQuizViewModel(): {
 export function useResultViewModel() {
   const navigation = useNavigation();
   return {
-    styleName: "The Free Spirit",
+    styleName: MOCK_MONEY_STYLE.name,
     continue: () => navigation.resetTo("home"),
     close: () => navigation.resetTo("home"),
   };
@@ -74,26 +74,24 @@ export function useResultViewModel() {
 export function useRewardViewModel() {
   const navigation = useNavigation();
   const quest = useQuestStore((state) => state.quest);
+  /**
+   * The quest has already paid out by the time this screen renders
+   * (`questActions.complete` awards the XP), so this is the level *after* the
+   * reward — which is what a screen announcing "80 XP earned" should show.
+   */
+  const level = levelFromXp(useQuestStore((state) => state.xpTotal));
   return {
     xpEarned: quest.xpReward,
     limitLabel: formatMoney(quest.limit, { fractionDigits: 0 }),
     rewardName: quest.rewardName,
+    levelLabel: `Level ${level.level}`,
+    nextLevelLabel: `Level ${level.level + 1}`,
+    levelPercent: level.percent,
     apply: () => {
       questActions.applyRewardStyle();
       walletActions.selectCard("travel");
       navigation.navigate("wallet");
     },
     home: () => navigation.navigate("home"),
-  };
-}
-
-export function useProfileViewModel() {
-  const navigation = useNavigation();
-  return {
-    name: MOCK_CARDHOLDER.name,
-    styleLine: "The Free Spirit · Level 3",
-    levelPercent: 75,
-    retakeQuiz: () => navigation.navigate("quiz"),
-    openSettings: () => navigation.navigate("settings"),
   };
 }

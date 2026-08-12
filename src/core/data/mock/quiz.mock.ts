@@ -1,4 +1,10 @@
-import type { QuizQuestion } from "../../domain/quiz";
+import type { MoneyStyle, QuizQuestion } from "../../domain/quiz";
+
+/** Always this one, whatever the user answers. See the README's shortcut list. */
+export const MOCK_MONEY_STYLE: MoneyStyle = {
+  name: "The Free Spirit",
+  blurb: "You value freedom, experiences, and generosity. Your plan focuses on spending with intention.",
+};
 
 export const MOCK_QUIZ_QUESTION: QuizQuestion = {
   prompt: "When you want something, what usually happens?",
