@@ -14,7 +14,7 @@
   letter-spacing: -2.2px;
 }
 .progress-heading {
-  color: var(--teal);
+  color: var(--brand);
   margin-bottom: 10px;
 }
 .progress-track {
@@ -30,7 +30,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--teal);
+  background: var(--brand);
 }
 .orbit-accent {
   position: relative;
@@ -44,7 +44,7 @@
   top: 24px;
   width: 150px;
   height: 74px;
-  border-top: 3px dotted rgba(8, 126, 121, 0.42);
+  border-top: 3px dotted rgba(14, 59, 92, 0.42);
   border-radius: 50%;
   transform: rotate(-8deg);
 }
@@ -52,7 +52,7 @@
   position: absolute;
   right: 1px;
   top: 48px;
-  color: var(--amber);
+  color: var(--gold);
   font-size: 26px;
 }
 .answer-list {
@@ -88,9 +88,9 @@
   cursor: pointer;
 }
 .answer-option.is-selected {
-  border-color: var(--teal);
-  background: var(--teal-soft);
-  box-shadow: inset 0 0 0 1px rgba(8, 126, 121, 0.2);
+  border-color: var(--brand);
+  background: var(--success-soft);
+  box-shadow: inset 0 0 0 1px rgba(14, 59, 92, 0.2);
 }
 .answer-icon,
 .answer-check {
@@ -99,7 +99,7 @@
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  color: var(--teal);
+  color: var(--brand);
   background: #f3eee4;
 }
 .answer-option.is-selected .answer-icon {
@@ -108,8 +108,8 @@
 .answer-check {
   width: 36px;
   height: 36px;
-  color: white;
-  background: var(--teal);
+  color: var(--primary-ink);
+  background: var(--primary-fill);
 }
 .answer-check svg {
   width: 20px;

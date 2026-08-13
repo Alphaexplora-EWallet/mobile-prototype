@@ -16,9 +16,9 @@
   place-items: center;
   width: 84px;
   height: 84px;
-  border: 2px solid var(--teal);
+  border: 2px solid var(--brand);
   border-radius: 20px;
-  color: var(--teal);
+  color: var(--brand);
   background: var(--cream);
 }
 .viewfinder-frame svg {
@@ -38,10 +38,10 @@
   gap: 6px;
   margin-top: 20px;
   padding: 20px;
-  border: 1.5px solid var(--teal);
+  border: 1.5px solid var(--brand);
   border-radius: 22px;
   text-align: center;
-  background: var(--teal-soft);
+  background: var(--success-soft);
 }
 .decoded-code h2 {
   margin: 4px 0 0;
@@ -84,7 +84,7 @@
   font-size: 16px;
 }
 .qr-amount {
-  color: var(--teal-dark);
+  color: var(--success-text);
   font-size: 21px;
   font-weight: 900;
   letter-spacing: -0.6px;

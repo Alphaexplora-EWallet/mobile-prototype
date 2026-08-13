@@ -52,8 +52,8 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  color: var(--teal);
-  background: var(--teal-soft);
+  color: var(--brand);
+  background: var(--success-soft);
   font-size: 15px;
 }
 .insight-copy {

@@ -22,7 +22,7 @@
   gap: 3px;
   padding: 12px;
   border-radius: 16px;
-  background: var(--teal-soft);
+  background: var(--success-soft);
 }
 .statement-balance-row small {
   color: var(--muted);
@@ -97,7 +97,7 @@
   font-size: 13px;
 }
 .statement-entry-amounts strong.positive {
-  color: var(--teal-dark);
+  color: var(--success-text);
 }
 .statement-entry-amounts small {
   color: var(--muted);

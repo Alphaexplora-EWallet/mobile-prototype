@@ -26,8 +26,8 @@
   cursor: pointer;
 }
 .notification-row.is-unread {
-  border-color: var(--teal);
-  background: var(--teal-soft);
+  border-color: var(--brand);
+  background: var(--success-soft);
 }
 .notification-icon {
   display: grid;
@@ -36,7 +36,7 @@
   width: 36px;
   height: 36px;
   border-radius: var(--radius-sm);
-  color: var(--teal);
+  color: var(--brand);
   background: var(--cream);
 }
 .notification-icon svg {
@@ -67,7 +67,7 @@
   height: 9px;
   margin-top: 6px;
   border-radius: 50%;
-  background: var(--teal);
+  background: var(--brand);
 }
 
 /* --- Sessions ------------------------------------------------------------- */
@@ -98,8 +98,8 @@
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  color: var(--cream);
-  background: var(--teal);
+  color: var(--primary-ink);
+  background: var(--primary-fill);
 }
 .tier-badge svg {
   width: 27px;
@@ -147,11 +147,11 @@
   width: 17px;
   height: 17px;
   margin-top: 1px;
-  color: var(--teal);
+  color: var(--brand);
 }
 .tier-next {
-  border-color: var(--teal);
-  background: var(--teal-soft);
+  border-color: var(--brand);
+  background: var(--success-soft);
 }
 .tier-next p {
   margin: 0 0 14px;
@@ -184,14 +184,14 @@
   place-items: center;
   width: 96px;
   height: 68px;
-  border: 2px solid var(--teal);
+  border: 2px solid var(--brand);
   border-radius: var(--radius-sm);
-  color: var(--teal);
+  color: var(--brand);
   background: var(--cream);
 }
 .capture-frame.is-done {
-  color: var(--cream);
-  background: var(--teal);
+  color: var(--primary-ink);
+  background: var(--primary-fill);
 }
 .capture-frame svg {
   width: 30px;
@@ -296,7 +296,7 @@
   font-size: 16px;
 }
 .rail-fee {
-  color: var(--teal-dark);
+  color: var(--brand);
   font-size: 13px;
   font-weight: 800;
 }
@@ -368,7 +368,7 @@
   line-height: 1.55;
 }
 .help-topic.is-open {
-  border-color: var(--teal);
+  border-color: var(--brand);
 }
 .dispute-detail {
   width: 100%;
@@ -383,7 +383,7 @@
   background: var(--surface);
 }
 .dispute-detail:focus-visible {
-  border-color: var(--teal);
+  border-color: var(--brand);
 }
 
 /* --- Cards and accounts --------------------------------------------------- */
@@ -421,13 +421,13 @@
   flex: none;
   padding: 4px 8px;
   border-radius: 999px;
-  color: var(--teal-dark);
+  color: var(--success-text);
   font-size: 10px;
   font-style: normal;
   font-weight: 900;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  background: var(--teal-soft);
+  background: var(--success-soft);
 }
 .linked-account-row .clear-button {
   display: grid;
@@ -442,7 +442,7 @@
   height: 18px;
 }
 .linked-account-row .clear-button[aria-pressed="true"] {
-  color: var(--teal);
+  color: var(--brand);
 }
 .linked-account-row .clear-button:disabled {
   cursor: default;
