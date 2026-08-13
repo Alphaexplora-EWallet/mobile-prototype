@@ -35,7 +35,6 @@ export function useSignUpViewModel() {
       setMobile(normalizeMobileNumber(value).slice(0, 11));
       setAttempted(false);
     },
-    canContinue: valid,
     error: attempted && !valid ? mobileNumberFormatMessage() : null,
     continue: () => {
       if (!valid) {
@@ -127,7 +126,6 @@ export function useSignUpDetailsViewModel() {
     setFullName,
     email,
     setEmail,
-    canContinue: valid,
     error: attempted && !valid ? "Add your full name, and check the email address." : null,
     continue: () => {
       if (!valid) {
