@@ -123,26 +123,59 @@
 }
 .home-card-summary {
   position: relative;
-  overflow: hidden;
-  display: block;
+  display: grid;
+  align-content: space-between;
   width: 100%;
   aspect-ratio: 1.72;
-  padding: 0;
+  padding: 22px;
   border: 0;
   border-radius: var(--radius-lg);
   text-align: left;
+  color: white;
+  background:
+    radial-gradient(circle at 88% 15%, rgba(255, 255, 255, 0.16), transparent 40%),
+    linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
   cursor: pointer;
-  box-shadow: var(--shadow-surface);
+  box-shadow: var(--shadow-primary);
   transition: transform 0.2s ease;
-}
-.home-card-summary .card-front-content {
-  inset: 0;
 }
 .home-card-summary:hover {
   transform: translateY(-2px);
 }
 .home-card-summary:active {
   transform: scale(0.99);
+}
+.home-card-summary-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.home-card-summary-top .brand-mark {
+  width: 84px;
+}
+.home-card-summary-visa {
+  font-size: 21px;
+  font-style: italic;
+  letter-spacing: -1px;
+}
+.home-card-summary-label {
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: 0.85;
+}
+.home-card-summary-number {
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.home-card-summary-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
 }
 .quick-actions {
   display: grid;
