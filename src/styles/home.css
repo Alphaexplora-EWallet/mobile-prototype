@@ -16,6 +16,7 @@
 }
 /* Home header: uniform 40px circular action icons. */
 .home-page .theme-toggle,
+.home-page .bell-button,
 .home-page .avatar-button,
 .home-page .home-balance-heading button {
   width: 40px;
@@ -23,16 +24,31 @@
   border-radius: 50%;
 }
 .home-page .theme-toggle,
+.home-page .bell-button,
 .home-page .avatar-button {
+  position: relative;
   color: var(--teal);
   border-color: transparent;
   background: var(--teal-soft);
 }
-.home-page .theme-toggle:hover {
+.home-page .theme-toggle:hover,
+.home-page .bell-button:hover {
   color: var(--cream);
   background: var(--teal);
 }
+.home-page .bell-button::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--cream);
+  border-radius: 50%;
+  background: var(--coral);
+}
 .home-page .theme-toggle svg,
+.home-page .bell-button svg,
 .home-page .avatar-button svg,
 .home-page .home-balance-heading button svg {
   width: 20px;
@@ -45,7 +61,34 @@
   display: grid;
   gap: 15px;
 }
+.home-balance-heading {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+.home-skyline {
+  position: absolute;
+  top: -18px;
+  right: -10px;
+  z-index: 0;
+  width: 190px;
+  height: auto;
+  pointer-events: none;
+}
+.home-skyline-sun {
+  fill: var(--amber);
+}
+.home-skyline-mountain-far {
+  fill: var(--teal-soft);
+  opacity: 0.16;
+}
+.home-skyline-mountain-near {
+  fill: var(--teal);
+  opacity: 0.16;
+}
 .home-balance-heading > span {
+  position: relative;
+  z-index: 1;
   display: block;
   margin-bottom: 5px;
   color: var(--muted);
@@ -53,6 +96,8 @@
   font-weight: 650;
 }
 .home-balance-heading > div {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -75,6 +120,29 @@
   color: var(--teal);
   background: var(--teal-soft);
   cursor: pointer;
+}
+.home-card-summary {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.72;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--shadow-surface);
+  transition: transform 0.2s ease;
+}
+.home-card-summary .card-front-content {
+  inset: 0;
+}
+.home-card-summary:hover {
+  transform: translateY(-2px);
+}
+.home-card-summary:active {
+  transform: scale(0.99);
 }
 .quick-actions {
   display: grid;

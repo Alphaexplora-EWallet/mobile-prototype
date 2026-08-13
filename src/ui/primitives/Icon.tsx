@@ -23,6 +23,12 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
       <path d="M3 10h18M5 10v8m4-8v8m6-8v8m4-8v8M3 21h18M12 3l9 5H3l9-5z" />
     </>
   ),
+  bell: (
+    <>
+      <path d="M6 10a6 6 0 0112 0c0 4 1.5 5.8 2.3 6.6a1 1 0 01-.7 1.7H4.4a1 1 0 01-.7-1.7C4.5 15.8 6 14 6 10z" />
+      <path d="M9.5 20a2.5 2.5 0 005 0" />
+    </>
+  ),
   bolt: <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />,
   card: (
     <>

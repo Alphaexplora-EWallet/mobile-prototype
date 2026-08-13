@@ -10,6 +10,7 @@ import { preferencesActions, usePreferencesStore } from "../stores/preferences.s
 import { useQuestStore } from "../stores/quest.store";
 import { activityActions } from "../stores/activity.store";
 import type { Theme } from "@/ui/theme/ThemeContext";
+import type { CardPresentation } from "./useCardViews";
 import { useSelectedCard } from "./useCardViews";
 
 export type QuickActionId = "send" | "request" | "deposit" | "pay";
@@ -27,6 +28,7 @@ export type HomeViewModel = {
   theme: Theme;
   themeToggleLabel: string;
   balance: { heading: string; label: string; visible: boolean; toggleLabel: string };
+  card: CardPresentation;
   quickActions: readonly QuickActionVM[];
   quest: { titleLines: readonly string[]; spendLabel: string; progressPercent: number; hoursLeftLabel: string };
   styleProgress: { title: string; percent: number; percentLabel: string };
@@ -40,6 +42,7 @@ export type HomeViewModel = {
   }[];
   toggleTheme(): void;
   toggleBalance(): void;
+  pressCard(): void;
   pressQuickAction(id: QuickActionId): void;
   pressQuest(): void;
   pressTransaction(id: string): void;
@@ -65,6 +68,7 @@ export function useHomeViewModel(): HomeViewModel {
       visible: balanceVisible,
       toggleLabel: `${balanceVisible ? "Hide" : "Show"} ${selected.displayLabel} balance`,
     },
+    card: selected,
     quickActions: QUICK_ACTIONS,
     quest: {
       titleLines: quest.titleLines,
@@ -87,6 +91,7 @@ export function useHomeViewModel(): HomeViewModel {
     })),
     toggleTheme: preferencesActions.toggleTheme,
     toggleBalance: preferencesActions.toggleBalanceVisibility,
+    pressCard: () => navigation.switchTab("wallet"),
     pressQuickAction: (id) =>
       navigation.navigate(
         id === "send" ? "transfer" : id === "request" ? "request-entry" : id === "deposit" ? "deposit" : "payments",

@@ -1,5 +1,7 @@
 import { Fragment } from "react";
 import { useHomeViewModel } from "@/core/viewmodels/useHomeViewModel";
+import { HomeSkyline } from "../assets/HomeSkyline";
+import { HomeCardSummary } from "../cards/HomeCardSummary";
 import { BrandMark } from "../layout/BrandMark";
 import { Icon } from "../primitives/Icon";
 import { QuickAction } from "../primitives/QuickAction";
@@ -24,6 +26,14 @@ export function HomeScreen() {
           >
             <Icon name="contrast" />
           </button>
+          <button
+            className="bell-button"
+            type="button"
+            aria-label="Open notifications"
+            onClick={() => vm.goTo("notifications")}
+          >
+            <Icon name="bell" />
+          </button>
           <button className="avatar-button" type="button" aria-label="Open profile" onClick={vm.openProfile}>
             <Icon name="user" />
           </button>
@@ -32,6 +42,7 @@ export function HomeScreen() {
 
       <section className="home-wallet-block">
         <div className="home-balance-heading">
+          <HomeSkyline />
           <span>{balance.heading}</span>
           <div>
             <strong aria-live="polite">{balance.label}</strong>
@@ -40,6 +51,8 @@ export function HomeScreen() {
             </button>
           </div>
         </div>
+
+        <HomeCardSummary card={vm.card} onPress={vm.pressCard} />
 
         <div className="quick-actions home-card-actions">
           {vm.quickActions.map((action) => (

@@ -7,6 +7,7 @@ export type IconName =
   | "arrow-down"
   | "arrow-left"
   | "bank"
+  | "bell"
   | "bolt"
   | "card"
   | "check"
