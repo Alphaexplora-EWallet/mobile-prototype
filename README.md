@@ -7,12 +7,18 @@ no backend today — `docs/backend-architecture.md` (draft, ALP-6) and `docs/mul
 
 ## Docs
 
-| File                           | Status          | Content                                                             |
-| ------------------------------ | --------------- | ------------------------------------------------------------------- |
-| `README.md` (this file)        | Current         | What the prototype is, how to run it, architecture overview         |
-| `docs/backend-architecture.md` | Draft (ALP-6)   | The planned backend: schemas, NetBank BaaS mapping, migration path  |
-| `docs/multi-user-model.md`     | Decided (ALP-7) | How FIN-A users map to NetBank accounts (the decision behind ALP-6) |
-| `AGENTS.md` / `CLAUDE.md`      | Current         | Working guidelines for agents / Claude Code                         |
+| File                            | Status               | Content                                                                    |
+| ------------------------------- | -------------------- | -------------------------------------------------------------------------- |
+| `README.md` (this file)         | Current              | What the prototype is, how to run it, architecture overview                |
+| `docs/README.md`                | Current              | Documentation map: every doc, its status, and its owner                    |
+| `docs/backend-architecture.md`  | Draft (ALP-6)        | The planned backend: schemas, NetBank BaaS mapping, migration path         |
+| `docs/multi-user-model.md`      | Decided (ALP-7)      | How FIN-A users map to NetBank accounts (the decision behind ALP-6)        |
+| `docs/frontend-architecture.md` | Current              | The frontend as it is: MVVM, platform-seam layering, navigation, tests     |
+| `docs/data-layer.md`            | In progress (ALP-34) | Data/API surface: repositories, mock fixtures, stores, money, NetBank path |
+| `docs/developer-guide.md`       | In progress (ALP-34) | Setup, structure walkthrough, how to add a screen/feature                  |
+| `CHANGELOG.md`                  | In progress (ALP-34) | What shipped, from git history                                             |
+| `DESIGN.md`                     | Current (stale name) | UI layout & visual design guide (still says "EasyPay"; see doc map)        |
+| `AGENTS.md` / `CLAUDE.md`       | Current              | Working guidelines for agents / Claude Code                                |
 
 ```bash
 npm install
@@ -99,7 +105,7 @@ rather than `Intl.NumberFormat` — see the comment in `core/money/format.ts` fo
 `src/test/app.flow.test.tsx` is a **golden snapshot** of the app's whole journey — 15 snapshot
 stops covering onboarding, the full quest flow, the money screens, and all five tabs — captured
 against the original single-file version before the restructure began. It is the proof that the
-whole restructure did not change what the app renders. The screen map has since grown to 47
+whole restructure did not change what the app renders. The screen map has since grown to 48
 screens (`ScreenParams` in `core/navigation/screens.ts`); the golden test is a representative
 walk, not an exhaustive one.
 
