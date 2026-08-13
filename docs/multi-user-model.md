@@ -1,8 +1,8 @@
 # FIN-A Wallet — NetBank Multi-User Model (Decision)
 
-Status: **decided** (issue ALP-7). Records how multiple FIN-A users map onto NetBank accounts, and
-why. Complements `backend-architecture.md`, which assumes this model in its TL;DR; this file is the
-decision behind that assumption.
+Status: **decided** (issue ALP-7), verified against current `src/core` 2026-08-13. Records how
+multiple FIN-A users map onto NetBank accounts, and why. Complements `backend-architecture.md`,
+which assumes this model in its TL;DR; this file is the decision behind that assumption.
 
 ## Decision
 
@@ -18,6 +18,25 @@ shared account with internal division.** Concretely:
 
 This matches what the mock already models (`src/core/data/mock/accounts.mock.ts`): Maya's two cards
 are two distinct NetBank account numbers under one customer.
+
+## Status against current code (2026-08-13)
+
+Verified against the current tree — the model holds and the prototype has moved closer to it:
+
+- `data/mock/accounts.mock.ts` — two `BankAccount`s (`acct-main` 009123456789, `acct-travel`
+  009987651198), both in the name `MAYA SANTOS`, both at "NetBank (A Rural Bank), Inc.": one
+  customer, two accounts, exactly the 1:1 mapping above.
+- `data/mock/user.mock.ts` — the prototype now models the person separately from the card
+  (`core/domain/user.ts`): full name, mobile, email, status, shaped after `identity.users` so the
+  client model and the server schema do not have to be reconciled later.
+- `data/mock/accounts.mock.ts` also seeds `MOCK_VIRTUAL_ACCOUNT` — the per-wallet inbound address
+  (VCA) that the "inbound funding stays per wallet" line above describes.
+- `stores/accounts.store.ts` (GAP-09) added user-managed **linked** bank accounts beyond the card
+  faces; those are additional per-account NetBank records under the same customer, not a pooled
+  balance — consistent with this decision.
+- The savings jar (`payments.openJar` / `jarState`) is the one intentional exception to "one
+  account per wallet": it is a second balance on the same wallet, still a NetBank-side account
+  rather than an internal FIN-A sub-ledger.
 
 ## Why not a shared account with internal division
 

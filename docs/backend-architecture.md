@@ -1,8 +1,12 @@
 # FIN-A Wallet — Backend Architecture & Database Schemas (Draft)
 
-Status: **initial draft** (issue ALP-6). The repo is currently a frontend-only prototype whose
-`BankingGateway` is an in-memory mock. This document is the first cut of the backend that will
-replace the mock, built on NetBank as the Banking-as-a-Service custodian.
+Status: **draft** (issue ALP-6), refreshed 2026-08-13 against current `src/core`. The repo is a
+frontend-only prototype whose `BankingGateway` is an in-memory mock
+(`platform/web/createMockNetBankGateway.ts`). This document is the first cut of the backend that
+will replace the mock, built on NetBank as the Banking-as-a-Service custodian. Since the first cut,
+the prototype has landed profile / personal details, an in-app notification feed, a savings jar,
+send-to-mobile, request money, buy load, cash-out, spending insights, statement export, linked bank
+accounts, and a biller catalog — §2 and §5.1 map those onto the backend contexts below.
 
 ## 0. TL;DR — decisions locked in
 
@@ -31,7 +35,10 @@ replace the mock, built on NetBank as the Banking-as-a-Service custodian.
 
 FIN-A Wallet is a personality-powered Philippine e-wallet: pesos, cards ("Main wallet",
 "Travel jar"), transfers, bill payments, QR pay, cash-in, a quest ring with XP, KYC tiers, and
-transaction-level security. Every financial action is simulated today.
+transaction-level security — plus, since the first cut of this doc: a savings jar, send-to-mobile,
+request money, buy load, cash-out to bank, monthly spending insights, statement CSV export, linked
+bank accounts, a biller catalog, an in-app notification feed, and profile / personal details.
+Every financial action is simulated today.
 
 ### 1.1 The two-ledger rule
 
@@ -43,7 +50,11 @@ There are exactly two ledgers in this system, and they are not peers:
 | FIN-A records       | FIN-A   | **Evidence.** Intents, quotes, receipts, activity feed, quest progress. |
 
 FIN-A records are derived from, and reconciled against, the NetBank ledger — never the other way.
-This kills the classic e-wallet bug of a local balance that disagrees with the bank.
+This kills the classic e-wallet bug of a local balance that disagrees with the bank. The prototype
+already operates this way in the client: `core/app/syncBalances.ts` re-reads balances from the
+gateway after every money movement instead of subtracting locally, and `wallet.store.ts` documents
+the rule ("the wallet is a cache of the bank's answer rather than a second ledger that could
+disagree"). The backend keeps the same invariant server-side.
 
 ### 1.2 Non-negotiables
 
@@ -62,13 +73,19 @@ This kills the classic e-wallet bug of a local balance that disagrees with the b
 
 Boundaries come from the prototype's domain files, not from team structure.
 
-| Context        | Owns                                                                                               | Prototype roots                                                                                                                             |
-| -------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identity`     | Users, KYC submissions, device sessions, OTP challenges, transaction PIN, quiz result              | `domain/compliance.ts`, `domain/security.ts`, `stores/kyc.store.ts`                                                                         |
-| `wallet`       | Wallets (card faces), balance cache, spending limits, virtual accounts (VCAs)                      | `domain/account.ts`, `domain/card.ts`, `stores/wallet.store.ts`                                                                             |
-| `payments`     | Payment intents, activity feed, recipients, billers, autopay, statements, disputes, reconciliation | `domain/banking.ts`, `domain/paymentIntent.ts`, `domain/payments.ts`, `domain/rails.ts`, `domain/transaction.ts`, `stores/payment.store.ts` |
-| `engagement`   | Quests, XP, levels, reward style unlocks, quiz scoring                                             | `stores/quest.store.ts`, `domain/quiz.ts`                                                                                                   |
-| `notification` | In-app notification feed, push tokens                                                              | `domain/notification.ts`                                                                                                                    |
+| Context        | Owns                                                                                                             | Prototype roots (current `src/core`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `identity`     | Users, KYC submissions, device sessions, OTP challenges, transaction PIN, quiz result                            | `domain/compliance.ts`, `domain/security.ts`, `domain/user.ts`, `stores/kyc.store.ts`, `stores/user.store.ts`                                                                                                                                                                                                                                                                                                                                                                                       |
+| `wallet`       | Wallets (card faces), balance cache, spending limits, savings jar, virtual accounts (VCAs), linked bank accounts | `domain/account.ts`, `domain/card.ts`, `stores/wallet.store.ts`, `stores/accounts.store.ts`, `stores/jar.store.ts`                                                                                                                                                                                                                                                                                                                                                                                  |
+| `payments`     | Payment intents, activity feed, recipients, billers, autopay, statements, disputes, reconciliation               | `domain/banking.ts`, `domain/paymentIntent.ts`, `domain/payments.ts`, `domain/rails.ts`, `domain/transaction.ts`, `domain/statement.ts`, `domain/request.ts`, `domain/load.ts`, `stores/payment.store.ts`, `stores/activity.store.ts`, `stores/transfer.store.ts`, `stores/cashout.store.ts`, `stores/deposit.store.ts`, `stores/bills.store.ts`, `stores/billerCatalog.store.ts`, `stores/buyload.store.ts`, `stores/requests.store.ts`, `stores/recipients.store.ts`, `stores/statement.store.ts` |
+| `engagement`   | Quests, XP, levels, reward style unlocks, quiz scoring                                                           | `stores/quest.store.ts`, `domain/quiz.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `notification` | In-app notification feed, notification preferences, push tokens                                                  | `domain/notification.ts`, `stores/settings.store.ts`, `data/mock/notifications.mock.ts`                                                                                                                                                                                                                                                                                                                                                                                                             |
+
+The roots column names the files whose domain vocabulary defines the context. Per-session flow
+stores (`transfer`, `cashout`, `deposit`, `bills`, `buyload`, `requests`, `qr`, `billerCatalog`,
+`recipients`) hold client-side drafts and selections; when the backend lands they become server
+calls, not tables. Note the prototype's `stores/preferences.store.ts` (theme, balance visibility)
+is device/appearance state — it belongs to the client, not to any backend context.
 
 Plus two shared infrastructure pieces: an **API Gateway / BFF** (the only thing the mobile/web
 client talks to) and a **worker** (outbox relay, reconciliation job, autopay scheduler, quest
@@ -210,6 +227,11 @@ CREATE TABLE identity.quiz_results (
 `users.pin_hash` and `otp_challenges.code_hash` are hashes only (argon2id); the plaintext code is
 delivered out of band and never stored. KYC document images go to NetBank's KYC API — we keep the
 reference, not the scans.
+
+The prototype now models the person separately from the card: `core/domain/user.ts` (with fixture
+`data/mock/user.mock.ts`) is deliberately shaped after `identity.users` so the server model and the
+client model do not need reconciling later; personal-details edits (`stores/user.store.ts`) step up
+through OTP first, which mirrors the `otp_challenges`/`device_sessions` flow above.
 
 ### 4.2 `wallet`
 
@@ -448,6 +470,11 @@ CREATE TABLE notification.push_tokens (
 );
 ```
 
+The prototype's in-app feed already exists client-side (`domain/notification.ts`,
+`data/mock/notifications.mock.ts`, `stores/settings.store.ts`) and already encodes two rules to
+preserve server-side: `system` messages are not optional (`visibleNotifications` always passes
+them), and `transactionId` links a notification to a real transaction so tapping it resolves.
+
 ### 4.6 Outbox (one per service schema)
 
 Each service publishes its own events from its own schema — isolation holds even for the event
@@ -481,25 +508,27 @@ for server-to-server calls, short-lived user tokens for app calls.
 
 ### 5.1 Product mapping (prototype port → NetBank surface)
 
-| `BankingGateway` port                           | Backend behavior             | NetBank product / surface                                                                                                  |
-| ----------------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `accounts.list`                                 | List the user's wallets      | Account-as-a-Service: list accounts                                                                                        |
-| `accounts.virtualAccount`                       | Inbound funding address      | Virtual Collection Accounts (create, limits, QRPH)                                                                         |
-| `accounts.statements`                           | Monthly statements           | Transaction history / statement retrieval                                                                                  |
-| `activity.list` / `get`                         | Activity feed, cursor-paged  | Transaction retrieval (VCA payments, A2A txn details)                                                                      |
-| `activity.dispute`                              | Open a dispute               | Manual ops channel (no public dispute API found)                                                                           |
-| `directory.banks`                               | Bank list                    | Cached directory (rails: instapay / pesonet)                                                                               |
-| `directory.verifyAccountName`                   | Name inquiry before transfer | InstaPay account-name inquiry                                                                                              |
-| `directory.billers`                             | Biller catalog               | Bills Payment catalog                                                                                                      |
-| `directory.validateBillAccount`                 | Biller account validation    | Biller account validation                                                                                                  |
-| `payments.quote`                                | Fee + arrival + cutoff       | Fee schedule + rail limits (cached, computed server-side)                                                                  |
-| `payments.submit`                               | Execute the intent           | Disburse-to-Account (InstaPay ≤ ₱50k / PESONet), Bills Payment, QRPH collect, internal A2A (real-time to NetBank accounts) |
-| `payments.status`                               | Poll pending                 | A2A txn detail retrieval + webhooks                                                                                        |
-| `payments.createInboundQr` / `decodeQr`         | QR PH codes                  | QRPH generation / decode                                                                                                   |
-| `compliance.kycStatus` / `submitKyc` / `limits` | Tier + limits                | KYC/onboarding API; limits computed server-side                                                                            |
-| `security.requestOtp` / `verifyOtp`             | OTP challenge                | Own OTP provider or NetBank (see §10)                                                                                      |
-| `security.verifyPin`                            | Transaction PIN              | **Local only** — the PIN never leaves FIN-A                                                                                |
-| `security.sessions` / `revokeSession`           | Device sessions              | Local `device_sessions` table                                                                                              |
+| `BankingGateway` port                           | Backend behavior                           | NetBank product / surface                                                                                                      |
+| ----------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `accounts.list`                                 | List the user's wallets                    | Account-as-a-Service: list accounts                                                                                            |
+| `accounts.virtualAccount`                       | Inbound funding address                    | Virtual Collection Accounts (create, limits, QRPH)                                                                             |
+| `accounts.statements`                           | Monthly statements                         | Transaction history / statement retrieval                                                                                      |
+| `activity.list` / `get`                         | Activity feed, cursor-paged                | Transaction retrieval (VCA payments, A2A txn details)                                                                          |
+| `activity.dispute`                              | Open a dispute                             | Manual ops channel (no public dispute API found)                                                                               |
+| `directory.banks`                               | Bank list                                  | Cached directory (rails: instapay / pesonet)                                                                                   |
+| `directory.verifyAccountName`                   | Name inquiry before transfer               | InstaPay account-name inquiry                                                                                                  |
+| `directory.lookupMobileName`                    | FIN-A wallet name inquiry by mobile number | Internal FIN-A directory (GAP-04 send-to-mobile: the same typo protection as the bank check, for a mobile-number-keyed wallet) |
+| `directory.billers`                             | Biller catalog                             | Bills Payment catalog                                                                                                          |
+| `directory.validateBillAccount`                 | Biller account validation                  | Biller account validation                                                                                                      |
+| `payments.quote`                                | Fee + arrival + cutoff                     | Fee schedule + rail limits (cached, computed server-side)                                                                      |
+| `payments.submit`                               | Execute the intent                         | Disburse-to-Account (InstaPay ≤ ₱50k / PESONet), Bills Payment, QRPH collect, internal A2A (real-time to NetBank accounts)     |
+| `payments.status`                               | Poll pending                               | A2A txn detail retrieval + webhooks                                                                                            |
+| `payments.createInboundQr` / `decodeQr`         | QR PH codes                                | QRPH generation / decode                                                                                                       |
+| `payments.openJar` / `jarState`                 | Savings jar lifecycle                      | A2A moves to/from a separate balance (GAP-07); the jar's balance is the bank's answer, cached in `wallet.store.jar`            |
+| `compliance.kycStatus` / `submitKyc` / `limits` | Tier + limits                              | KYC/onboarding API; limits computed server-side                                                                                |
+| `security.requestOtp` / `verifyOtp`             | OTP challenge                              | Own OTP provider or NetBank (see §10)                                                                                          |
+| `security.verifyPin`                            | Transaction PIN                            | **Local only** — the PIN never leaves FIN-A                                                                                    |
+| `security.sessions` / `revokeSession`           | Device sessions                            | Local `device_sessions` table                                                                                                  |
 
 ### 5.2 Webhooks and reconciliation
 
@@ -529,7 +558,8 @@ NetBank call itself carries a NetBank idempotency key when supported.
    confirmation (PIN or OTP) → submit to NetBank → `payment_intents` row (status `submitted`) +
    outbox `payment.submitted` → webhook/poll → status `completed` → `transactions` row →
    outbox `payment.completed` → consumers: `notification` (feed row), `engagement` (quest spent
-   accumulates), `wallet` (balance cache refresh).
+   accumulates), `wallet` (balance cache refresh — re-read from NetBank via `syncBalances`, exactly
+   as `core/app/syncBalances.ts` does in the prototype).
 2. **Cash-in via VCA.** User shares their VCA number; the payer's bank pushes over InstaPay /
    PESONet → NetBank webhook → `payments` upserts an inbound `transactions` row (deduped by
    `netbank_txn_id`) → outbox `cashin.received` → wallet cache + notification. No intent of ours
@@ -543,6 +573,14 @@ NetBank call itself carries a NetBank idempotency key when supported.
    card face).
 6. **Autopay.** Worker selects due `autopay_enrollments`, creates intents, submits, updates
    `next_run_at`. Pause/resume is a status flip.
+7. **Send to a mobile number (GAP-04).** Sender looks the recipient up by mobile
+   (`directory.lookupMobileName`) → intent kind `transfer` with rail `internal` (both FIN-A wallets
+   live at NetBank, so it is a real-time A2A) → the same quote/confirm/submit pipeline, no step-up
+   (`requiresStepUp` in `paymentIntent.ts` already returns false for internal rail).
+8. **Savings jar (GAP-07).** `payments.openJar` creates the jar at the bank; moves in/out are
+   intents with kinds `jar-in` / `jar-out` (no step-up), and `wallet.store.jar` is a cache of
+   `payments.jarState` — the jar balance never counts toward the main balance or the spending limit,
+   which is a NetBank-side fact, not a client rule.
 
 ## 7. Security & compliance
 
@@ -591,9 +629,12 @@ NetBank call itself carries a NetBank idempotency key when supported.
   are wallet faces, not plastic, so this is non-blocking; revisit when available.
 - **Statements.** No explicit statement file format (MT940/CSV) found in NetBank's public docs —
   plan reconciliation via retrieval APIs + webhooks; confirm with NetBank before building the
-  statement feature.
+  statement feature. The prototype already generates CSV client-side (`domain/statement.ts`,
+  delivered through the `statementExport` platform port), so the server-side source is the open bit.
 - **OTP delivery.** Own SMS aggregator vs NetBank OTP — affects `security.requestOtp`.
-- **Autopay schedule model.** Day-of-month vs custom cadence; only a display string exists today.
-- **Quiz scoring.** The prototype always returns "The Free Spirit"; decide whether the money-style
-  result is computed server-side and stored in `identity.quiz_results`.
+- **Autopay schedule model.** Day-of-month vs custom cadence; only a display string plus an
+  `active`/`paused` status exists today (`AutopayEnrollment` in `domain/payments.ts`).
+- **Quiz scoring.** The prototype always returns "The Free Spirit" — the answer is captured but
+  never scored (`data/mock/quiz.mock.ts`); decide whether the money-style result is computed
+  server-side and stored in `identity.quiz_results`.
 - **Direct Debit / FX.** NetBank offers them; explicitly out of scope for the MVP.
