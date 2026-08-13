@@ -8,11 +8,11 @@
   width: 100%;
   margin: 4px 0 22px;
   padding: 15px 16px;
-  border: 1.5px solid var(--teal);
+  border: 1.5px solid var(--brand);
   border-radius: var(--radius-lg);
   color: var(--ink);
   text-align: left;
-  background: var(--teal-soft);
+  background: var(--success-soft);
   cursor: pointer;
 }
 .destination-cta-icon {
@@ -21,8 +21,8 @@
   width: 38px;
   height: 38px;
   border-radius: var(--radius-sm);
-  color: var(--cream);
-  background: var(--teal);
+  color: var(--primary-ink);
+  background: var(--primary-fill);
 }
 .destination-cta-icon svg {
   width: 20px;
@@ -49,7 +49,7 @@
   border-radius: 15px;
 }
 .recipient-list-row.is-selected {
-  background: var(--teal-soft);
+  background: var(--success-soft);
 }
 .recipient-list-choose {
   display: flex;
@@ -67,7 +67,7 @@
 .recipient-list-choose > svg {
   width: 18px;
   height: 18px;
-  color: var(--teal);
+  color: var(--brand);
 }
 .recipient-initials {
   display: grid;
@@ -75,14 +75,14 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  color: var(--teal-dark);
+  color: var(--brand);
   font-size: 13px;
   font-weight: 900;
-  background: var(--teal-soft);
+  background: var(--success-soft);
 }
 .recipient-list-row.is-selected .recipient-initials {
-  color: var(--cream);
-  background: var(--teal);
+  color: var(--primary-ink);
+  background: var(--primary-fill);
 }
 
 /* --- Bank destination ----------------------------------------------------- */
@@ -101,8 +101,8 @@
   line-height: 1.45;
 }
 .verified-name {
-  color: var(--teal-dark);
-  background: var(--teal-soft);
+  color: var(--success-text);
+  background: var(--success-soft);
 }
 .verified-name svg,
 .rail-note svg {
@@ -146,8 +146,8 @@
   line-height: 1.4;
 }
 .segment.is-selected {
-  border-color: var(--teal);
-  background: var(--teal-soft);
+  border-color: var(--brand);
+  background: var(--success-soft);
 }
 .segment:disabled {
   cursor: not-allowed;
@@ -168,8 +168,8 @@
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  color: var(--cream);
-  background: var(--teal);
+  color: var(--primary-ink);
+  background: var(--primary-fill);
 }
 .confirm-lock svg {
   width: 26px;
@@ -201,7 +201,7 @@
   background: var(--surface);
 }
 .pin-field input:focus-visible {
-  border-color: var(--teal);
+  border-color: var(--brand);
 }
 
 /* --- Status timeline ------------------------------------------------------ */
@@ -255,17 +255,17 @@
   background: var(--surface);
 }
 .status-timeline li.is-done .status-dot {
-  border-color: var(--teal);
-  color: var(--cream);
-  background: var(--teal);
+  border-color: var(--success);
+  color: #16110f;
+  background: var(--success);
 }
 .status-dot svg {
   width: 15px;
   height: 15px;
 }
 .receipt-check.is-pending {
-  color: var(--ink);
-  background: var(--amber);
+  color: #16110f;
+  background: var(--gold);
 }
 
 /* --- Bills and autopay ---------------------------------------------------- */
@@ -282,8 +282,8 @@
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  color: var(--teal);
-  background: var(--teal-soft);
+  color: var(--brand);
+  background: var(--success-soft);
 }
 .biller-icon svg {
   width: 26px;
@@ -307,10 +307,10 @@
   gap: 10px;
   margin-bottom: 18px;
   padding: 20px;
-  border: 1.5px solid var(--teal);
+  border: 1.5px solid var(--success);
   border-radius: var(--radius-lg);
   text-align: center;
-  background: var(--teal-soft);
+  background: var(--success-soft);
 }
 .virtual-account strong {
   font-size: 26px;

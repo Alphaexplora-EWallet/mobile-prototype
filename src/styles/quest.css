@@ -28,15 +28,15 @@
   margin-top: 20px;
   padding: 12px 14px;
   border-radius: 16px;
-  color: var(--teal-dark);
-  background: var(--teal-soft);
+  color: var(--success-text);
+  background: var(--success-soft);
 }
 .tracking-status > svg {
   flex: 0 0 auto;
   padding: 4px;
   border-radius: 50%;
-  color: white;
-  background: var(--teal);
+  color: #16110f;
+  background: var(--success);
 }
 .tracking-status > span {
   display: grid;
@@ -59,7 +59,7 @@
   width: 240px;
   height: 240px;
   border-radius: 50%;
-  background: conic-gradient(var(--teal) 0 41%, #e4ebe6 41% 100%);
+  background: conic-gradient(var(--gold) 0 41%, #e4ebe6 41% 100%);
   transform: rotate(-18deg);
 }
 .quest-ring::before {
@@ -91,7 +91,7 @@
   background: var(--line);
 }
 .quest-ring b {
-  color: var(--teal);
+  color: var(--brand);
   font-size: 22px;
 }
 .ring-percent {
@@ -100,8 +100,8 @@
   bottom: 65px;
   padding: 8px 12px;
   border-radius: 16px;
-  color: var(--teal);
-  background: var(--teal-soft);
+  color: var(--success-text);
+  background: var(--success-soft);
   font-weight: 800;
 }
 .why-section {
@@ -112,7 +112,7 @@
   font-size: 21px;
 }
 .why-section h2 span {
-  color: var(--teal);
+  color: var(--brand);
 }
 .why-section p {
   margin: 0;
@@ -125,7 +125,7 @@
   align-items: center;
   gap: 10px;
   padding: 14px;
-  border: 1px solid rgba(240, 170, 36, 0.45);
+  border: 1px solid rgba(241, 173, 24, 0.45);
   border-radius: 20px;
   background: #fff9ec;
 }
@@ -154,14 +154,14 @@
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  color: var(--amber);
+  color: var(--gold);
   background: #fff0d1;
 }
 .xp-star svg {
-  fill: var(--amber);
+  fill: var(--gold);
 }
 .teal-text {
-  color: var(--teal);
+  color: var(--brand);
 }
 .quest-actions {
   display: grid;

@@ -28,11 +28,11 @@
 }
 /* A single brand accent for the active tab. */
 .bottom-nav button.is-active {
-  color: var(--teal);
+  color: var(--brand);
   font-weight: 800;
 }
 .bottom-nav button.is-active svg {
-  fill: rgba(8, 126, 121, 0.16);
+  fill: rgba(14, 59, 92, 0.16);
   stroke-width: 2.2;
 }
 .sheet-backdrop {
@@ -68,8 +68,8 @@
   height: 60px;
   margin: 0 auto 12px;
   border-radius: 50%;
-  color: var(--teal);
-  background: var(--teal-soft);
+  color: var(--brand);
+  background: var(--success-soft);
 }
 .action-sheet h2 {
   margin: 0;

@@ -67,9 +67,9 @@
   cursor: pointer;
 }
 .activity-filter.is-selected {
-  border-color: var(--teal);
-  color: var(--teal-dark);
-  background: var(--teal-soft);
+  border-color: var(--brand);
+  color: var(--brand);
+  background: var(--success-soft);
 }
 .activity-list {
   margin-top: 16px;
@@ -104,14 +104,14 @@
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  color: var(--teal);
-  background: var(--teal-soft);
+  color: var(--brand);
+  background: var(--success-soft);
   font-size: 22px;
 }
 .review-icon,
 .receipt-check {
-  color: var(--cream);
-  background: var(--teal);
+  color: #16110f;
+  background: var(--success);
 }
 .review-icon svg,
 .receipt-check svg {
@@ -121,12 +121,12 @@
 .status-chip {
   padding: 5px 9px;
   border-radius: 99px;
-  color: var(--teal-dark);
+  color: var(--success-text);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  background: var(--teal-soft);
+  background: var(--success-soft);
 }
 .detail-hero > strong,
 .review-hero h1,
@@ -235,8 +235,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  color: var(--teal-dark);
-  background: var(--teal-soft);
+  color: var(--brand);
+  background: var(--success-soft);
   font-size: 13px;
   font-weight: 900;
 }
@@ -270,7 +270,7 @@
   text-decoration: line-through;
 }
 .request-row.is-accepted .request-amount {
-  color: var(--teal-dark);
+  color: var(--success-text);
 }
 .request-actions {
   grid-area: actions;
@@ -287,8 +287,8 @@
 }
 .request-actions button:first-child {
   border: 0;
-  color: var(--cream);
-  background: var(--teal);
+  color: #16110f;
+  background: var(--success);
 }
 .request-actions button:last-child {
   border: 1.5px solid var(--line);

@@ -88,7 +88,7 @@
   background: #ded7cb;
 }
 .welcome-dots span.is-active {
-  background: var(--teal);
+  background: var(--brand);
 }
 
 .sign-in-page {
@@ -136,12 +136,12 @@
   padding: 0 15px;
   border: 1px solid var(--line);
   border-radius: 17px;
-  color: var(--teal);
+  color: var(--brand);
   background: rgba(255, 253, 248, 0.8);
 }
 .input-shell:focus-within {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(8, 126, 121, 0.12);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(14, 59, 92, 0.12);
 }
 .input-shell svg {
   width: 20px;
@@ -174,7 +174,7 @@
   margin-top: -8px;
   padding: 0;
   border: 0;
-  color: var(--teal);
+  color: var(--brand);
   background: transparent;
   font-size: 13px;
   font-weight: 800;
@@ -188,7 +188,7 @@
   text-align: center;
 }
 .demo-auth > span {
-  color: var(--amber);
+  color: var(--gold);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 1.4px;

@@ -10,8 +10,8 @@
   gap: 9px;
 }
 .avatar-button {
-  color: var(--teal);
-  background: var(--teal-soft);
+  color: var(--brand);
+  background: var(--success-soft);
   border: 0;
 }
 /* Home header: uniform 40px circular action icons. */
@@ -24,13 +24,13 @@
 }
 .home-page .theme-toggle,
 .home-page .avatar-button {
-  color: var(--teal);
+  color: var(--brand);
   border-color: transparent;
-  background: var(--teal-soft);
+  background: var(--success-soft);
 }
 .home-page .theme-toggle:hover {
-  color: var(--cream);
-  background: var(--teal);
+  color: var(--primary-ink);
+  background: var(--primary-fill);
 }
 .home-page .theme-toggle svg,
 .home-page .avatar-button svg,
@@ -72,8 +72,8 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  color: var(--teal);
-  background: var(--teal-soft);
+  color: var(--brand);
+  background: var(--success-soft);
   cursor: pointer;
 }
 .quick-actions {
@@ -98,7 +98,7 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  color: var(--teal-dark);
+  color: var(--brand);
   background: white;
 }
 .quick-actions small {
@@ -118,14 +118,14 @@
     transform 0.2s ease;
 }
 .home-card-actions button:hover {
-  background: var(--teal-soft);
+  background: var(--success-soft);
 }
 .home-card-actions button:active {
   transform: scale(0.97);
 }
 .home-card-actions button > span {
-  color: var(--teal);
-  background: var(--teal-soft);
+  color: var(--brand);
+  background: var(--success-soft);
 }
 /* Home quick actions: cohesive icon circles and line weights. */
 .home-card-actions button {
@@ -166,7 +166,7 @@
 .home-section-heading button {
   padding: 0;
   border: 0;
-  color: var(--teal);
+  color: var(--brand);
   font: inherit;
   font-size: 13px;
   font-weight: 800;
@@ -186,9 +186,9 @@
   color: white;
   background:
     radial-gradient(circle at 85% 12%, rgba(255, 255, 255, 0.14), transparent 34%),
-    repeating-linear-gradient(45deg, #06908a 0 8px, #057b76 8px 12px), linear-gradient(160deg, #0b8b85, #006863);
+    repeating-linear-gradient(45deg, #0e3b5c 0 8px, #0a2c47 8px 12px), linear-gradient(160deg, #0e3b5c, #0a2c47);
   cursor: pointer;
-  box-shadow: 0 8px 22px rgba(0, 75, 71, 0.18);
+  box-shadow: 0 8px 22px rgba(14, 59, 92, 0.18);
 }
 .quest-card-content {
   position: relative;
@@ -215,7 +215,7 @@
   border-radius: 50%;
 }
 .quest-icon {
-  color: #0b6f6a;
+  color: #0b7a55;
   background: rgba(255, 255, 255, 0.92);
 }
 .quest-spend {
@@ -253,7 +253,7 @@
   padding: 9px 12px;
   border-radius: 14px;
   color: var(--ink);
-  background: var(--amber);
+  background: var(--gold);
   font-weight: 800;
 }
 .style-progress {
@@ -273,7 +273,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  color: var(--amber);
+  color: var(--gold);
   font-size: 28px;
   background: #dfeee8;
 }
@@ -291,10 +291,10 @@
   width: 46px;
   height: 46px;
   border: 5px solid #dce9e4;
-  border-top-color: var(--teal);
-  border-right-color: var(--teal);
+  border-top-color: var(--brand);
+  border-right-color: var(--brand);
   border-radius: 50%;
-  color: var(--teal);
+  color: var(--brand);
   font-size: 11px;
   font-weight: 800;
   transform: rotate(15deg);
@@ -344,8 +344,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  color: var(--teal);
-  background: var(--teal-soft);
+  color: var(--brand);
+  background: var(--success-soft);
   font-weight: 900;
 }
 .transaction-copy {
@@ -359,5 +359,5 @@
   font-size: 13px;
 }
 .positive {
-  color: var(--teal);
+  color: var(--success-text);
 }

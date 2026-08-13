@@ -7,12 +7,20 @@
   text-rendering: optimizeLegibility;
   --ink: #142126;
   --muted: #667074;
-  --teal: #087e79;
-  --teal-dark: #006863;
-  --teal-soft: #e5f1ed;
+  /* Brand primary (navy) — buttons, links, active nav, focus. */
+  --brand: #0e3b5c;
+  --brand-hover: #0a2c47;
+  /* Role-inversion pair: the primary fill flips on dark (navy can't carry
+     white text there), so components pair these two tokens, never white. */
+  --primary-fill: #0e3b5c;
+  --primary-ink: #ffffff;
+  /* Money-in / success (teal, demoted from primary to functional). */
+  --success: #0e9f6e;
+  --success-text: #0b7a55;
+  --success-soft: #e5f1ed;
   --cream: #fbf7ef;
   --cream-deep: #f5ede0;
-  --amber: #f0aa24;
+  --gold: #f1ad18;
   --coral: #ec5f43;
   --line: #e5ded1;
   /* Translucent card fill for state blocks and detail cards. */
@@ -32,7 +40,7 @@
   /* Elevation scale (DESIGN.md §18): low-opacity only, no strong black shadows. */
   --shadow-surface: var(--shadow);
   --shadow-floating: 0 12px 28px rgba(20, 33, 38, 0.14);
-  --shadow-primary: 0 20px 40px rgba(0, 75, 71, 0.22);
+  --shadow-primary: 0 20px 40px rgba(14, 59, 92, 0.22);
   /* Typography scale (DESIGN.md §20), levels 1 (hero) through 5 (meta). */
   --text-hero: 34px;
   --text-title: 22px;
@@ -47,12 +55,17 @@
   background: #0a0f0d;
   --ink: #f2f0e8;
   --muted: #9aa69f;
-  --teal: #3cb7aa;
-  --teal-dark: #278f86;
-  --teal-soft: #193531;
+  /* Brand inverts on dark: the primary *fill* becomes gold with dark ink. */
+  --brand: #e8b24d;
+  --brand-hover: #f1ad18;
+  --primary-fill: #e8b24d;
+  --primary-ink: #16110f;
+  --success: #3cb7aa;
+  --success-text: #3cb7aa;
+  --success-soft: #193531;
   --cream: #101614;
   --cream-deep: #17201d;
-  --amber: #e8b24d;
+  --gold: #e8b24d;
   --coral: #ef826b;
   --line: #2a3632;
   --surface: rgba(23, 32, 29, 0.6);

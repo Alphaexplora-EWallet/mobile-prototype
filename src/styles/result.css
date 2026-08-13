@@ -9,7 +9,7 @@
 }
 .eyebrow {
   margin: 0 0 14px;
-  color: var(--teal);
+  color: var(--success-text);
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 2.6px;
@@ -41,10 +41,10 @@
   place-items: center;
   width: 150px;
   height: 120px;
-  border: 6px double #075d59;
+  border: 6px double #f1ad18;
   border-radius: 22px;
-  color: #022f2d;
-  background: repeating-linear-gradient(45deg, #087d77, #087d77 6px, #04716c 6px, #04716c 8px);
+  color: #f1ad18;
+  background: repeating-linear-gradient(45deg, #0e3b5c, #0e3b5c 6px, #0a2c47 6px, #0a2c47 8px);
   box-shadow: var(--shadow);
   transform: rotate(-3deg);
 }
@@ -70,13 +70,13 @@
   left: 30px;
   top: 6px;
   z-index: 2;
-  color: var(--amber);
+  color: var(--gold);
   font-size: 74px;
 }
 .character-orbit {
   position: absolute;
   inset: 40px 0 0;
-  border: 2px solid var(--teal);
+  border: 2px solid var(--brand);
   border-radius: 50%;
   transform: rotate(-15deg);
 }
@@ -92,7 +92,7 @@
 .character-star-two {
   left: 3px;
   bottom: 23px;
-  color: var(--amber);
+  color: var(--gold);
 }
 .result-description {
   max-width: 350px;
@@ -121,11 +121,11 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  color: var(--teal);
-  background: var(--teal-soft);
+  color: var(--brand);
+  background: var(--success-soft);
 }
 .trait:nth-child(1) > span {
-  color: var(--amber);
+  color: var(--gold);
 }
 .trait:nth-child(3) > span {
   color: var(--coral);
@@ -136,7 +136,7 @@
 }
 .palm-glyph {
   font-size: 28px;
-  color: var(--teal);
+  color: var(--brand);
 }
 .growth-note {
   display: flex;
@@ -148,6 +148,6 @@
   font-size: 13px;
 }
 .growth-note span {
-  color: var(--amber);
+  color: var(--gold);
   font-size: 22px;
 }

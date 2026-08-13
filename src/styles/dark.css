@@ -1,8 +1,8 @@
 /* Dark theme */
 :root[data-theme="dark"] body {
   background:
-    radial-gradient(circle at 15% 12%, rgba(60, 183, 170, 0.1), transparent 30%),
-    radial-gradient(circle at 88% 82%, rgba(232, 178, 77, 0.07), transparent 25%), #0a0f0d;
+    radial-gradient(circle at 15% 12%, rgba(232, 178, 77, 0.08), transparent 30%),
+    radial-gradient(circle at 88% 82%, rgba(232, 178, 77, 0.06), transparent 25%), #0a0f0d;
 }
 :root[data-theme="dark"] .phone-shell {
   border-color: #050807;
@@ -19,7 +19,7 @@
 }
 :root[data-theme="dark"] .screen {
   background:
-    radial-gradient(circle at 82% 10%, rgba(60, 183, 170, 0.045), transparent 26%),
+    radial-gradient(circle at 82% 10%, rgba(232, 178, 77, 0.04), transparent 26%),
     linear-gradient(rgba(16, 22, 20, 0.965), rgba(16, 22, 20, 0.965)),
     repeating-linear-gradient(135deg, transparent, transparent 6px, rgba(193, 218, 209, 0.025) 7px);
 }
@@ -32,11 +32,11 @@
 :root[data-theme="dark"] .home-page .theme-toggle,
 :root[data-theme="dark"] .home-page .avatar-button {
   border-color: transparent;
-  background: var(--teal-soft);
+  background: var(--success-soft);
   box-shadow: none;
 }
 :root[data-theme="dark"] .home-page .theme-toggle:hover {
-  background: var(--teal);
+  background: var(--primary-fill);
 }
 :root[data-theme="dark"] .brand-mark-lockup {
   filter: brightness(0) invert(1);
@@ -85,7 +85,7 @@
 :root[data-theme="dark"] .source-option.is-selected,
 :root[data-theme="dark"] .recipient-chip.is-selected,
 :root[data-theme="dark"] .amount-preset.is-selected {
-  background: var(--teal-soft);
+  background: var(--success-soft);
 }
 :root[data-theme="dark"] .input-shell input {
   color: var(--ink);
@@ -153,7 +153,16 @@
   color: #8fb3ad;
 }
 :root[data-theme="dark"] .quest-ring {
-  background: conic-gradient(var(--teal) 0 41%, #293a36 41% 100%);
+  background: conic-gradient(var(--gold) 0 41%, #293a36 41% 100%);
+}
+:root[data-theme="dark"] .mini-ring {
+  border-color: var(--line);
+  border-top-color: var(--brand);
+  border-right-color: var(--brand);
+  color: var(--brand);
+}
+:root[data-theme="dark"] .pay-scan-card {
+  border-color: rgba(232, 178, 77, 0.3);
 }
 :root[data-theme="dark"] .reward-strip,
 :root[data-theme="dark"] .controls-section.is-highlighted {
@@ -174,7 +183,13 @@
   color: #8f9e9a;
 }
 :root[data-theme="dark"] .bottom-nav button.is-active {
-  color: var(--teal);
+  color: var(--brand);
+}
+:root[data-theme="dark"] .bottom-nav button.is-active svg {
+  fill: rgba(232, 178, 77, 0.18);
+}
+:root[data-theme="dark"] .toggle span {
+  background: #16110f;
 }
 :root[data-theme="dark"] .action-sheet {
   background: var(--cream);
