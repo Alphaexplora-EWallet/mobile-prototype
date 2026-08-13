@@ -3,6 +3,8 @@ import type { TransferRail } from "../domain/rails";
 import { MOCK_RECIPIENTS } from "../data/mock/payments.mock";
 
 export const INITIAL_TRANSFER_DRAFT = {
+  /** Which step of the "Send to" / "Amount" wizard is showing. Survives a tab switch. */
+  step: 1 as 1 | 2,
   amount: "",
   note: "",
   /** Keyed on `Recipient.id`. It was keyed on `initials`, which is not unique. */
@@ -30,6 +32,8 @@ export const INITIAL_TRANSFER_DRAFT = {
 
 type TransferState = typeof INITIAL_TRANSFER_DRAFT & {
   actions: {
+    nextStep(): void;
+    previousStep(): void;
     setAmount(value: string): void;
     setNote(value: string): void;
     selectRecipient(id: string): void;
@@ -51,6 +55,8 @@ type TransferState = typeof INITIAL_TRANSFER_DRAFT & {
 export const useTransferStore = create<TransferState>()((set, get) => ({
   ...INITIAL_TRANSFER_DRAFT,
   actions: {
+    nextStep: () => set((state) => ({ step: state.step === 1 ? 2 : state.step })),
+    previousStep: () => set((state) => ({ step: state.step === 2 ? 1 : state.step })),
     setAmount: (amount) => set({ amount }),
     setNote: (note) => set({ note }),
     selectRecipient: (selectedRecipient) => {

@@ -42,8 +42,11 @@ describe("cash-in flow", () => {
     const user = start();
     await openDeposit(user);
 
-    await user.type(screen.getByRole("textbox", { name: /Amount to add/i }), "1000");
+    // Step 1: choose a method, then continue to the Amount step.
     await press(user, /Over the counter/i);
+    await press(user, /^Continue$/);
+
+    await user.type(screen.getByRole("textbox", { name: /Amount to add/i }), "1000");
 
     // The strip stops claiming "No fee" once a method that charges is chosen.
     expect(screen.getByText("₱20.00")).toBeTruthy();
@@ -65,8 +68,9 @@ describe("cash-in flow", () => {
   it("credits the balance and files a cash-in transaction", async () => {
     const user = start();
     await openDeposit(user);
-    await user.type(screen.getByRole("textbox", { name: /Amount to add/i }), "1000");
     await press(user, /Scan to cash in/i);
+    await press(user, /^Continue$/);
+    await user.type(screen.getByRole("textbox", { name: /Amount to add/i }), "1000");
     await press(user, /^Add money$/);
     await press(user, /Confirm and add/i);
     expect(await screen.findByRole("heading", { name: /Money added/i })).toBeTruthy();
@@ -85,8 +89,9 @@ describe("cash-in flow", () => {
     await openDeposit(user);
 
     // "Linked bank account" is the default and is a push method: a wallet cannot
-    // pull from another bank, so it shows the number to send to.
-    await press(user, /^Add money$/);
+    // pull from another bank, so Step 1's button already reads "Get account
+    // number" and skips the Amount step entirely.
+    await press(user, /Get account number/i);
 
     expect(await screen.findByRole("heading", { name: /Your account number/i })).toBeTruthy();
     expect(screen.getByText("0091 2345 6789")).toBeTruthy();
@@ -110,7 +115,7 @@ describe("cash-in flow", () => {
 
     const user = start({}, platform);
     await openDeposit(user);
-    await press(user, /^Add money$/);
+    await press(user, /Get account number/i);
     expect(await screen.findByRole("heading", { name: /Your account number/i })).toBeTruthy();
 
     await press(user, /Copy account number/i);
@@ -123,7 +128,7 @@ describe("cash-in flow", () => {
     // plain HTTP actually does.
     const user = start();
     await openDeposit(user);
-    await press(user, /^Add money$/);
+    await press(user, /Get account number/i);
     expect(await screen.findByRole("heading", { name: /Your account number/i })).toBeTruthy();
 
     await press(user, /Copy account number/i);
@@ -133,13 +138,19 @@ describe("cash-in flow", () => {
   it("keeps the cash-in draft when going back from review", async () => {
     const user = start();
     await openDeposit(user);
-    await user.type(screen.getByRole("textbox", { name: /Amount to add/i }), "750");
     await press(user, /Over the counter/i);
+    await press(user, /^Continue$/);
+    await user.type(screen.getByRole("textbox", { name: /Amount to add/i }), "750");
     await press(user, /^Add money$/);
     expect(await screen.findByText("Review cash in")).toBeTruthy();
 
+    // Back to the Amount step: the typed amount survived in the store.
     await press(user, /Back to home/i);
     expect(screen.getByRole("textbox", { name: /Amount to add/i })).toHaveValue("750");
+
+    // Back again: step-aware back returns to "Choose a method" without leaving
+    // the screen, and the method chosen there survived too.
+    await press(user, /Back to home/i);
     expect(screen.getByRole("button", { name: /Over the counter/i })).toHaveAttribute("aria-pressed", "true");
   });
 });

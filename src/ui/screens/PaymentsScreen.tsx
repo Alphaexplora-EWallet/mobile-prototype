@@ -1,5 +1,6 @@
 import { Icon } from "../primitives/Icon";
 import { LinkRow } from "../primitives/LinkRow";
+import { MoveMoneyTile } from "../primitives/MoveMoneyTile";
 import { PageBar } from "../layout/PageBar";
 import { StateBlock } from "../primitives/StateBlock";
 import { TransactionRow } from "../money/TransactionRow";
@@ -8,7 +9,6 @@ import { usePaymentsViewModel } from "@/core/viewmodels/useMoneyMovementViewMode
 
 export function PaymentsScreen() {
   const vm = usePaymentsViewModel();
-  const { source } = vm;
 
   return (
     <div className="tab-page money-page payments-page">
@@ -27,17 +27,17 @@ export function PaymentsScreen() {
 
       <section className="money-field">
         <span className="field-label">Move money</span>
-        <div className="control-list">
-          <LinkRow
+        <div className="move-money-tiles">
+          <MoveMoneyTile
             icon="send"
             title="Send money"
-            detail={`From •••• ${source.last4}`}
+            detail="To anyone, instantly"
             onClick={() => vm.goTo("transfer")}
           />
-          <LinkRow
+          <MoveMoneyTile
             icon="arrow-down"
             title="Add money"
-            detail="Cash in from bank, card, or counter"
+            detail="Bank, card, or counter"
             onClick={() => vm.goTo("deposit")}
           />
         </div>

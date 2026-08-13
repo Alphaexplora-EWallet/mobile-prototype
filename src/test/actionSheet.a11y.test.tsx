@@ -33,8 +33,10 @@ const openReceipt = async (user: ReturnType<typeof userEvent.setup>) => {
   await click(user, /Build my plan/i);
 
   await click(user, /^Send$/);
-  await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), "500");
+  // Step 1 "Send to": the default recipient is already selected.
   await click(user, /^Continue$/);
+  await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), "500");
+  await click(user, /Continue and review/i);
   await click(user, /Confirm and send/i);
   expect(await screen.findByRole("heading", { name: /Transfer complete/i })).toBeTruthy();
 };

@@ -20,6 +20,48 @@
   letter-spacing: -0.4px;
 }
 
+/* Payments tab: Send money / Add money as an equal-weight two-up tile row. */
+.move-money-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.move-money-tile {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  background: rgba(255, 253, 248, 0.78);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+.move-money-tile:hover {
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+.move-money-tile-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  color: var(--cream);
+  background: var(--teal);
+}
+.move-money-tile strong {
+  font-size: 15px;
+}
+.move-money-tile small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .source-picker {
   display: grid;
   grid-auto-flow: column;

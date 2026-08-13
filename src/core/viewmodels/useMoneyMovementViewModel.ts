@@ -8,7 +8,7 @@ import {
   MOCK_DEPOSIT_METHODS,
   MOCK_LOAD_OPERATORS,
 } from "../data/mock/payments.mock";
-import { findBank } from "../data/mock/banks.mock";
+import { findBank, RAIL_PRICING } from "../data/mock/banks.mock";
 import { defaultRailFor } from "../domain/rails";
 import { SIMULATED_NOTE } from "../domain/simulation";
 import { formatMoney, parseMoneyInput } from "../money/format";
@@ -87,13 +87,34 @@ export function createAmountDraft(
  */
 export type AmountDraft = ReturnType<typeof createAmountDraft>;
 
+/**
+ * The over-limit message shared by both Amount steps. Unparsable input and a
+ * zero/empty amount stay silent — the primary button is just disabled — since
+ * an amount step shouldn't scold a value the user hasn't finished typing yet.
+ */
+function amountLimitError(amount: string, parsed: Money | null, limit: Money, limitLabel: string): string | null {
+  if (amount.trim() === "") return null;
+  if (!parsed) return "Enter a valid amount.";
+  if (parsed.amount <= 0) return null;
+  if (parsed.amount > limit.amount) return `That's more than your available balance (${limitLabel}).`;
+  return null;
+}
+
+export type FeePreviewVM = { feeLabel: string; arrivalLabel: string };
+
 export type TransferViewModel = MoneyBase &
   AmountDraft & {
+    step: 1 | 2;
+    canAdvance: boolean;
+    advance(): void;
     note: string;
     setNote(value: string): void;
     recipients: readonly Recipient[];
     selectedRecipient: string;
     selectRecipient(id: string): void;
+    /** Local, non-authoritative — `gateway.payments.quote()` at payment-review is the source of truth. */
+    feePreview: FeePreviewVM | null;
+    amountError: string | null;
     review(): void;
     manageRecipients(): void;
   };
@@ -103,59 +124,84 @@ export function useTransferViewModel(): TransferViewModel {
   const navigation = useNavigation();
   const gateway = useBankingGateway();
   const source = useSelectedCard();
+  const step = useTransferStore((state) => state.step);
   const amount = useTransferStore((state) => state.amount);
   const note = useTransferStore((state) => state.note);
   const selectedRecipient = useTransferStore((state) => state.selectedRecipient);
   const recipients = useRecipientsStore((state) => state.saved);
 
+  const recipient = recipients.find((candidate) => candidate.id === selectedRecipient) ?? null;
+  const bank = recipient ? findBank(recipient.bankCode) : null;
+  const previewRail = bank ? defaultRailFor(bank) : null;
+  const pricing = previewRail ? RAIL_PRICING[previewRail] : null;
+
+  const parsed = parseMoneyInput(amount);
+  const canAdvance =
+    step === 1
+      ? selectedRecipient !== ""
+      : parsed !== null && parsed.amount > 0 && parsed.amount <= source.balance.amount;
+
+  /**
+   * Builds the intent here rather than on the review screen. Review reads one
+   * intent off the store and knows nothing about where it came from, which is
+   * what lets cash-in, bills and QR reuse it.
+   */
+  const review = () => {
+    if (!parsed || parsed.amount <= 0 || !recipient || !previewRail) return;
+
+    paymentActions.start(
+      {
+        kind: "transfer",
+        sourceCardId: source.id,
+        sourceLabel: `${source.displayLabel} •••• ${source.last4}`,
+        recipient,
+        rail: previewRail,
+        amount: parsed,
+        note,
+      },
+      gateway.nextIdempotencyKey(),
+    );
+    navigation.navigate("payment-review");
+  };
+
   return {
     ...base,
     ...createAmountDraft(amount, transferActions.setAmount),
+    step,
+    canAdvance,
+    advance: () => (step === 1 ? transferActions.nextStep() : review()),
     note,
     setNote: transferActions.setNote,
     recipients,
     selectedRecipient,
     selectRecipient: transferActions.selectRecipient,
-    /**
-     * Builds the intent here rather than on the review screen. Review reads one
-     * intent off the store and knows nothing about where it came from, which is
-     * what lets cash-in, bills and QR reuse it.
-     */
-    review: () => {
-      const parsed = parseMoneyInput(amount);
-      const recipient = recipients.find((candidate) => candidate.id === selectedRecipient);
-      if (!parsed || parsed.amount <= 0 || !recipient) return;
-      const bank = findBank(recipient.bankCode);
-      const rail = bank ? defaultRailFor(bank) : null;
-      if (!rail) return;
-
-      paymentActions.start(
-        {
-          kind: "transfer",
-          sourceCardId: source.id,
-          sourceLabel: `${source.displayLabel} •••• ${source.last4}`,
-          recipient,
-          rail,
-          amount: parsed,
-          note,
-        },
-        gateway.nextIdempotencyKey(),
-      );
-      navigation.navigate("payment-review");
-    },
+    feePreview: pricing
+      ? { feeLabel: isZero(pricing.fee) ? "No fee" : formatMoney(pricing.fee), arrivalLabel: pricing.arrivalLabel }
+      : null,
+    amountError: amountLimitError(amount, parsed, source.balance, source.balanceLabel),
+    review,
     manageRecipients: () => navigation.navigate("recipients"),
+    back: () => (step === 1 ? base.back() : transferActions.previousStep()),
   };
 }
 
+export type DepositMethodGroupVM = { label: string; methods: readonly DepositMethod[] };
+
 export type DepositViewModel = MoneyBase &
   AmountDraft & {
-    methods: readonly DepositMethod[];
+    step: 1 | 2;
+    canAdvance: boolean;
+    advance(): void;
+    /** "Instant" (pulled, quoted) methods first, "Manual" (pushed to the wallet) second. */
+    methodGroups: readonly DepositMethodGroupVM[];
     selectedMethod: string;
     selectMethod(id: string): void;
+    /** "Get account number" for an inbound method, "Continue" otherwise — the branch is visible before it happens. */
+    step1ActionLabel: string;
+    amountError: string | null;
     /** "No fee" when it is free — the strip said that unconditionally before. */
     feeLabel: string;
     arrivalLabel: string;
-    canContinue: boolean;
     submit(): void;
   };
 
@@ -164,43 +210,67 @@ export function useDepositViewModel(): DepositViewModel {
   const navigation = useNavigation();
   const gateway = useBankingGateway();
   const destination = useSelectedCard();
+  const step = useDepositStore((state) => state.step);
   const amount = useDepositStore((state) => state.amount);
   const selectedMethod = useDepositStore((state) => state.selectedMethod);
 
   const method = MOCK_DEPOSIT_METHODS.find((candidate) => candidate.id === selectedMethod) ?? MOCK_DEPOSIT_METHODS[0];
   const parsed = parseMoneyInput(amount);
 
+  const submit = () => {
+    /**
+     * A wallet cannot pull from another bank. For the push methods the honest
+     * answer is "here is the account number to send to", not a payment form.
+     */
+    if (method.inbound) {
+      navigation.navigate("fund-wallet");
+      return;
+    }
+    if (!parsed || parsed.amount <= 0) return;
+    paymentActions.start(
+      {
+        kind: "cash-in",
+        destinationCardId: destination.id,
+        destinationLabel: `${destination.displayLabel} •••• ${destination.last4}`,
+        method,
+        amount: parsed,
+      },
+      gateway.nextIdempotencyKey(),
+    );
+    navigation.navigate("payment-review");
+  };
+
+  const canAdvance =
+    step === 1
+      ? selectedMethod !== ""
+      : parsed !== null && parsed.amount > 0 && parsed.amount <= destination.balance.amount;
+
   return {
     ...base,
     ...createAmountDraft(amount, depositActions.setAmount),
-    methods: MOCK_DEPOSIT_METHODS,
-    selectedMethod,
-    selectMethod: depositActions.selectMethod,
-    feeLabel: isZero(method.fee) ? "No fee" : formatMoney(method.fee),
-    arrivalLabel: method.arrivalLabel,
-    canContinue: method.inbound === true || Boolean(parsed && parsed.amount > 0),
-    submit: () => {
-      /**
-       * A wallet cannot pull from another bank. For the push methods the honest
-       * answer is "here is the account number to send to", not a payment form.
-       */
-      if (method.inbound) {
-        navigation.navigate("fund-wallet");
+    step,
+    canAdvance,
+    /** Step 1's "Continue" skips straight to `fund-wallet` for an inbound method — Step 2 never renders for it. */
+    advance: () => {
+      if (step === 1) {
+        if (method.inbound) submit();
+        else depositActions.nextStep();
         return;
       }
-      if (!parsed || parsed.amount <= 0) return;
-      paymentActions.start(
-        {
-          kind: "cash-in",
-          destinationCardId: destination.id,
-          destinationLabel: `${destination.displayLabel} •••• ${destination.last4}`,
-          method,
-          amount: parsed,
-        },
-        gateway.nextIdempotencyKey(),
-      );
-      navigation.navigate("payment-review");
+      submit();
     },
+    methodGroups: [
+      { label: "Instant", methods: MOCK_DEPOSIT_METHODS.filter((candidate) => candidate.inbound !== true) },
+      { label: "Manual", methods: MOCK_DEPOSIT_METHODS.filter((candidate) => candidate.inbound === true) },
+    ],
+    selectedMethod,
+    selectMethod: depositActions.selectMethod,
+    step1ActionLabel: method.inbound ? "Get account number" : "Continue",
+    amountError: amountLimitError(amount, parsed, destination.balance, destination.balanceLabel),
+    feeLabel: isZero(method.fee) ? "No fee" : formatMoney(method.fee),
+    arrivalLabel: method.arrivalLabel,
+    submit,
+    back: () => (step === 1 ? base.back() : depositActions.previousStep()),
   };
 }
 

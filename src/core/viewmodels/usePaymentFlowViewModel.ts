@@ -18,6 +18,7 @@ import { useBankingGateway } from "../platform/BankingGatewayContext";
 import { activityActions } from "../stores/activity.store";
 import { buyloadActions } from "../stores/buyload.store";
 import { cashOutActions } from "../stores/cashout.store";
+import { depositActions } from "../stores/deposit.store";
 import { jarActions } from "../stores/jar.store";
 import { paymentActions, usePaymentStore } from "../stores/payment.store";
 import { requestsActions } from "../stores/requests.store";
@@ -322,6 +323,7 @@ export function usePaymentReceiptViewModel() {
     done: () => {
       paymentActions.reset();
       transferActions.reset();
+      depositActions.reset();
       cashOutActions.reset();
       buyloadActions.reset();
       jarActions.reset();

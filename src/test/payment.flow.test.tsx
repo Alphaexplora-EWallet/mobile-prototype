@@ -29,21 +29,37 @@ const start = (options: MockGatewayOptions = {}) => {
 const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
   user.click(screen.getByRole("button", { name }));
 
-/** Onboards to Home, then opens Send with an amount typed in. */
+/** Onboards to Home, opens Send, and continues past Step 1 with an amount typed in. */
 const openTransfer = async (user: ReturnType<typeof userEvent.setup>, amount: string) => {
   await press(user, /Start my journey/i);
   await press(user, /^Continue$/);
   await press(user, /Build my plan/i);
   await press(user, /^Send$/);
+  // Step 1 "Send to": the default recipient is already selected.
+  await press(user, /^Continue$/);
   await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), amount);
 };
 
-/** Walks Send → recipients → bank destination, stopping before the rail choice. */
+/** Onboards to Home and opens Send, stopping at Step 1 "Send to". */
+const openSendStep1 = async (user: ReturnType<typeof userEvent.setup>) => {
+  await press(user, /Start my journey/i);
+  await press(user, /^Continue$/);
+  await press(user, /Build my plan/i);
+  await press(user, /^Send$/);
+};
+
+/**
+ * Walks Send → recipients → bank destination, stopping before the rail choice.
+ * The amount is typed on the destination screen's own Amount field — the same
+ * `transfer.store.ts` value the Step 2 field would edit, just entered before
+ * ever reaching Step 2, since "add a new recipient" branches off Step 1.
+ */
 const openBankDestination = async (user: ReturnType<typeof userEvent.setup>, amount: string, accountNumber: string) => {
-  await openTransfer(user, amount);
+  await openSendStep1(user);
   await press(user, /Add recipient/i);
   await press(user, /Send to a bank account/i);
   await press(user, /BDO Unibank/i);
+  await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), amount);
   await user.type(screen.getByRole("textbox", { name: /Account number/i }), accountNumber);
   await press(user, /Check account name/i);
 };
@@ -91,10 +107,11 @@ describe("interbank transfer flow", () => {
 
   it("rejects a malformed account number at the inquiry", async () => {
     const user = start();
-    await openTransfer(user, "500");
+    await openSendStep1(user);
     await press(user, /Add recipient/i);
     await press(user, /Send to a bank account/i);
     await press(user, /BDO Unibank/i);
+    await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), "500");
     await user.type(screen.getByRole("textbox", { name: /Account number/i }), "123");
     await press(user, /Check account name/i);
 
@@ -146,10 +163,12 @@ describe("interbank transfer flow", () => {
   it("refuses to send more than the wallet holds", async () => {
     const user = start();
     // ₱30,000 from a wallet holding ₱24,680.50, to a saved FIN-A recipient.
+    // The Amount step now catches this itself — Continue and review stays
+    // disabled and the gateway is never even asked.
     await openTransfer(user, "30000");
-    await press(user, /^Continue$/);
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/more than this wallet holds/i);
+    expect(await screen.findByRole("alert")).toHaveTextContent(/more than your available balance/i);
+    expect(screen.getByRole("button", { name: /Continue and review/i })).toBeDisabled();
   });
 
   it("saves a verified bank account as a recipient", async () => {
@@ -175,7 +194,7 @@ describe("interbank transfer flow", () => {
 
   it("removes a saved recipient", async () => {
     const user = start();
-    await openTransfer(user, "500");
+    await openSendStep1(user);
     await press(user, /Add recipient/i);
 
     const list = screen.getByRole("region", { name: /Saved recipients/i });

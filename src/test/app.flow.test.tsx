@@ -120,8 +120,10 @@ describe("FIN-A app flow", () => {
     await click(/Build my plan/i);
 
     await click(/^Send$/);
-    await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), "500");
+    // Step 1 "Send to": the default recipient is already selected.
     await click(/^Continue$/);
+    await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), "500");
+    await click(/Continue and review/i);
     await click(/Confirm and send/i);
     expect(await screen.findByRole("heading", { name: /Transfer complete/i })).toBeTruthy();
 
@@ -145,8 +147,10 @@ describe("FIN-A app flow", () => {
     await user.click(screen.getByRole("button", { name: /^Continue$/ }));
     await user.click(screen.getByRole("button", { name: /Build my plan/i }));
     await user.click(screen.getByRole("button", { name: /^Send$/ }));
-    await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), "500");
+    // Step 1 "Send to": the default recipient is already selected.
     await user.click(screen.getByRole("button", { name: /^Continue$/ }));
+    await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), "500");
+    await user.click(screen.getByRole("button", { name: /Continue and review/i }));
 
     expect(screen.getByText("Review transfer")).toBeTruthy();
     await user.click(screen.getByRole("button", { name: /Confirm and send/i }));
