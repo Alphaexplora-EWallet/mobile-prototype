@@ -1,6 +1,6 @@
 # FIN-A Wallet — Documentation Map
 
-Status: **current** — reflects the repository at commit `7e332c9` (2026-08-13, ALP-34). This file is
+Status: **current** — reflects the repository at commit `dc385e3` (2026-08-13, ALP-34). This file is
 the index for every knowledge document in the repo: what exists, what status it carries, and who
 owns it. The README's docs table mirrors this map — keep the two in sync.
 
