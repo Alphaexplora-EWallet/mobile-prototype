@@ -41,8 +41,8 @@ export function HomeScreen() {
       </header>
 
       <section className="home-wallet-block">
+        <HomeSkyline />
         <div className="home-balance-heading">
-          <HomeSkyline />
           <span>{balance.heading}</span>
           <div>
             <strong aria-live="polite">{balance.label}</strong>
