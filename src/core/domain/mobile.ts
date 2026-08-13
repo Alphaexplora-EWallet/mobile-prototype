@@ -13,6 +13,18 @@ const MOBILE_PATTERN = /^09\d{9}$/;
 export const normalizeMobileNumber = (value: string): string => value.replace(/\D/g, "");
 
 /**
+ * Sanitises a mobile field as it is typed or pasted: digits only, and
+ * international input ("+63 917 555 2288") is folded into the national 09-form
+ * the app stores and validates. Anything else is passed through for the
+ * validation rules to judge.
+ */
+export const normalizeMobileInput = (value: string): string => {
+  const digits = normalizeMobileNumber(value);
+  if (digits.startsWith("63") && digits.length === 12) return `0${digits.slice(2)}`;
+  return digits;
+};
+
+/**
  * Whether a value is a well-formed Philippine mobile number. Accepts the digits
  * alone or with the usual spacing ("0917 456 2288") — anything else fails.
  */
@@ -30,3 +42,14 @@ export const maskMobileNumber = (value: string): string => {
 
 /** Inline message for a value that failed `isValidMobileNumber`. */
 export const mobileNumberFormatMessage = (): string => "Enter an 11-digit Philippine mobile number starting with 09.";
+
+/**
+ * The display form stored on the profile: "09175552288" → "+63 917 555 2288",
+ * matching the `MOCK_USER.mobile` format the rest of the app renders. Falls
+ * back to the input when it is not a national-format number.
+ */
+export const formatMobileDisplay = (value: string): string => {
+  const digits = value.replace(/\D/g, "");
+  if (!/^09\d{9}$/.test(digits)) return value;
+  return `+63 ${digits.slice(1, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+};

@@ -3,7 +3,7 @@ import { IMAGERY } from "../assets";
 import { useWelcomeViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
 export function WelcomeScreen() {
-  const { start, signIn } = useWelcomeViewModel();
+  const { start, signIn, createAccount } = useWelcomeViewModel();
 
   return (
     <div className="onboarding-page welcome-page">
@@ -32,8 +32,11 @@ export function WelcomeScreen() {
       </figure>
 
       <div className="welcome-actions">
-        <button className="primary-button welcome-primary" type="button" onClick={start}>
-          <span>✦</span> Start my journey <b>›</b>
+        <button className="primary-button welcome-primary" type="button" onClick={createAccount}>
+          <span>✦</span> Create account <b>›</b>
+        </button>
+        <button className="secondary-button" type="button" onClick={start}>
+          Start my journey
         </button>
         <button className="secondary-button" type="button" onClick={signIn}>
           I already have an account

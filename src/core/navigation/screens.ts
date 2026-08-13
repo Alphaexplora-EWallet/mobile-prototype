@@ -12,6 +12,12 @@ import type { IconName } from "../domain/icons";
 export type ScreenParams = {
   welcome: undefined;
   "sign-in": undefined;
+  /** Registration: mobile → OTP → details → PIN → done. See useSignUpViewModel. */
+  "sign-up": undefined;
+  "sign-up-otp": undefined;
+  "sign-up-details": undefined;
+  "sign-up-pin": undefined;
+  "sign-up-done": undefined;
   quiz: undefined;
   result: undefined;
   home: undefined;

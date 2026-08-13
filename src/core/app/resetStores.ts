@@ -18,6 +18,7 @@ import { INITIAL_QR, useQrStore } from "../stores/qr.store";
 import { INITIAL_REQUESTS, useRequestsStore } from "../stores/requests.store";
 import { INITIAL_SETTINGS, useSettingsStore } from "../stores/settings.store";
 import { INITIAL_RECIPIENTS, useRecipientsStore } from "../stores/recipients.store";
+import { INITIAL_REGISTRATION, useRegistrationStore } from "../stores/registration.store";
 import { INITIAL_TRANSFER_DRAFT, useTransferStore } from "../stores/transfer.store";
 import { INITIAL_USER, useUserStore } from "../stores/user.store";
 import { useWalletStore } from "../stores/wallet.store";
@@ -62,6 +63,7 @@ export function resetStores(): void {
   useKycStore.setState(INITIAL_KYC);
   useSettingsStore.setState(INITIAL_SETTINGS);
   useRecipientsStore.setState(INITIAL_RECIPIENTS);
+  useRegistrationStore.setState(INITIAL_REGISTRATION);
   useUserStore.setState(INITIAL_USER);
   useWalletStore.setState({
     // `cards` used to be safe to omit because nothing mutated it. Settling a

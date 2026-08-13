@@ -20,6 +20,7 @@ export function useWelcomeViewModel() {
   return {
     start: () => navigation.navigate("quiz"),
     signIn: () => navigation.navigate("sign-in"),
+    createAccount: () => navigation.navigate("sign-up"),
   };
 }
 

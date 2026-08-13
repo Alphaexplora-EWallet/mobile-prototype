@@ -38,7 +38,7 @@ import {
   MOCK_TRANSACTION_PIN,
 } from "@/core/data/mock/security.mock";
 import { formatMoney } from "@/core/money/format";
-import { isValidMobileNumber } from "@/core/domain/mobile";
+import { isValidMobileNumber, maskMobileNumber as maskMobileDigits } from "@/core/domain/mobile";
 import { addMoney, compareMoney, type Money, money, pesos, subtractMoney } from "@/core/money/money";
 import { maskMobileNumber } from "@/core/domain/load";
 import type {
@@ -81,6 +81,7 @@ export type MockGatewayCall =
   | "security.requestOtp"
   | "security.verifyOtp"
   | "security.verifyPin"
+  | "security.setPin"
   | "security.sessions"
   | "security.revokeSession";
 
@@ -268,7 +269,16 @@ const receiptDescription = (intent: PaymentIntent): string => {
 /** The simulated "now" the seed fixtures' "Today"/"Yesterday" labels point at. */
 const DEFAULT_TODAY_ISO = "2026-08-11";
 
-export function createMockNetBankGateway(options: MockGatewayOptions = {}): BankingGateway {
+/**
+ * What `createMockNetBankGateway` actually returns: the full contract plus the
+ * simulation-only `reset`. The interface keeps `reset` optional so the offline
+ * gateway and a future server adapter can omit it; the mock always provides it.
+ */
+export type MockNetBankGateway = BankingGateway & {
+  reset(): void;
+};
+
+export function createMockNetBankGateway(options: MockGatewayOptions = {}): MockNetBankGateway {
   const {
     latencyMs = 0,
     failures = {},
@@ -282,23 +292,52 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
   let activityLog: BankingTransaction[] = seed ? [...seed] : seedActivity();
   let balances = seedBalances();
   let jarState: JarState = { opened: false, balance: pesos(0) };
-  let kyc: KycStatus = kycRejection
-    ? {
-        ...INITIAL_KYC_STATUS,
-        tier: kycTier,
-        state: "rejected",
-        submittedLabel: "Rejected Jul 2, 2026",
-        reviewNote: kycRejection.reason,
-        rejectedStepIndex: kycRejection.stepIndex,
-      }
-    : { ...INITIAL_KYC_STATUS, tier: kycTier };
+  /** The seeded KYC posture, recomputed on `reset` so a rejection survives rewind. */
+  const initialKyc = (): KycStatus =>
+    kycRejection
+      ? {
+          ...INITIAL_KYC_STATUS,
+          tier: kycTier,
+          state: "rejected",
+          submittedLabel: "Rejected Jul 2, 2026",
+          reviewNote: kycRejection.reason,
+          rejectedStepIndex: kycRejection.stepIndex,
+        }
+      : { ...INITIAL_KYC_STATUS, tier: kycTier };
+  let kyc: KycStatus = initialKyc();
   let sessionList: readonly DeviceSession[] = MOCK_SESSIONS;
+  /**
+   * The demo account ships with `MOCK_TRANSACTION_PIN`; a sign-up replaces it
+   * with the PIN the new user chose. This mirrors `identity.users.pin_hash` —
+   * the gateway owns the credential, the ViewModel never sees it.
+   */
+  let transactionPin = MOCK_TRANSACTION_PIN;
   let idempotencyCounter = 0;
-  const referenceCounters: Record<string, number> = {};
+  let referenceCounters: Record<string, number> = {};
   /** Replaying a key returns the original receipt instead of paying twice. */
   const submitted = new Map<string, PaymentReceipt>();
   const issuedTokens = new Set<ConfirmationToken>();
   const pollCounts = new Map<string, number>();
+
+  /**
+   * Rewinds every mutable fixture to its seeded state. The gateway outlives the
+   * navigation stack (it is a module singleton from `main.tsx`), so signing out
+   * must rewind it here or the previous session's PIN, balances and KYC tier
+   * leak into the next sign-in. A server adapter would have no such method.
+   */
+  const reset = (): void => {
+    activityLog = seed ? [...seed] : seedActivity();
+    balances = seedBalances();
+    jarState = { opened: false, balance: pesos(0) };
+    kyc = initialKyc();
+    sessionList = MOCK_SESSIONS;
+    transactionPin = MOCK_TRANSACTION_PIN;
+    idempotencyCounter = 0;
+    referenceCounters = {};
+    submitted.clear();
+    issuedTokens.clear();
+    pollCounts.clear();
+  };
 
   const settle = <T>(call: MockGatewayCall, produce: () => GatewayResult<T>): Promise<GatewayResult<T>> => {
     const forced = failures[call];
@@ -672,9 +711,16 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
   };
 
   const security: SecurityPort = {
-    async requestOtp(_purpose: OtpPurpose) {
+    async requestOtp(_purpose: OtpPurpose, destination?: string) {
       return settle<OtpChallenge>("security.requestOtp", () =>
-        ok({ maskedDestination: MOCK_OTP_DESTINATION, expiresInLabel: "Expires in 5 minutes", digits: 6 }),
+        ok({
+          // A sign-up hands the number over for the first time, so the
+          // challenge masks the number it was just sent to; every other purpose
+          // is answered from the account the gateway already knows.
+          maskedDestination: destination ? maskMobileDigits(destination) : MOCK_OTP_DESTINATION,
+          expiresInLabel: "Expires in 5 minutes",
+          digits: 6,
+        }),
       );
     },
     async verifyOtp(purpose, code) {
@@ -687,12 +733,21 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
     },
     async verifyPin(pin) {
       return settle<ConfirmationToken>("security.verifyPin", () => {
-        if (pin.trim() !== MOCK_TRANSACTION_PIN) {
+        if (pin.trim() !== transactionPin) {
           return failed("invalid-account", "That PIN is not right. Try again.");
         }
         const token = `pin-${issuedTokens.size + 1}`;
         issuedTokens.add(token);
         return ok(token);
+      });
+    },
+    async setPin(pin) {
+      return settle<null>("security.setPin", () => {
+        if (!/^\d{6}$/.test(pin)) {
+          return failed("invalid-account", "Your transaction PIN is exactly 6 digits.");
+        }
+        transactionPin = pin;
+        return ok(null);
       });
     },
     async sessions() {
@@ -720,5 +775,6 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
       idempotencyCounter += 1;
       return `IDMP-${String(idempotencyCounter).padStart(6, "0")}`;
     },
+    reset,
   };
 }

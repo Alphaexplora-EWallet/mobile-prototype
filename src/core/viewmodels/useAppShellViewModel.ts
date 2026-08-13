@@ -3,6 +3,7 @@ import type { SheetAction, SheetResult } from "../domain/simulation";
 import type { Screen, TabScreen } from "../navigation/screens";
 import { isTabScreen } from "../navigation/screens";
 import { useNavigation } from "../navigation/useNavigation";
+import { useBankingGateway } from "../platform/BankingGatewayContext";
 import { usePreferencesStore } from "../stores/preferences.store";
 import { uiActions, useUiStore } from "../stores/ui.store";
 import { resetStores } from "../app/resetStores";
@@ -21,6 +22,7 @@ export type AppShellViewModel = {
 
 export function useAppShellViewModel(): AppShellViewModel {
   const { screen, switchTab } = useNavigation();
+  const gateway = useBankingGateway();
   const theme = usePreferencesStore((state) => state.theme);
   const sheet = useUiStore(useShallow((state) => state.sheet));
 
@@ -36,8 +38,12 @@ export function useAppShellViewModel(): AppShellViewModel {
         // Order matters. resetStores puts the navigation stack back to Welcome
         // itself, so nothing further is needed — and clearing the sheet first
         // would leave a frame where the signed-out state is still on screen.
+        // The gateway outlives the stack (module singleton), so a sign-out must
+        // rewind its simulated fixtures too — otherwise the previous session's
+        // transaction PIN (and balances/KYC) leak into the next sign-in.
         uiActions.dismissSheet();
         resetStores();
+        gateway.reset?.();
         return;
     }
   };

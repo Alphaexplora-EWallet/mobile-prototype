@@ -9,6 +9,8 @@ type UserState = UserProfile & {
     setFullName(fullName: string): void;
     setMobile(mobile: string): void;
     setEmail(email: string): void;
+    /** A fresh sign-up replaces the demo fixture's "Member since Jan 2025". */
+    setMemberSinceLabel(label: string): void;
   };
 };
 
@@ -31,6 +33,10 @@ export const useUserStore = create<UserState>()((set, get) => ({
     setEmail: (email) => {
       if (get().email === email) return;
       set({ email });
+    },
+    setMemberSinceLabel: (memberSinceLabel) => {
+      if (get().memberSinceLabel === memberSinceLabel) return;
+      set({ memberSinceLabel });
     },
   },
 }));

@@ -1,0 +1,64 @@
+/* Sign-up registration flow */
+.signup-pin {
+  display: grid;
+  gap: 8px;
+  color: #354044;
+  font-size: 13px;
+  font-weight: 800;
+}
+.signup-pin input {
+  width: 100%;
+  padding: 16px 18px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 10px;
+  text-align: center;
+  background: var(--surface);
+}
+.signup-pin input:focus-visible {
+  border-color: var(--teal);
+}
+
+.sign-up-done-page {
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  padding-bottom: 16px;
+}
+.signup-done-hero {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  margin: 48px 0 36px;
+  text-align: center;
+}
+.signup-done-hero h1 {
+  margin: 0;
+  color: #06142f;
+  font-size: 38px;
+  line-height: 1.02;
+  letter-spacing: -1.8px;
+}
+.signup-done-hero p {
+  margin: 0;
+  max-width: 300px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.signup-done-check {
+  width: 68px;
+  height: 68px;
+}
+.signup-done-check svg {
+  width: 32px;
+  height: 32px;
+}
+.sign-up-done-page .money-actions {
+  margin-top: auto;
+  display: grid;
+  gap: 12px;
+}

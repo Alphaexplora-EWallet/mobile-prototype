@@ -30,6 +30,13 @@ export const unavailableBankingGateway: BankingGateway = {
     decodeQr: offline,
   },
   compliance: { kycStatus: offline, submitKyc: offline, limits: offline },
-  security: { requestOtp: offline, verifyOtp: offline, verifyPin: offline, sessions: offline, revokeSession: offline },
+  security: {
+    requestOtp: offline,
+    verifyOtp: offline,
+    verifyPin: offline,
+    setPin: offline,
+    sessions: offline,
+    revokeSession: offline,
+  },
   nextIdempotencyKey: () => "unavailable",
 };

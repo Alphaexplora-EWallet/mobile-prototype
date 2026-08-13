@@ -11,6 +11,11 @@ import { BottomNav } from "@/ui/layout/BottomNav";
 import { ActionSheet } from "@/ui/overlays/ActionSheet";
 import { WelcomeScreen } from "@/ui/screens/WelcomeScreen";
 import { SignInScreen } from "@/ui/screens/SignInScreen";
+import { SignUpScreen } from "@/ui/screens/SignUpScreen";
+import { SignUpOtpScreen } from "@/ui/screens/SignUpOtpScreen";
+import { SignUpDetailsScreen } from "@/ui/screens/SignUpDetailsScreen";
+import { SignUpPinScreen } from "@/ui/screens/SignUpPinScreen";
+import { SignUpDoneScreen } from "@/ui/screens/SignUpDoneScreen";
 import { QuizScreen } from "@/ui/screens/QuizScreen";
 import { ResultScreen } from "@/ui/screens/ResultScreen";
 import { HomeScreen } from "@/ui/screens/HomeScreen";
@@ -65,6 +70,11 @@ import { SpendingInsightsScreen } from "@/ui/screens/SpendingInsightsScreen";
 const SCREENS: Record<Screen, () => JSX.Element> = {
   welcome: WelcomeScreen,
   "sign-in": SignInScreen,
+  "sign-up": SignUpScreen,
+  "sign-up-otp": SignUpOtpScreen,
+  "sign-up-details": SignUpDetailsScreen,
+  "sign-up-pin": SignUpPinScreen,
+  "sign-up-done": SignUpDoneScreen,
   quiz: QuizScreen,
   result: ResultScreen,
   home: HomeScreen,
