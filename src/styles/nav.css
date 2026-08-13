@@ -32,7 +32,7 @@
   font-weight: 800;
 }
 .bottom-nav button.is-active svg {
-  fill: rgba(8, 126, 121, 0.16);
+  fill: rgba(10, 111, 184, 0.16);
   stroke-width: 2.2;
 }
 .sheet-backdrop {

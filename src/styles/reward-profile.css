@@ -21,7 +21,7 @@
   position: absolute;
   inset: -20px 0 auto;
   height: 130px;
-  border-top: 3px dotted rgba(8, 126, 121, 0.35);
+  border-top: 3px dotted rgba(10, 111, 184, 0.35);
   border-radius: 50%;
   pointer-events: none;
 }

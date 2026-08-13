@@ -7,9 +7,9 @@
   text-rendering: optimizeLegibility;
   --ink: #142126;
   --muted: #667074;
-  --teal: #087e79;
-  --teal-dark: #006863;
-  --teal-soft: #e5f1ed;
+  --teal: #0a6fb8;
+  --teal-dark: #07508a;
+  --teal-soft: #e1edf7;
   --cream: #fbf7ef;
   --cream-deep: #f5ede0;
   --amber: #f0aa24;
@@ -32,7 +32,7 @@
   /* Elevation scale (DESIGN.md §18): low-opacity only, no strong black shadows. */
   --shadow-surface: var(--shadow);
   --shadow-floating: 0 12px 28px rgba(20, 33, 38, 0.14);
-  --shadow-primary: 0 20px 40px rgba(0, 75, 71, 0.22);
+  --shadow-primary: 0 20px 40px rgba(7, 80, 138, 0.22);
   /* Typography scale (DESIGN.md §20), levels 1 (hero) through 5 (meta). */
   --text-hero: 34px;
   --text-title: 22px;
@@ -47,9 +47,9 @@
   background: #0a0f0d;
   --ink: #f2f0e8;
   --muted: #9aa69f;
-  --teal: #3cb7aa;
-  --teal-dark: #278f86;
-  --teal-soft: #193531;
+  --teal: #58a6e8;
+  --teal-dark: #2e86c9;
+  --teal-soft: #142b3d;
   --cream: #101614;
   --cream-deep: #17201d;
   --amber: #e8b24d;

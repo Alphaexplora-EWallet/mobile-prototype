@@ -141,7 +141,7 @@
 }
 .input-shell:focus-within {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(8, 126, 121, 0.12);
+  box-shadow: 0 0 0 3px rgba(10, 111, 184, 0.12);
 }
 .input-shell svg {
   width: 20px;

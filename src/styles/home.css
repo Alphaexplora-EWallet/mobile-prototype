@@ -186,9 +186,9 @@
   color: white;
   background:
     radial-gradient(circle at 85% 12%, rgba(255, 255, 255, 0.14), transparent 34%),
-    repeating-linear-gradient(45deg, #06908a 0 8px, #057b76 8px 12px), linear-gradient(160deg, #0b8b85, #006863);
+    repeating-linear-gradient(45deg, #0e79c4 0 8px, #0a64aa 8px 12px), linear-gradient(160deg, #0b75c1, #07508a);
   cursor: pointer;
-  box-shadow: 0 8px 22px rgba(0, 75, 71, 0.18);
+  box-shadow: 0 8px 22px rgba(7, 80, 138, 0.18);
 }
 .quest-card-content {
   position: relative;
@@ -215,7 +215,7 @@
   border-radius: 50%;
 }
 .quest-icon {
-  color: #0b6f6a;
+  color: #0a639e;
   background: rgba(255, 255, 255, 0.92);
 }
 .quest-spend {

@@ -1,7 +1,7 @@
 /* Dark theme */
 :root[data-theme="dark"] body {
   background:
-    radial-gradient(circle at 15% 12%, rgba(60, 183, 170, 0.1), transparent 30%),
+    radial-gradient(circle at 15% 12%, rgba(88, 166, 232, 0.1), transparent 30%),
     radial-gradient(circle at 88% 82%, rgba(232, 178, 77, 0.07), transparent 25%), #0a0f0d;
 }
 :root[data-theme="dark"] .phone-shell {
@@ -19,7 +19,7 @@
 }
 :root[data-theme="dark"] .screen {
   background:
-    radial-gradient(circle at 82% 10%, rgba(60, 183, 170, 0.045), transparent 26%),
+    radial-gradient(circle at 82% 10%, rgba(88, 166, 232, 0.045), transparent 26%),
     linear-gradient(rgba(16, 22, 20, 0.965), rgba(16, 22, 20, 0.965)),
     repeating-linear-gradient(135deg, transparent, transparent 6px, rgba(193, 218, 209, 0.025) 7px);
 }
