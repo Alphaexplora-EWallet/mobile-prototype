@@ -84,6 +84,28 @@ describe("cash-in flow", () => {
     expect(await screen.findByText("₱25,680.50")).toBeTruthy();
   });
 
+  it("accepts a deposit larger than the current balance", async () => {
+    // Add money has no external-source limit to check the amount against —
+    // unlike Send money's own-balance cap, a client-side check here would
+    // just be checking the wrong number and blocking ordinary top-ups.
+    const user = start();
+    await openDeposit(user);
+    await press(user, /Scan to cash in/i);
+    await press(user, /^Continue$/);
+    await user.type(screen.getByRole("textbox", { name: /Amount to add/i }), "30000");
+
+    expect(screen.getByRole("button", { name: /^Add money$/ })).toBeEnabled();
+    expect(screen.queryByRole("alert")).toBeNull();
+
+    await press(user, /^Add money$/);
+    await press(user, /Confirm and add/i);
+    expect(await screen.findByRole("heading", { name: /Money added/i })).toBeTruthy();
+
+    await press(user, /^Done$/);
+    // ₱24,680.50 + ₱30,000.00, no fee here.
+    expect(await screen.findByText("₱54,680.50")).toBeTruthy();
+  });
+
   it("sends a linked-bank cash-in to the virtual account instead of a payment", async () => {
     const user = start();
     await openDeposit(user);

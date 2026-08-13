@@ -88,9 +88,11 @@ export function createAmountDraft(
 export type AmountDraft = ReturnType<typeof createAmountDraft>;
 
 /**
- * The over-limit message shared by both Amount steps. Unparsable input and a
- * zero/empty amount stay silent — the primary button is just disabled — since
- * an amount step shouldn't scold a value the user hasn't finished typing yet.
+ * Send money's over-balance message. Unparsable input and a zero/empty amount
+ * stay silent — the primary button is just disabled — since an amount step
+ * shouldn't scold a value the user hasn't finished typing yet. Add money has
+ * no equivalent: there is no external-source limit to check the amount
+ * against, so it defers to the gateway's `insufficient-funds` result instead.
  */
 function amountLimitError(amount: string, parsed: Money | null, limit: Money, limitLabel: string): string | null {
   if (amount.trim() === "") return null;
@@ -198,7 +200,6 @@ export type DepositViewModel = MoneyBase &
     selectMethod(id: string): void;
     /** "Get account number" for an inbound method, "Continue" otherwise — the branch is visible before it happens. */
     step1ActionLabel: string;
-    amountError: string | null;
     /** "No fee" when it is free — the strip said that unconditionally before. */
     feeLabel: string;
     arrivalLabel: string;
@@ -240,10 +241,15 @@ export function useDepositViewModel(): DepositViewModel {
     navigation.navigate("payment-review");
   };
 
-  const canAdvance =
-    step === 1
-      ? selectedMethod !== ""
-      : parsed !== null && parsed.amount > 0 && parsed.amount <= destination.balance.amount;
+  /**
+   * Unlike Send money, there is no client-side over-balance check here: the
+   * amount is going *into* this balance, and there is no real external-source
+   * limit to check it against (checking the destination's own balance would
+   * block completely ordinary top-ups). The gateway's `insufficient-funds`
+   * result at payment-review remains the only check, same as before this step
+   * existed.
+   */
+  const canAdvance = step === 1 ? selectedMethod !== "" : parsed !== null && parsed.amount > 0;
 
   return {
     ...base,
@@ -266,7 +272,6 @@ export function useDepositViewModel(): DepositViewModel {
     selectedMethod,
     selectMethod: depositActions.selectMethod,
     step1ActionLabel: method.inbound ? "Get account number" : "Continue",
-    amountError: amountLimitError(amount, parsed, destination.balance, destination.balanceLabel),
     feeLabel: isZero(method.fee) ? "No fee" : formatMoney(method.fee),
     arrivalLabel: method.arrivalLabel,
     submit,

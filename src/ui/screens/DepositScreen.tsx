@@ -77,12 +77,6 @@ export function DepositScreen() {
             onSelectPreset={vm.selectPreset}
           />
 
-          {vm.amountError && (
-            <p className="transfer-error" role="alert">
-              {vm.amountError}
-            </p>
-          )}
-
           {/*
            * Both lines come from the selected method now. They read exactly as the
            * hardcoded pair did for the default (linked bank), and tell the truth for
