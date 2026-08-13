@@ -19,6 +19,7 @@
 
 /* Per-screen component rules, in the order they appeared originally. */
 @import "./welcome.css";
+@import "./signup.css";
 @import "./quiz.css";
 @import "./result.css";
 @import "./home.css";
