@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { isValidMobileNumber, maskMobileNumber, mobileNumberFormatMessage, normalizeMobileNumber } from "./mobile";
+import {
+  formatMobileDisplay,
+  isValidMobileNumber,
+  maskMobileNumber,
+  mobileNumberFormatMessage,
+  normalizeMobileNumber,
+} from "./mobile";
 
 describe("mobile number rules", () => {
   it("accepts an 11-digit number starting with 09", () => {
@@ -29,5 +35,11 @@ describe("mobile number rules", () => {
 
   it("offers a single, human message for the invalid case", () => {
     expect(mobileNumberFormatMessage()).toBe("Enter an 11-digit Philippine mobile number starting with 09.");
+  });
+
+  it("formats the profile display form, and only for national numbers", () => {
+    expect(formatMobileDisplay("09175552288")).toBe("+63 917 555 2288");
+    expect(formatMobileDisplay("0917 555 2288")).toBe("+63 917 555 2288");
+    expect(formatMobileDisplay("12345")).toBe("12345"); // not a national number — untouched
   });
 });

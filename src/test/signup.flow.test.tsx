@@ -87,6 +87,11 @@ describe("registration flow", () => {
     const nav = screen.getByRole("navigation", { name: /primary navigation/i });
     await user.click(within(nav).getByRole("button", { name: /^Profile$/ }));
     expect(await screen.findByRole("heading", { name: NAME })).toBeTruthy();
+
+    // The mobile is stored in display form, the MOCK_USER invariant.
+    await press(user, /Personal details/i);
+    expect(await screen.findByText("+63 917 555 2288")).toBeTruthy();
+    expect(screen.getByText(EMAIL)).toBeTruthy();
   });
 
   it("rejects a wrong one-time code", async () => {
@@ -135,5 +140,21 @@ describe("registration flow", () => {
     await openSignUp(user);
     await press(user, /Back to welcome/i);
     expect(screen.getByRole("heading", { name: /Money that\s*follows your life/i })).toBeTruthy();
+  });
+
+  it("surfaces a failed code request and clears the error on retype", async () => {
+    const user = userEvent.setup();
+    render(
+      <BankingGatewayProvider gateway={createMockNetBankGateway({ failures: { "security.requestOtp": "network" } })}>
+        <App />
+      </BankingGatewayProvider>,
+    );
+    await press(user, /Create account/i);
+    await type(user, "Mobile number", MOBILE);
+    await press(user, /^Continue$/);
+
+    // The intro stops pretending to send, and the reason is on screen.
+    expect(await screen.findByRole("alert")).toHaveTextContent(/reach NetBank/i);
+    expect(screen.getByText(/We could not send your code/i)).toBeTruthy();
   });
 });

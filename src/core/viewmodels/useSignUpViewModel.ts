@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { isValidMobileNumber, mobileNumberFormatMessage, normalizeMobileNumber } from "../domain/mobile";
+import {
+  formatMobileDisplay,
+  isValidMobileNumber,
+  mobileNumberFormatMessage,
+  normalizeMobileNumber,
+} from "../domain/mobile";
 import type { OtpChallenge } from "../domain/security";
 import { MOCK_OTP_CODE } from "../data/mock/security.mock";
 import { useNavigation } from "../navigation/useNavigation";
@@ -75,10 +80,17 @@ export function useSignUpOtpViewModel() {
 
   return {
     title: "Check your phone",
-    intro: challenge ? `We sent a ${digits}-digit code to ${challenge.maskedDestination}.` : "Sending your code…",
+    intro: challenge
+      ? `We sent a ${digits}-digit code to ${challenge.maskedDestination}.`
+      : error
+        ? "We could not send your code. Check your connection and try again."
+        : "Sending your code…",
     expiresLabel: challenge?.expiresInLabel ?? "",
     code,
-    setCode: (value: string) => setCode(value.replace(/\D/g, "").slice(0, digits)),
+    setCode: (value: string) => {
+      setCode(value.replace(/\D/g, "").slice(0, digits));
+      setError(null);
+    },
     digits,
     canSubmit: code.length === digits && !isVerifying,
     isVerifying,
@@ -109,10 +121,11 @@ export function useSignUpOtpViewModel() {
 
 export function useSignUpDetailsViewModel() {
   const navigation = useNavigation();
-  const draft = useRegistrationStore((state) => state);
+  const storedFullName = useRegistrationStore((state) => state.fullName);
+  const storedEmail = useRegistrationStore((state) => state.email);
 
-  const [fullName, setFullName] = useState(draft.fullName);
-  const [email, setEmail] = useState(draft.email);
+  const [fullName, setFullName] = useState(storedFullName);
+  const [email, setEmail] = useState(storedEmail);
   const [attempted, setAttempted] = useState(false);
 
   const nameValid = fullName.trim().length >= 2;
@@ -143,7 +156,9 @@ export function useSignUpDetailsViewModel() {
 export function useSignUpPinViewModel() {
   const navigation = useNavigation();
   const gateway = useBankingGateway();
-  const draft = useRegistrationStore((state) => state);
+  const fullName = useRegistrationStore((state) => state.fullName);
+  const mobile = useRegistrationStore((state) => state.mobile);
+  const email = useRegistrationStore((state) => state.email);
 
   const [pin, setPin] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -194,10 +209,11 @@ export function useSignUpPinViewModel() {
         return;
       }
       // The account is created: `identity.users` gets the registered details,
-      // replacing the demo fixture this prototype ships with.
-      userActions.setFullName(draft.fullName);
-      userActions.setMobile(draft.mobile);
-      userActions.setEmail(draft.email);
+      // replacing the demo fixture this prototype ships with. The mobile is
+      // stored in display form, the same invariant MOCK_USER upholds.
+      userActions.setFullName(fullName);
+      userActions.setMobile(formatMobileDisplay(mobile));
+      userActions.setEmail(email);
       userActions.setMemberSinceLabel("Just joined");
       navigation.navigate("sign-up-done");
     },

@@ -30,3 +30,14 @@ export const maskMobileNumber = (value: string): string => {
 
 /** Inline message for a value that failed `isValidMobileNumber`. */
 export const mobileNumberFormatMessage = (): string => "Enter an 11-digit Philippine mobile number starting with 09.";
+
+/**
+ * The display form stored on the profile: "09175552288" → "+63 917 555 2288",
+ * matching the `MOCK_USER.mobile` format the rest of the app renders. Falls
+ * back to the input when it is not a national-format number.
+ */
+export const formatMobileDisplay = (value: string): string => {
+  const digits = value.replace(/\D/g, "");
+  if (!/^09\d{9}$/.test(digits)) return value;
+  return `+63 ${digits.slice(1, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+};
