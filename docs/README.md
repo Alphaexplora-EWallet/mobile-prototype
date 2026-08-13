@@ -1,23 +1,23 @@
 # FIN-A Wallet — Documentation Map
 
-Status: **current** — reflects the repository at commit `bed2a4b` (2026-08-13, ALP-34). This file is
+Status: **current** — reflects the repository at commit `7e332c9` (2026-08-13, ALP-34). This file is
 the index for every knowledge document in the repo: what exists, what status it carries, and who
 owns it. The README's docs table mirrors this map — keep the two in sync.
 
 ## The map
 
-| File                            | Status               | Owner                 | Content                                                                                                                     |
-| ------------------------------- | -------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `README.md`                     | Current              | team                  | Entry point: what the prototype is, how to run it, architecture overview, known shortcuts                                   |
-| `docs/README.md`                | Current              | Knowledge Curator     | This map                                                                                                                    |
-| `docs/backend-architecture.md`  | Draft (ALP-6)        | Architecture Recorder | The planned NetBank backend: schemas, BaaS mapping, migration path                                                          |
-| `docs/multi-user-model.md`      | Decided (ALP-7)      | Architecture Recorder | The decision behind ALP-6: how FIN-A users map to NetBank accounts                                                          |
-| `docs/frontend-architecture.md` | Current              | Architecture Recorder | The frontend as it actually is: MVVM contract, platform-seam layering, navigation, testing, RN port story                   |
-| `docs/data-layer.md`            | In progress (ALP-34) | API Documenter        | Data/API surface: `core/data` repositories + mock fixtures, `core/stores` contracts, `core/money`, NetBank replacement path |
-| `docs/developer-guide.md`       | Current (ALP-34)     | Code Explainer        | Setup, structure walkthrough, how to add a screen/feature, real file references                                             |
-| `CHANGELOG.md`                  | Current (ALP-34)     | Changelog Agent       | What actually shipped, from git history                                                                                     |
-| `DESIGN.md`                     | Current (stale name) | team                  | UI layout & visual design guide; still says "EasyPay", predates the FIN-A rename (see flags)                                |
-| `AGENTS.md` / `CLAUDE.md`       | Current              | team                  | Working guidelines for agents / Claude Code                                                                                 |
+| File                            | Status               | Owner                 | Content                                                                                                                        |
+| ------------------------------- | -------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `README.md`                     | Current              | team                  | Entry point: what the prototype is, how to run it, architecture overview, known shortcuts                                      |
+| `docs/README.md`                | Current              | Knowledge Curator     | This map                                                                                                                       |
+| `docs/backend-architecture.md`  | Draft (ALP-6)        | Architecture Recorder | The planned NetBank backend: schemas, BaaS mapping, migration path                                                             |
+| `docs/multi-user-model.md`      | Decided (ALP-7)      | Architecture Recorder | The decision behind ALP-6: how FIN-A users map to NetBank accounts                                                             |
+| `docs/frontend-architecture.md` | Current              | Architecture Recorder | The frontend as it actually is: MVVM contract, platform-seam layering, navigation, testing, RN port story                      |
+| `docs/data-layer.md`            | Current (ALP-34)     | API Documenter        | Data/API surface: `core/data` mock fixtures, `core/stores` contracts, `core/money`, gateway contract, NetBank replacement path |
+| `docs/developer-guide.md`       | Current (ALP-34)     | Code Explainer        | Setup, structure walkthrough, how to add a screen/feature, real file references                                                |
+| `CHANGELOG.md`                  | Current (ALP-34)     | Changelog Agent       | What actually shipped, from git history                                                                                        |
+| `DESIGN.md`                     | Current (stale name) | team                  | UI layout & visual design guide; still says "EasyPay", predates the FIN-A rename (see flags)                                   |
+| `AGENTS.md` / `CLAUDE.md`       | Current              | team                  | Working guidelines for agents / Claude Code                                                                                    |
 
 Statuses are ordered: **Draft** → **Decided** → **Current**. "In progress (ALP-34)" means the file
 is planned in the current documentation effort and not yet committed — flip it to **Current** when

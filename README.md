@@ -7,18 +7,18 @@ no backend today — `docs/backend-architecture.md` (draft, ALP-6) and `docs/mul
 
 ## Docs
 
-| File                            | Status               | Content                                                                    |
-| ------------------------------- | -------------------- | -------------------------------------------------------------------------- |
-| `README.md` (this file)         | Current              | What the prototype is, how to run it, architecture overview                |
-| `docs/README.md`                | Current              | Documentation map: every doc, its status, and its owner                    |
-| `docs/backend-architecture.md`  | Draft (ALP-6)        | The planned backend: schemas, NetBank BaaS mapping, migration path         |
-| `docs/multi-user-model.md`      | Decided (ALP-7)      | How FIN-A users map to NetBank accounts (the decision behind ALP-6)        |
-| `docs/frontend-architecture.md` | Current              | The frontend as it is: MVVM, platform-seam layering, navigation, tests     |
-| `docs/data-layer.md`            | In progress (ALP-34) | Data/API surface: repositories, mock fixtures, stores, money, NetBank path |
-| `docs/developer-guide.md`       | Current (ALP-34)     | Setup, structure walkthrough, how to add a screen/feature                  |
-| `CHANGELOG.md`                  | Current (ALP-34)     | What shipped, from git history                                             |
-| `DESIGN.md`                     | Current (stale name) | UI layout & visual design guide (still says "EasyPay"; see doc map)        |
-| `AGENTS.md` / `CLAUDE.md`       | Current              | Working guidelines for agents / Claude Code                                |
+| File                            | Status               | Content                                                                                 |
+| ------------------------------- | -------------------- | --------------------------------------------------------------------------------------- |
+| `README.md` (this file)         | Current              | What the prototype is, how to run it, architecture overview                             |
+| `docs/README.md`                | Current              | Documentation map: every doc, its status, and its owner                                 |
+| `docs/backend-architecture.md`  | Draft (ALP-6)        | The planned backend: schemas, NetBank BaaS mapping, migration path                      |
+| `docs/multi-user-model.md`      | Decided (ALP-7)      | How FIN-A users map to NetBank accounts (the decision behind ALP-6)                     |
+| `docs/frontend-architecture.md` | Current              | The frontend as it is: MVVM, platform-seam layering, navigation, tests                  |
+| `docs/data-layer.md`            | Current (ALP-34)     | Data/API surface: mock fixtures, store contracts, money, gateway contract, NetBank path |
+| `docs/developer-guide.md`       | Current (ALP-34)     | Setup, structure walkthrough, how to add a screen/feature                               |
+| `CHANGELOG.md`                  | Current (ALP-34)     | What shipped, from git history                                                          |
+| `DESIGN.md`                     | Current (stale name) | UI layout & visual design guide (still says "EasyPay"; see doc map)                     |
+| `AGENTS.md` / `CLAUDE.md`       | Current              | Working guidelines for agents / Claude Code                                             |
 
 ```bash
 npm install
