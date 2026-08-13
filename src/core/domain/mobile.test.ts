@@ -4,6 +4,7 @@ import {
   isValidMobileNumber,
   maskMobileNumber,
   mobileNumberFormatMessage,
+  normalizeMobileInput,
   normalizeMobileNumber,
 } from "./mobile";
 
@@ -26,6 +27,15 @@ describe("mobile number rules", () => {
   it("normalises input to digits only", () => {
     expect(normalizeMobileNumber("0917 456-2288")).toBe("09174562288");
     expect(normalizeMobileNumber("+63 917 456 2288")).toBe("639174562288");
+  });
+
+  it("folds pasted international input into the national 09-form", () => {
+    expect(normalizeMobileInput("+63 917 555 2288")).toBe("09175552288");
+    expect(normalizeMobileInput("639175552288")).toBe("09175552288");
+    expect(normalizeMobileInput("0917 555 2288")).toBe("09175552288");
+    // A partial or malformed paste is passed through for validation to judge.
+    expect(normalizeMobileInput("6391755")).toBe("6391755");
+    expect(normalizeMobileInput("0917ABC2288")).toBe("09172288");
   });
 
   it("masks to the first four and last four digits", () => {

@@ -3,7 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
 import { createMockNetBankGateway } from "@/platform/web/createMockNetBankGateway";
-import { MOCK_OTP_CODE } from "@/core/data/mock/security.mock";
+import { MOCK_OTP_CODE, MOCK_TRANSACTION_PIN } from "@/core/data/mock/security.mock";
 import { maskMobileNumber } from "@/core/domain/mobile";
 import App from "../App";
 
@@ -156,5 +156,68 @@ describe("registration flow", () => {
     // The intro stops pretending to send, and the reason is on screen.
     expect(await screen.findByRole("alert")).toHaveTextContent(/reach NetBank/i);
     expect(screen.getByText(/We could not send your code/i)).toBeTruthy();
+  });
+
+  it("steps back through every sign-up screen", async () => {
+    const user = start();
+    await openSignUp(user);
+    await type(user, "Mobile number", MOBILE);
+    await press(user, /^Continue$/);
+    await type(user, "One-time code", MOCK_OTP_CODE);
+    await press(user, /Verify and continue/i);
+    await type(user, "Full name", NAME);
+    await press(user, /^Continue$/);
+    await type(user, "Transaction PIN", PIN);
+    await type(user, "Re-enter your PIN", PIN);
+
+    // PIN → details
+    await press(user, /Back to home/i);
+    expect(await screen.findByRole("heading", { name: /What should we call you/i })).toBeTruthy();
+    // details → OTP
+    await press(user, /Back to home/i);
+    expect(await screen.findByRole("heading", { name: /Check your phone/i })).toBeTruthy();
+    // OTP → mobile
+    await press(user, /Back to home/i);
+    expect(await screen.findByRole("heading", { name: /What's your\s*mobile number/i })).toBeTruthy();
+    // mobile → welcome
+    await press(user, /Back to welcome/i);
+    expect(screen.getByRole("heading", { name: /Money that\s*follows your life/i })).toBeTruthy();
+  });
+
+  it("restores the demo PIN after sign-up and sign-out", async () => {
+    const user = start();
+    await openSignUp(user);
+    await register(user);
+    await press(user, /Go to my wallet/i);
+
+    // Sign out from Profile.
+    const nav = screen.getByRole("navigation", { name: /primary navigation/i });
+    await user.click(within(nav).getByRole("button", { name: /^Profile$/ }));
+    await press(user, /^Sign out$/);
+    await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: /^Sign out$/ }));
+
+    // Back in as the demo user.
+    expect(await screen.findByRole("button", { name: /Create account/i })).toBeTruthy();
+    await press(user, /I already have an account/i);
+    await press(user, /Continue with demo account/i);
+    expect(await screen.findByText("Recent transactions")).toBeTruthy();
+
+    // An InstaPay transfer steps up to the transaction PIN — which must be the
+    // demo PIN again, not the one the sign-up chose (the gateway rewinds with
+    // resetStores on sign-out; a page reload should not be required).
+    await press(user, /^Send$/);
+    await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), "500");
+    await press(user, /Add recipient/i);
+    await press(user, /Send to a bank account/i);
+    await press(user, /BDO Unibank/i);
+    await user.type(screen.getByRole("textbox", { name: /Account number/i }), "003812340001");
+    await press(user, /Check account name/i);
+    expect(await screen.findByText(/Is that right\?/i)).toBeTruthy();
+    await press(user, /InstaPay/i);
+    await press(user, /^Continue$/);
+    await press(user, /Continue to confirm/i);
+    await user.type(screen.getByLabelText(/Transaction PIN/i), MOCK_TRANSACTION_PIN);
+    await press(user, /Confirm payment/i);
+    expect(await screen.findByRole("heading", { name: /Transfer complete/i })).toBeTruthy();
   });
 });

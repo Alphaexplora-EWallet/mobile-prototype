@@ -201,6 +201,27 @@ describe("mock NetBank gateway", () => {
     expect(errorOf(await gateway.security.setPin("123"))).toBe("invalid-account");
   });
 
+  it("rewinds the simulation on reset, restoring the demo credential", async () => {
+    const gateway = createMockNetBankGateway();
+
+    // A sign-up replaces the PIN and a transfer moves the balance.
+    await gateway.security.setPin("741963");
+    await submit(gateway, transfer("internal", 500), NO_CONFIRMATION_REQUIRED);
+    expect(errorOf(await gateway.security.verifyPin(MOCK_TRANSACTION_PIN))).toBe("invalid-account");
+    expect(unwrap(await gateway.accounts.list()).find((account) => account.cardId === "main")?.balance).toEqual(
+      pesos(24_180.5),
+    );
+
+    // Sign-out rewinds the whole simulated bank, not just the stores.
+    gateway.reset();
+
+    expect(unwrap(await gateway.security.verifyPin(MOCK_TRANSACTION_PIN))).toMatch(/^pin-/);
+    expect(errorOf(await gateway.security.verifyPin("741963"))).toBe("invalid-account");
+    expect(unwrap(await gateway.accounts.list()).find((account) => account.cardId === "main")?.balance).toEqual(
+      pesos(24_680.5),
+    );
+  });
+
   it("surfaces an injected failure so the screens' error states are reachable", async () => {
     const gateway = createMockNetBankGateway({ failures: { "activity.list": "network" } });
     const result = await gateway.activity.list();

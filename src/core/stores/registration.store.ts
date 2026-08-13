@@ -30,6 +30,8 @@ type RegistrationState = RegistrationDraft & {
     setMobile(mobile: string): void;
     setFullName(fullName: string): void;
     setEmail(email: string): void;
+    /** Clears the draft once the account exists, so it never lingers into a future flow. */
+    reset(): void;
   };
 };
 
@@ -48,6 +50,7 @@ export const useRegistrationStore = create<RegistrationState>()((set, get) => ({
       if (get().email === email) return;
       set({ email });
     },
+    reset: () => set({ ...INITIAL_REGISTRATION }),
   },
 }));
 

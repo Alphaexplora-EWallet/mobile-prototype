@@ -45,14 +45,24 @@ existing money-style quiz, so the "FIN-A" character is not a bolt-on after accou
 
 5. **Account creation commits at the PIN step.** The user store (the prototype's `identity.users`)
    is written once, on successful `setPin`: name, mobile, email, and a "Just joined" member-since
-   label replacing the demo fixture's. The demo wallet data stays as-is — multi-user-model.md
-   states the per-user NetBank account is a phase-1 backend concern; the prototype simulates the
-   created wallet with the existing fixtures.
+   label replacing the demo fixture's; the draft is cleared in the same step. The demo wallet data
+   stays as-is — multi-user-model.md states the per-user NetBank account is a phase-1 backend
+   concern; the prototype simulates the created wallet with the existing fixtures.
 
-6. **Validation matches the domain, not ad-hoc copy.** The mobile screen reuses
+6. **Sign-out rewinds the simulated bank, not just the stores.** The gateway is a module singleton
+   (`main.tsx`), so its fixtures outlive the navigation stack. The mock implements an optional
+   `reset()` on the `BankingGateway` contract — rewinding balances, KYC tier, sessions and the
+   registered transaction PIN to their seeded state — and the app shell calls it after
+   `resetStores()` on sign-out. Without it, a sign-up-chosen PIN would survive sign-out and the
+   demo credential (`246810`) would fail payment confirm until a reload. A server adapter has no
+   equivalent: its state lives server-side.
+
+7. **Validation matches the domain, not ad-hoc copy.** The mobile screen reuses
    `isValidMobileNumber` / `mobileNumberFormatMessage` (the same rules the gateway re-checks), and
    the PIN screen enforces the 6-digit rule the mock's `setPin` enforces — neither side trusts the
-   other, per the existing two-sided validation pattern.
+   other, per the existing two-sided validation pattern. Pasted international input
+   ("+63 917 555 2288") is folded into the national 09-form by `normalizeMobileInput` before the
+   length cap applies.
 
 ## Contract changes
 
@@ -60,13 +70,16 @@ existing money-style quiz, so the "FIN-A" character is not a bolt-on after accou
 - `SecurityPort.requestOtp(purpose, destination?)` — optional destination, used by sign-up
 - `SecurityPort.setPin(pin)` — local-only PIN registration (`GatewayResult<null>`)
 - Mock gateway: `security.setPin` failure-injection call, mutable `transactionPin`, destination
-  masking in `requestOtp` (`platform/web/createMockNetBankGateway.ts`)
+  masking in `requestOtp`, simulation `reset()` (`platform/web/createMockNetBankGateway.ts`)
+- `BankingGateway.reset?()` — optional, simulation-only; the mock implements it, the offline
+  gateway and a future server adapter omit it
 
 ## Test coverage
 
 - `src/test/signup.flow.test.tsx` — happy path (register → quiz → Profile shows the new identity),
-  wrong OTP, mismatched PIN recovery, straight-to-wallet, back-to-welcome.
+  wrong OTP, mismatched PIN recovery, straight-to-wallet, back-to-welcome, back-navigation
+  through every step, and the sign-out regression (sign-up PIN must not survive sign-out).
 - `createMockNetBankGateway.test.ts` — `setPin` replaces the demo PIN; `verifyPin` follows;
-  sign-up challenge masks the submitted number.
+  `reset()` restores the demo credential and balance; sign-up challenge masks the submitted number.
 - Golden `01-welcome` snapshot regenerated for the intentional Welcome CTA change (new
   "Create account" primary button).

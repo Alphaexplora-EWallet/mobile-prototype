@@ -39,6 +39,14 @@ export interface BankingGateway {
    * this codebase bans, and a caller-side counter cannot survive a reload.
    */
   nextIdempotencyKey(): string;
+  /**
+   * Simulation-only: rewinds the mock's mutable fixtures (balances, KYC tier,
+   * sessions, the registered transaction PIN) so a fresh sign-in starts from
+   * the demo world again. Signing out calls this after `resetStores()`. A
+   * server adapter has no equivalent — its state lives server-side — so only
+   * the mock implements it.
+   */
+  reset?(): void;
 }
 
 export interface AccountsPort {

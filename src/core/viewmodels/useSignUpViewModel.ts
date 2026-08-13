@@ -3,7 +3,7 @@ import {
   formatMobileDisplay,
   isValidMobileNumber,
   mobileNumberFormatMessage,
-  normalizeMobileNumber,
+  normalizeMobileInput,
 } from "../domain/mobile";
 import type { OtpChallenge } from "../domain/security";
 import { MOCK_OTP_CODE } from "../data/mock/security.mock";
@@ -37,7 +37,9 @@ export function useSignUpViewModel() {
     intro: "A FIN-A wallet is tied to your mobile number — this is how you sign in and receive codes.",
     mobile,
     setMobile: (value: string) => {
-      setMobile(normalizeMobileNumber(value).slice(0, 11));
+      // Pasted international input ("+63 917 555 2288") becomes the national
+      // 09-form before the slice, so it is never mangled by the length cap.
+      setMobile(normalizeMobileInput(value).slice(0, 11));
       setAttempted(false);
     },
     error: attempted && !valid ? mobileNumberFormatMessage() : null,
@@ -110,6 +112,7 @@ export function useSignUpOtpViewModel() {
       navigation.navigate("sign-up-details");
     },
     resend: async () => {
+      if (isVerifying) return;
       setError(null);
       const result = await gateway.security.requestOtp("sign-up", mobile);
       if (result.ok) setChallenge(result.value);
@@ -215,6 +218,7 @@ export function useSignUpPinViewModel() {
       userActions.setMobile(formatMobileDisplay(mobile));
       userActions.setEmail(email);
       userActions.setMemberSinceLabel("Just joined");
+      registrationActions.reset();
       navigation.navigate("sign-up-done");
     },
     back: navigation.goBack,

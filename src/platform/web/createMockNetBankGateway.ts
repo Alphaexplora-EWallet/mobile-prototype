@@ -269,7 +269,16 @@ const receiptDescription = (intent: PaymentIntent): string => {
 /** The simulated "now" the seed fixtures' "Today"/"Yesterday" labels point at. */
 const DEFAULT_TODAY_ISO = "2026-08-11";
 
-export function createMockNetBankGateway(options: MockGatewayOptions = {}): BankingGateway {
+/**
+ * What `createMockNetBankGateway` actually returns: the full contract plus the
+ * simulation-only `reset`. The interface keeps `reset` optional so the offline
+ * gateway and a future server adapter can omit it; the mock always provides it.
+ */
+export type MockNetBankGateway = BankingGateway & {
+  reset(): void;
+};
+
+export function createMockNetBankGateway(options: MockGatewayOptions = {}): MockNetBankGateway {
   const {
     latencyMs = 0,
     failures = {},
@@ -283,16 +292,19 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
   let activityLog: BankingTransaction[] = seed ? [...seed] : seedActivity();
   let balances = seedBalances();
   let jarState: JarState = { opened: false, balance: pesos(0) };
-  let kyc: KycStatus = kycRejection
-    ? {
-        ...INITIAL_KYC_STATUS,
-        tier: kycTier,
-        state: "rejected",
-        submittedLabel: "Rejected Jul 2, 2026",
-        reviewNote: kycRejection.reason,
-        rejectedStepIndex: kycRejection.stepIndex,
-      }
-    : { ...INITIAL_KYC_STATUS, tier: kycTier };
+  /** The seeded KYC posture, recomputed on `reset` so a rejection survives rewind. */
+  const initialKyc = (): KycStatus =>
+    kycRejection
+      ? {
+          ...INITIAL_KYC_STATUS,
+          tier: kycTier,
+          state: "rejected",
+          submittedLabel: "Rejected Jul 2, 2026",
+          reviewNote: kycRejection.reason,
+          rejectedStepIndex: kycRejection.stepIndex,
+        }
+      : { ...INITIAL_KYC_STATUS, tier: kycTier };
+  let kyc: KycStatus = initialKyc();
   let sessionList: readonly DeviceSession[] = MOCK_SESSIONS;
   /**
    * The demo account ships with `MOCK_TRANSACTION_PIN`; a sign-up replaces it
@@ -301,11 +313,31 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
    */
   let transactionPin = MOCK_TRANSACTION_PIN;
   let idempotencyCounter = 0;
-  const referenceCounters: Record<string, number> = {};
+  let referenceCounters: Record<string, number> = {};
   /** Replaying a key returns the original receipt instead of paying twice. */
   const submitted = new Map<string, PaymentReceipt>();
   const issuedTokens = new Set<ConfirmationToken>();
   const pollCounts = new Map<string, number>();
+
+  /**
+   * Rewinds every mutable fixture to its seeded state. The gateway outlives the
+   * navigation stack (it is a module singleton from `main.tsx`), so signing out
+   * must rewind it here or the previous session's PIN, balances and KYC tier
+   * leak into the next sign-in. A server adapter would have no such method.
+   */
+  const reset = (): void => {
+    activityLog = seed ? [...seed] : seedActivity();
+    balances = seedBalances();
+    jarState = { opened: false, balance: pesos(0) };
+    kyc = initialKyc();
+    sessionList = MOCK_SESSIONS;
+    transactionPin = MOCK_TRANSACTION_PIN;
+    idempotencyCounter = 0;
+    referenceCounters = {};
+    submitted.clear();
+    issuedTokens.clear();
+    pollCounts.clear();
+  };
 
   const settle = <T>(call: MockGatewayCall, produce: () => GatewayResult<T>): Promise<GatewayResult<T>> => {
     const forced = failures[call];
@@ -743,5 +775,6 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
       idempotencyCounter += 1;
       return `IDMP-${String(idempotencyCounter).padStart(6, "0")}`;
     },
+    reset,
   };
 }
