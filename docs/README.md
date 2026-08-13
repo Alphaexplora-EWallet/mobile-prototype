@@ -15,7 +15,7 @@ owns it. The README's docs table mirrors this map — keep the two in sync.
 | `docs/frontend-architecture.md` | Current              | Architecture Recorder | The frontend as it actually is: MVVM contract, platform-seam layering, navigation, testing, RN port story                   |
 | `docs/data-layer.md`            | In progress (ALP-34) | API Documenter        | Data/API surface: `core/data` repositories + mock fixtures, `core/stores` contracts, `core/money`, NetBank replacement path |
 | `docs/developer-guide.md`       | In progress (ALP-34) | Code Explainer        | Setup, structure walkthrough, how to add a screen/feature, real file references                                             |
-| `CHANGELOG.md`                  | In progress (ALP-34) | Changelog Agent       | What actually shipped, from git history                                                                                     |
+| `CHANGELOG.md`                  | Current (ALP-34)     | Changelog Agent       | What actually shipped, from git history                                                                                     |
 | `DESIGN.md`                     | Current (stale name) | team                  | UI layout & visual design guide; still says "EasyPay", predates the FIN-A rename (see flags)                                |
 | `AGENTS.md` / `CLAUDE.md`       | Current              | team                  | Working guidelines for agents / Claude Code                                                                                 |
 
