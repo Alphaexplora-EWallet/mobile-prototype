@@ -568,7 +568,7 @@
   height: 44px;
   border-radius: var(--radius-sm);
   color: #7a5200;
-  background: rgba(255, 253, 248, 0.55);
+  background: rgba(255, 255, 255, 0.7);
 }
 .jar-card-icon svg {
   width: 22px;
@@ -602,24 +602,25 @@
   border: 1.5px solid rgba(122, 82, 0, 0.35);
   border-radius: var(--radius-sm);
   color: #6b4a08;
-  background: rgba(255, 253, 248, 0.5);
+  background: rgba(255, 255, 255, 0.6);
   font-weight: 800;
   cursor: pointer;
 }
 .jar-card-actions button:hover {
-  background: rgba(255, 253, 248, 0.85);
+  background: rgba(255, 255, 255, 0.9);
 }
 .controls-section.is-highlighted {
   padding: 15px;
   margin: 0 -4px;
   border: 2px solid var(--amber);
   border-radius: var(--radius-lg);
-  background: #fff9ec;
+  background: #fffdf5;
 }
 .control-list {
   overflow: hidden;
+  border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  background: rgba(255, 253, 248, 0.78);
+  background: var(--surface);
   box-shadow: var(--shadow-surface);
 }
 .control-row {

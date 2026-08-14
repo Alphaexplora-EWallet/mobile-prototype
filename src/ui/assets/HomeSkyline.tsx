@@ -1,17 +1,25 @@
 /**
- * Decorative sun/mountain skyline behind the Home balance heading. Inline SVG
- * (not a raster asset) so its fills key off the same CSS custom properties
- * dark.css already repoints for `data-theme="dark"` — no theme branching here.
+ * Seamless ambient luminous glow backdrop behind the Home balance heading.
+ * Uses 100% edge-faded radial gradients so there are zero hard crop lines or cutoffs.
  */
 export function HomeSkyline() {
   return (
-    <svg className="home-skyline" viewBox="0 0 300 160" aria-hidden="true" focusable="false">
-      <circle className="home-skyline-sun" cx="221" cy="38" r="17" />
-      <path
-        className="home-skyline-mountain-far"
-        d="M96 150c10-46 34-78 70-78s58 30 70 66c8-14 20-24 34-24 12 0 22 6 30 16v40H96z"
-      />
-      <path className="home-skyline-mountain-near" d="M40 160c14-58 46-96 92-96 44 0 78 36 92 88v8H40z" />
+    <svg className="home-skyline" viewBox="0 0 320 200" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id="skyline-glow-amber" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.18" />
+          <stop offset="50%" stopColor="#fbbf24" stopOpacity="0.06" />
+          <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="skyline-glow-blue" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.2" />
+          <stop offset="60%" stopColor="#60a5fa" stopOpacity="0.06" />
+          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {/* 100% seamlessly faded ambient glowing orbs with zero hard edges */}
+      <circle cx="200" cy="55" r="95" fill="url(#skyline-glow-amber)" />
+      <circle cx="260" cy="75" r="110" fill="url(#skyline-glow-blue)" />
     </svg>
   );
 }

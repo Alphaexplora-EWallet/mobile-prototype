@@ -137,11 +137,11 @@
   border: 1px solid var(--line);
   border-radius: 17px;
   color: var(--teal);
-  background: rgba(255, 253, 248, 0.8);
+  background: var(--surface);
 }
 .input-shell:focus-within {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(10, 111, 184, 0.12);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 .input-shell svg {
   width: 20px;

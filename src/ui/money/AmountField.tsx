@@ -6,6 +6,7 @@ export function AmountField({
   presets,
   selectedPresetId,
   onSelectPreset,
+  onMax,
 }: {
   label: string;
   value: string;
@@ -14,6 +15,7 @@ export function AmountField({
   presets: readonly { id: string; label: string }[];
   selectedPresetId: string | null;
   onSelectPreset: (id: string) => void;
+  onMax?: () => void;
 }) {
   return (
     <section className="money-field">
@@ -31,21 +33,30 @@ export function AmountField({
             aria-label={label}
           />
         </span>
-        <small className="amount-available">Available {available}</small>
+        <div className="amount-meta-row">
+          <small className="amount-available">Available {available}</small>
+          {onMax && (
+            <button type="button" className="amount-max-btn" onClick={onMax}>
+              Use max
+            </button>
+          )}
+        </div>
       </div>
-      <div className="amount-presets">
-        {presets.map((preset) => (
-          <button
-            className={`amount-preset ${selectedPresetId === preset.id ? "is-selected" : ""}`}
-            type="button"
-            key={preset.id}
-            onClick={() => onSelectPreset(preset.id)}
-            aria-pressed={selectedPresetId === preset.id}
-          >
-            {preset.label}
-          </button>
-        ))}
-      </div>
+      {presets.length > 0 && (
+        <div className="amount-presets">
+          {presets.map((preset) => (
+            <button
+              className={`amount-preset ${selectedPresetId === preset.id ? "is-selected" : ""}`}
+              type="button"
+              key={preset.id}
+              onClick={() => onSelectPreset(preset.id)}
+              aria-pressed={selectedPresetId === preset.id}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { CardId } from "../domain/card";
 import type { Biller, BillerCategory, DepositMethod, Recipient } from "../domain/payments";
 import type { LoadOperator } from "../domain/load";
@@ -112,8 +113,16 @@ export type TransferViewModel = MoneyBase &
     note: string;
     setNote(value: string): void;
     recipients: readonly Recipient[];
+    filteredRecipients: readonly Recipient[];
+    searchQuery: string;
+    setSearchQuery(value: string): void;
     selectedRecipient: string;
+    selectedRecipientDetails: Recipient | null;
     selectRecipient(id: string): void;
+    setMaxAmount(): void;
+    sendToBank(): void;
+    sendToMobile(): void;
+    scanQr(): void;
     /** Local, non-authoritative — `gateway.payments.quote()` at payment-review is the source of truth. */
     feePreview: FeePreviewVM | null;
     amountError: string | null;
@@ -131,11 +140,23 @@ export function useTransferViewModel(): TransferViewModel {
   const note = useTransferStore((state) => state.note);
   const selectedRecipient = useTransferStore((state) => state.selectedRecipient);
   const recipients = useRecipientsStore((state) => state.saved);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const recipient = recipients.find((candidate) => candidate.id === selectedRecipient) ?? null;
   const bank = recipient ? findBank(recipient.bankCode) : null;
   const previewRail = bank ? defaultRailFor(bank) : null;
   const pricing = previewRail ? RAIL_PRICING[previewRail] : null;
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredRecipients =
+    normalizedQuery === ""
+      ? recipients
+      : recipients.filter(
+          (person) =>
+            person.name.toLowerCase().includes(normalizedQuery) ||
+            person.handle.toLowerCase().includes(normalizedQuery) ||
+            person.bankCode.toLowerCase().includes(normalizedQuery),
+        );
 
   const parsed = parseMoneyInput(amount);
   const canAdvance =
@@ -166,6 +187,11 @@ export function useTransferViewModel(): TransferViewModel {
     navigation.navigate("payment-review");
   };
 
+  const setMaxAmount = () => {
+    const rawMax = formatMoney(source.balance, { symbol: false, grouping: false });
+    transferActions.setAmount(rawMax);
+  };
+
   return {
     ...base,
     ...createAmountDraft(amount, transferActions.setAmount),
@@ -175,8 +201,16 @@ export function useTransferViewModel(): TransferViewModel {
     note,
     setNote: transferActions.setNote,
     recipients,
+    filteredRecipients,
+    searchQuery,
+    setSearchQuery,
     selectedRecipient,
+    selectedRecipientDetails: recipient,
     selectRecipient: transferActions.selectRecipient,
+    setMaxAmount,
+    sendToBank: () => navigation.navigate("transfer-destination"),
+    sendToMobile: () => navigation.navigate("send-mobile"),
+    scanQr: () => navigation.navigate("qr-scan"),
     feePreview: pricing
       ? { feeLabel: isZero(pricing.fee) ? "No fee" : formatMoney(pricing.fee), arrivalLabel: pricing.arrivalLabel }
       : null,

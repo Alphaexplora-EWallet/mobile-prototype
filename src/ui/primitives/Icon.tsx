@@ -30,6 +30,11 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
     </>
   ),
   bolt: <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />,
+  bulb: (
+    <>
+      <path d="M9 18h6M10 22h4M12 2a7 7 0 00-7 7c0 2.5 1.5 4.5 3 6h8c1.5-1.5 3-3.5 3-6a7 7 0 00-7-7z" />
+    </>
+  ),
   card: (
     <>
       <rect x="2.5" y="5" width="19" height="14" rx="2.5" />
@@ -37,11 +42,17 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
     </>
   ),
   check: <path d="M5 12.5l4 4L19 7" />,
+  "chevron-down": <path d="M6 9l6 6 6-6" />,
   "chevron-right": <path d="M9 18l6-6-6-6" />,
   clock: (
     <>
       <circle cx="12" cy="12" r="9" />
       <path d="M12 7v5l3 2" />
+    </>
+  ),
+  coffee: (
+    <>
+      <path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3" />
     </>
   ),
   contrast: (

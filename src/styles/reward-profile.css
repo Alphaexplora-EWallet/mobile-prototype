@@ -217,7 +217,8 @@
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: rgba(255, 253, 248, 0.75);
+  background: var(--surface);
+  box-shadow: var(--shadow-surface);
 }
 .profile-section p {
   margin: 0;

@@ -1,40 +1,47 @@
 :root {
   color-scheme: light;
-  font-family: Inter, ui-rounded, "Avenir Next", "Segoe UI", system-ui, sans-serif;
-  color: #142126;
-  background: #ebe7de;
+  font-family:
+    "Plus Jakarta Sans",
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  color: #0f172a;
+  background: #f1f5f9;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --ink: #142126;
-  --muted: #667074;
-  --teal: #0a6fb8;
-  --teal-dark: #07508a;
-  --teal-soft: #e1edf7;
-  --cream: #fbf7ef;
-  --cream-deep: #f5ede0;
-  --amber: #f0aa24;
-  --coral: #ec5f43;
-  --line: #e5ded1;
-  /* Translucent card fill for state blocks and detail cards. */
-  --surface: rgba(255, 253, 248, 0.72);
-  /* Error text and border. --coral is tuned for fills, not for reading against. */
-  --danger-ink: #a64c32;
-  --danger-line: rgba(204, 97, 70, 0.35);
-  /* Filled destructive button. The pair is picked together: --coral itself is
-     too light to carry white text at AA, so the fill is darkened here. */
-  --danger-fill: #c4442c;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --teal: #2563eb;
+  --teal-dark: #1d4ed8;
+  --teal-soft: #eff6ff;
+  --cream: #ffffff;
+  --cream-deep: #f8fafc;
+  --amber: #f59e0b;
+  --coral: #ef4444;
+  --line: #e2e8f0;
+  /* Clean crisp card surface */
+  --surface: #ffffff;
+  /* Error text and border */
+  --danger-ink: #b91c1c;
+  --danger-line: rgba(239, 68, 68, 0.25);
+  --danger-fill: #dc2626;
   --danger-fill-ink: #fff;
-  --shadow: 0 16px 38px rgba(28, 46, 45, 0.12);
-  /* Radius scale (DESIGN.md §17): small controls / buttons / cards & nav. */
+  --shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  /* Radius scale */
   --radius-sm: 12px;
   --radius-md: 16px;
   --radius-lg: 24px;
-  /* Elevation scale (DESIGN.md §18): low-opacity only, no strong black shadows. */
+  /* Elevation scale */
   --shadow-surface: var(--shadow);
-  --shadow-floating: 0 12px 28px rgba(20, 33, 38, 0.14);
-  --shadow-primary: 0 20px 40px rgba(7, 80, 138, 0.22);
-  /* Typography scale (DESIGN.md §20), levels 1 (hero) through 5 (meta). */
-  --text-hero: 34px;
+  --shadow-floating: 0 12px 28px rgba(15, 23, 42, 0.08);
+  --shadow-primary: 0 12px 28px -4px rgba(37, 99, 235, 0.28);
+  /* Typography scale */
+  --text-hero: 36px;
   --text-title: 22px;
   --text-body: 15px;
   --text-caption: 13px;

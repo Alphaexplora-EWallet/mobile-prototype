@@ -81,7 +81,8 @@
   border: 1px solid var(--line);
   border-radius: 18px;
   text-align: left;
-  background: rgba(255, 253, 248, 0.7);
+  background: var(--surface);
+  box-shadow: var(--shadow-surface);
   font-size: 17px;
   line-height: 1.25;
   font-weight: 700;
