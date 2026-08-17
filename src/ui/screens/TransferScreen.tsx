@@ -100,7 +100,9 @@ export function TransferScreen() {
                     onClick={() => vm.selectRecipient(person.id)}
                     aria-pressed={vm.selectedRecipient === person.id}
                   >
-                    <span className="transfer-contact-avatar">{person.initials}</span>
+                    <span className="transfer-contact-avatar" aria-hidden="true">
+                      {person.initials}
+                    </span>
                     <span className="transfer-contact-info">
                       <strong>{person.name}</strong>
                       <small>{person.handle}</small>
@@ -119,7 +121,7 @@ export function TransferScreen() {
                   aria-label="Add recipient"
                   onClick={vm.manageRecipients}
                 >
-                  <span className="transfer-contact-avatar transfer-add-avatar">
+                  <span className="transfer-contact-avatar transfer-add-avatar" aria-hidden="true">
                     <Icon name="plus" />
                   </span>
                   <span className="transfer-contact-info">

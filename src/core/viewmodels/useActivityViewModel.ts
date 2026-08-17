@@ -1,15 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import type { BankingTransaction } from "../domain/banking";
-import { requestStatusLabel } from "../domain/request";
 import { isIncoming } from "../domain/transaction";
-import { formatMoney, formatSignedMoney } from "../money/format";
+import { formatSignedMoney, formatMoney } from "../money/format";
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
 import type { ActivityFilter } from "../stores/activity.store";
 import { ACTIVITY_FILTER_KINDS, activityActions, useActivityStore } from "../stores/activity.store";
-import { paymentActions } from "../stores/payment.store";
-import { requestsActions, useRequestsStore } from "../stores/requests.store";
-import { useSelectedCard } from "./useCardViews";
 
 const statusLabel = (status: BankingTransaction["status"]): string => {
   if (status === "completed") return "Completed";
@@ -41,10 +37,8 @@ const PAGE_SIZE = 10;
 export function useActivityViewModel() {
   const gateway = useBankingGateway();
   const navigation = useNavigation();
-  const source = useSelectedCard();
   const search = useActivityStore((state) => state.search);
   const filter = useActivityStore((state) => state.filter);
-  const requests = useRequestsStore((state) => state.requests);
 
   const [activity, setActivity] = useState<readonly BankingTransaction[]>([]);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
@@ -117,44 +111,6 @@ export function useActivityViewModel() {
       incoming: isIncoming(transaction),
       statusLabel: statusLabel(transaction.status),
     })),
-    /**
-     * Money requests are not bank activity — nothing moved yet — so they get
-     * their own section above the transaction feed. Pending rows carry the
-     * dev-only accept/reject actions that simulate the recipient's reply.
-     */
-    requests: requests.map((request) => ({
-      id: request.id,
-      initials: request.payer.initials,
-      name: request.payer.name,
-      amountLabel: formatMoney(request.amount),
-      note: request.note || "No note",
-      when: request.when,
-      statusLabel: requestStatusLabel(request.status),
-      isPending: request.status === "pending",
-    })),
-    acceptRequest: (id: string) => {
-      const request = requests.find((candidate) => candidate.id === id);
-      if (!request || request.status !== "pending") return;
-      // Acceptance routes into the shared pipeline as the payer's payment. The
-      // request flips to accepted only when that payment actually submits, so
-      // abandoning review leaves it pending and the balance untouched.
-      // Like cash-in, the credit lands on whichever card is selected at the
-      // moment the payment executes — the request itself carries no card.
-      paymentActions.start(
-        {
-          kind: "request",
-          requestId: request.id,
-          destinationCardId: source.id,
-          destinationLabel: `${source.displayLabel} •••• ${source.last4}`,
-          payer: request.payer,
-          amount: request.amount,
-          note: request.note,
-        },
-        gateway.nextIdempotencyKey(),
-      );
-      navigation.navigate("payment-review");
-    },
-    rejectRequest: (id: string) => requestsActions.markRejected(id),
     isLoading,
     error,
     refresh,

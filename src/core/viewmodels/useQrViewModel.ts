@@ -102,8 +102,7 @@ export function useQrScanViewModel() {
 }
 
 /**
- * The receive side, which the app had no screen for at all — there was no way to
- * ask anyone for money.
+ * The receive side: generates and displays the user's universal reusable QR Ph code.
  */
 export function useQrReceiveViewModel() {
   const navigation = useNavigation();
@@ -111,24 +110,14 @@ export function useQrReceiveViewModel() {
   const platform = usePlatform();
   const card = useSelectedCard();
 
-  const amountInput = useQrStore((state) => state.receiveAmount);
-  const note = useQrStore((state) => state.receiveNote);
-
   const [payload, setPayload] = useState<QrPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  /**
-   * Which payload was copied, not a boolean. Editing the amount mints a new
-   * code, and "Copied" has to stop claiming the old one — tracking the value
-   * makes that fall out instead of needing a reset inside the effect.
-   */
   const [copiedPayload, setCopiedPayload] = useState<string | null>(null);
-
-  const amount = useMemo(() => parseMoneyInput(amountInput), [amountInput]);
 
   useEffect(() => {
     let active = true;
-    void gateway.payments.createInboundQr({ cardId: card.id, amount: amount ?? null, note }).then((result) => {
+    void gateway.payments.createInboundQr({ cardId: card.id, amount: null, note: "" }).then((result) => {
       if (!active) return;
       if (result.ok) setPayload(result.value);
       else setError(result.error.message);
@@ -137,16 +126,12 @@ export function useQrReceiveViewModel() {
     return () => {
       active = false;
     };
-  }, [gateway, card.id, amount, note]);
+  }, [gateway, card.id]);
 
   return {
-    title: "My QR code",
-    intro: "Show this to be paid. Leave the amount blank for a code you can reuse.",
+    title: "Receive money",
+    intro: "Show this code to get paid. Anyone can scan it using any Philippine bank or e-wallet via QR Ph.",
     walletLabel: `${card.displayLabel} •••• ${card.last4}`,
-    amount: amountInput,
-    setAmount: qrActions.setReceiveAmount,
-    note,
-    setNote: qrActions.setReceiveNote,
     isLoading,
     error,
     code: payload

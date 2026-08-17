@@ -103,20 +103,16 @@ describe("QR PH flow", () => {
     expect(await screen.findByRole("button", { name: /Continue to confirm/i })).toBeTruthy();
   });
 
-  it("builds a reusable code with no amount, and a single-use one with an amount", async () => {
+  it("builds a reusable QR code to receive money", async () => {
     const user = start();
     await openScan(user);
     await press(user, /Show my QR code instead/i);
 
-    expect(await screen.findByRole("heading", { name: /Ask for money/i })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: /Show QR to receive/i })).toBeTruthy();
     const code = screen.getByRole("region", { name: /Your QR PH code/i });
     expect(within(code).getByText("Any amount")).toBeTruthy();
     expect(within(code).getByText(/Reusable · no expiry/i)).toBeTruthy();
     expect(within(code).getByRole("img", { name: /QR code for MAYA SANTOS/i })).toBeTruthy();
-
-    await user.type(screen.getByRole("textbox", { name: /Amount to request/i }), "500");
-    expect(await within(code).findByText("₱500.00")).toBeTruthy();
-    expect(within(code).getByText(/Single use/i)).toBeTruthy();
   });
 
   it("says the rendered pattern is not a scannable code", async () => {

@@ -128,6 +128,106 @@
   text-transform: uppercase;
 }
 
+/* Request Money: Horizontal Avatar Selection Rail */
+.recipient-row {
+  display: flex;
+  gap: 12px;
+  padding: 4px 2px 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.recipient-row::-webkit-scrollbar {
+  display: none;
+}
+.recipient-chip {
+  flex: 0 0 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 14px 10px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-surface);
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+.recipient-chip:hover {
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+.recipient-chip.is-selected {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+  box-shadow:
+    0 0 0 1px var(--teal),
+    0 4px 12px rgba(37, 99, 235, 0.12);
+}
+.recipient-chip > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--teal);
+  background: var(--teal-soft);
+  transition: all 0.2s ease;
+}
+.recipient-chip > span:first-child svg {
+  width: 20px;
+  height: 20px;
+}
+.recipient-chip.is-selected > span:first-child {
+  color: #ffffff;
+  background: var(--teal);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.3);
+}
+.recipient-chip strong {
+  width: 100%;
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recipient-chip small {
+  width: 100%;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recipient-chip.recipient-add {
+  border-style: dashed;
+  background: transparent;
+}
+.recipient-chip.recipient-add > span:first-child {
+  color: var(--muted);
+  background: #f1f5f9;
+  border: 1.5px dashed #cbd5e1;
+}
+.recipient-chip.recipient-add:hover {
+  border-color: var(--teal);
+}
+.recipient-chip.recipient-add:hover > span:first-child {
+  color: var(--teal);
+  background: var(--teal-soft);
+  border-color: var(--teal);
+}
+
 .amount-field {
   display: grid;
   gap: 6px;

@@ -88,6 +88,23 @@
 :root[data-theme="dark"] .amount-preset.is-selected {
   background: var(--teal-soft);
 }
+:root[data-theme="dark"] .recipient-chip > span:first-child {
+  color: var(--teal);
+  background: rgba(88, 166, 232, 0.15);
+}
+:root[data-theme="dark"] .recipient-chip.is-selected > span:first-child {
+  color: #ffffff;
+  background: var(--teal);
+}
+:root[data-theme="dark"] .recipient-chip.recipient-add {
+  background: transparent;
+  border-color: var(--line);
+}
+:root[data-theme="dark"] .recipient-chip.recipient-add > span:first-child {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--line);
+}
 :root[data-theme="dark"] .input-shell input {
   color: var(--ink);
 }

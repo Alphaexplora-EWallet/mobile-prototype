@@ -15,15 +15,15 @@ import type { Theme } from "@/ui/theme/ThemeContext";
 import type { CardPresentation } from "./useCardViews";
 import { useSelectedCard } from "./useCardViews";
 
-export type QuickActionId = "send" | "request" | "deposit" | "pay";
+export type QuickActionId = "send" | "receive" | "deposit" | "pay";
 
 export type QuickActionVM = { id: QuickActionId; label: string; icon: IconName };
 
 const QUICK_ACTIONS: readonly QuickActionVM[] = [
   { id: "send", label: "Send", icon: "send" },
-  { id: "request", label: "Request", icon: "arrow-down" },
+  { id: "receive", label: "Receive", icon: "qr" },
   { id: "deposit", label: "Add money", icon: "plus" },
-  { id: "pay", label: "Pay", icon: "qr" },
+  { id: "pay", label: "Pay", icon: "card" },
 ];
 
 /** Arrow glyph per direction — "flat" still needs one, never a blank chip. */
@@ -142,7 +142,7 @@ export function useHomeViewModel(): HomeViewModel {
     pressCard: () => navigation.switchTab("wallet"),
     pressQuickAction: (id) =>
       navigation.navigate(
-        id === "send" ? "transfer" : id === "request" ? "request-entry" : id === "deposit" ? "deposit" : "payments",
+        id === "send" ? "transfer" : id === "receive" ? "qr-receive" : id === "deposit" ? "deposit" : "payments",
       ),
     pressQuest: () => navigation.navigate("quest"),
     pressTransaction: (id: string) => {

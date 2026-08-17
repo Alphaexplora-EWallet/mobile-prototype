@@ -162,7 +162,6 @@ const REFERENCE_PREFIX: Readonly<Record<PaymentIntent["kind"], string>> = {
   bill: "NBK-BIL",
   qr: "NBK-QRP",
   buyload: "NBK-LOD",
-  request: "NBK-RQS",
   "jar-in": "NBK-JIN",
   "jar-out": "NBK-JOT",
 };
@@ -174,7 +173,6 @@ const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
   bill: "⚡",
   qr: "◫",
   buyload: "☎",
-  request: "↙",
   "jar-in": "↓",
   "jar-out": "↑",
 };
@@ -206,7 +204,6 @@ const nonRailArrivalLabel = (intent: PaymentIntent): string => {
   if (intent.kind === "cash-in") return intent.method.arrivalLabel;
   if (intent.kind === "bill") return "Posted to the biller within one banking day";
   if (intent.kind === "buyload") return "Credited to the number instantly";
-  if (intent.kind === "request") return "Credited to your wallet instantly";
   if (intent.kind === "jar-in" || intent.kind === "jar-out") return "Moved instantly";
   return "Paid instantly";
 };
@@ -225,8 +222,6 @@ const receiptName = (intent: PaymentIntent): string => {
       return `Withdrawn to ${intent.account.name}`;
     case "buyload":
       return `Bought ${intent.operator.name} load`;
-    case "request":
-      return `Received from ${intent.payer.name}`;
     case "jar-in":
     case "jar-out":
       return JAR_LABEL;
@@ -248,8 +243,6 @@ const receiptDescription = (intent: PaymentIntent): string => {
     case "buyload":
       // The number is masked even inside the receipt copy; it never renders raw.
       return `${intent.operator.name} load for ${maskMobileNumber(intent.phoneNumber)}.`;
-    case "request":
-      return intent.note.trim() || `Payment for your money request from ${intent.payer.name}.`;
     case "jar-in":
       return `Moved into the ${JAR_LABEL}.`;
     case "jar-out":
@@ -372,7 +365,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
       }
     }
 
-    if (intent.kind !== "cash-in" && intent.kind !== "request" && intent.kind !== "jar-out") {
+    if (intent.kind !== "cash-in" && intent.kind !== "jar-out") {
       const available = balances[intent.sourceCardId];
       if (available && compareMoney(quote.total, available) > 0) {
         return failed(
@@ -561,13 +554,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
           description: receiptDescription(intent),
           sourceLabel,
           recipient:
-            intent.kind === "transfer"
-              ? intent.recipient
-              : intent.kind === "cash-out"
-                ? intent.account
-                : intent.kind === "request"
-                  ? intent.payer
-                  : undefined,
+            intent.kind === "transfer" ? intent.recipient : intent.kind === "cash-out" ? intent.account : undefined,
           fee: quote.fee,
           rail: quote.rail ?? undefined,
           arrivalLabel: quote.arrivalLabel,

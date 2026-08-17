@@ -21,7 +21,6 @@ import { cashOutActions } from "../stores/cashout.store";
 import { depositActions } from "../stores/deposit.store";
 import { jarActions } from "../stores/jar.store";
 import { paymentActions, usePaymentStore } from "../stores/payment.store";
-import { requestsActions } from "../stores/requests.store";
 import { transferActions } from "../stores/transfer.store";
 import { uiActions } from "../stores/ui.store";
 
@@ -81,14 +80,6 @@ const COPY = {
     action: "Confirm and buy",
     submitting: "Buying securely…",
   },
-  request: {
-    reviewTitle: "Review request",
-    reviewLead: "You’re receiving",
-    receiptTitle: "Money received",
-    pendingTitle: "Money on its way",
-    action: "Confirm and receive",
-    submitting: "Receiving securely…",
-  },
   "jar-in": {
     reviewTitle: "Review jar deposit",
     reviewLead: "You’re moving into",
@@ -133,9 +124,6 @@ function usePaymentSubmit() {
     }
 
     paymentActions.setReceipt(result.value);
-    // The request only becomes "accepted" when its payment actually submits —
-    // walking away from review must leave it pending, because no money moved.
-    if (intent.kind === "request") requestsActions.markAccepted(intent.requestId);
     await syncBalances(gateway);
     setIsSubmitting(false);
     navigation.navigate("payment-receipt");
@@ -190,7 +178,7 @@ export function usePaymentReviewViewModel() {
               ]
             : [
                 {
-                  label: intent.kind === "cash-in" || intent.kind === "request" ? "To" : "From",
+                  label: intent.kind === "cash-in" ? "To" : "From",
                   value: intentCardLabel(intent),
                 },
               ]),
@@ -205,16 +193,15 @@ export function usePaymentReviewViewModel() {
   return {
     title: copy.reviewTitle,
     lead: copy.reviewLead,
-    /** Money into the wallet reads "from" — a request received or a jar withdrawal. */
-    counterpartyPreposition: intent?.kind === "request" || intent?.kind === "jar-out" ? "from" : "to",
+    /** Money into the wallet reads "from" — a jar withdrawal. */
+    counterpartyPreposition: intent?.kind === "jar-out" ? "from" : "to",
     actionLabel: stepUp ? "Continue to confirm" : copy.action,
     submittingLabel: copy.submitting,
     isReady: intent !== null,
     amountLabel: intent ? formatMoney(intent.amount) : "",
     counterparty: intent ? intentCounterparty(intent) : "",
     counterpartyDetail: intent ? intentCounterpartyDetail(intent) : "",
-    /** One text node on purpose: tests match "to Smart" / "from Jomar D." whole. */
-    counterpartyLine: intent ? `${intent.kind === "request" ? "from" : "to"} ${intentCounterparty(intent)}` : "",
+    counterpartyLine: intent ? `${intent.kind === "jar-out" ? "from" : "to"} ${intentCounterparty(intent)}` : "",
     rows,
     cutoffLabel: quote?.cutoffLabel ?? null,
     limitLabel: quote?.limitLabel ?? null,
@@ -416,8 +403,6 @@ const receiptKind = (receipt: PaymentReceipt): keyof typeof COPY => {
       return "qr";
     case "load-purchase":
       return "buyload";
-    case "request-in":
-      return "request";
     case "jar-in":
       return "jar-in";
     case "jar-out":
