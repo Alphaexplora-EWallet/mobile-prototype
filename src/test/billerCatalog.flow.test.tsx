@@ -29,6 +29,8 @@ const openPayTab = async (user: ReturnType<typeof userEvent.setup>) => {
   await press(user, /Build my plan/i);
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user.click(within(nav).getByRole("button", { name: /^Pay$/ }));
+  await press(user, /Payment options/i);
+  await press(user, /Pay a bill/i);
 };
 
 describe("biller catalog", () => {
@@ -91,9 +93,12 @@ describe("biller catalog", () => {
     expect(stars[0]).toHaveAttribute("aria-pressed", "true");
 
     // Leave the tab and come back: the favorite persists within the session.
+    await press(user, /Back to home/i);
     const nav = screen.getByRole("navigation", { name: /primary navigation/i });
     await user.click(within(nav).getByRole("button", { name: /^Home$/ }));
     await user.click(within(nav).getByRole("button", { name: /^Pay$/ }));
+    await press(user, /Payment options/i);
+    await press(user, /Pay a bill/i);
     expect(screen.getByText("Favorites")).toBeTruthy();
     expect(screen.getAllByRole("button", { name: "Remove Meralco from favorites" }).length).toBe(2);
 
@@ -119,9 +124,12 @@ describe("biller catalog", () => {
     expect(stars[0]).toHaveAttribute("aria-pressed", "true");
 
     // Like favorites, the query is session state: it survives a tab switch.
+    await press(user, /Back to home/i);
     const nav = screen.getByRole("navigation", { name: /primary navigation/i });
     await user.click(within(nav).getByRole("button", { name: /^Home$/ }));
     await user.click(within(nav).getByRole("button", { name: /^Pay$/ }));
+    await press(user, /Payment options/i);
+    await press(user, /Pay a bill/i);
     expect(screen.getByRole("searchbox", { name: /Search billers/i })).toHaveValue("mer");
     expect(screen.queryByRole("button", { name: /GlobePostpaid mobile/i })).toBeNull();
   });

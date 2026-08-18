@@ -194,6 +194,32 @@
 :root[data-theme="dark"] .bottom-nav button.is-active {
   color: var(--teal);
 }
+:root[data-theme="dark"] .pay-clean-options-btn {
+  color: var(--ink);
+}
+:root[data-theme="dark"] .pay-clean-options-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+:root[data-theme="dark"] .pay-scanner-hero-card {
+  background: linear-gradient(160deg, #1e3a8a 0%, #1d4ed8 35%, #3730a3 70%, #581c87 100%);
+  box-shadow: 0 20px 44px -10px rgba(0, 0, 0, 0.65);
+}
+:root[data-theme="dark"] .pay-scanner-hero-card:hover {
+  box-shadow: 0 24px 50px -8px rgba(0, 0, 0, 0.75);
+}
+:root[data-theme="dark"] .action-circle-icon {
+  background: #1e293b;
+  color: #38bdf8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+:root[data-theme="dark"] .pay-action-pill-btn.is-active .action-circle-icon {
+  background: #451a03;
+  color: #fbbf24;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.5);
+}
+:root[data-theme="dark"] .action-circle-label {
+  color: var(--ink);
+}
 :root[data-theme="dark"] .action-sheet {
   background: var(--cream);
 }

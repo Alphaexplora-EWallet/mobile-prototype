@@ -90,6 +90,7 @@ describe("FIN-A app flow", () => {
     await userEvent.setup().click(within(nav).getByRole("button", { name: /^Pay$/ }));
     snap(container, "12-payments");
 
+    await click(/Payment options/i);
     await click(/Add money/i);
     snap(container, "13-deposit");
 

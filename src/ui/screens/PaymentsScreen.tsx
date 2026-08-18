@@ -1,126 +1,172 @@
+import { useState } from "react";
 import { Icon } from "../primitives/Icon";
 import { LinkRow } from "../primitives/LinkRow";
-import { MoveMoneyTile } from "../primitives/MoveMoneyTile";
-import { PageBar } from "../layout/PageBar";
-import { StateBlock } from "../primitives/StateBlock";
-import { TransactionRow } from "../money/TransactionRow";
-import { BillerRow } from "../primitives/BillerRow";
 import { usePaymentsViewModel } from "@/core/viewmodels/useMoneyMovementViewModel";
 
 export function PaymentsScreen() {
   const vm = usePaymentsViewModel();
+  const [optionsOpen, setOptionsOpen] = useState(false);
 
   return (
-    <div className="tab-page money-page payments-page">
-      <PageBar title="Pay" optionsLabel="Payment options" />
+    <div className="tab-page money-page pay-tab-screen">
+      {/* Screen Header */}
+      <header className="pay-clean-header">
+        <h1 className="pay-clean-title">Pay</h1>
+        <button
+          className="pay-clean-options-btn"
+          type="button"
+          aria-label="Payment options"
+          onClick={() => setOptionsOpen(true)}
+        >
+          <Icon name="more" />
+        </button>
+      </header>
 
-      <button className="pay-scan-card" type="button" onClick={vm.scanToPay}>
-        <span className="pay-scan-icon">
-          <Icon name="qr" />
-        </span>
-        <span className="pay-scan-copy">
-          <strong>Scan to pay</strong>
-          <small>Point your camera at any QR Ph code</small>
-        </span>
-        <Icon name="chevron-right" />
+      {/* Main Hero Viewfinder Card */}
+      <button
+        className={`pay-scanner-hero-card ${vm.flashOn ? "has-flash-on" : ""}`}
+        type="button"
+        onClick={vm.scanToPay}
+        aria-label="Scan to pay: Point camera at any QR Ph code"
+      >
+        {/* Decorative Wave Vector Background */}
+        <svg className="scanner-hero-waves" viewBox="0 0 340 180" preserveAspectRatio="none" aria-hidden="true">
+          <path
+            d="M 0,110 C 70,140 140,80 220,125 C 270,150 310,135 340,140 L 340,180 L 0,180 Z"
+            fill="rgba(255, 255, 255, 0.08)"
+          />
+          <path
+            d="M 0,135 C 80,105 160,165 240,115 C 280,95 315,120 340,115 L 340,180 L 0,180 Z"
+            fill="rgba(255, 255, 255, 0.14)"
+          />
+        </svg>
+
+        {/* Illuminated Neon Viewfinder */}
+        <div className="scanner-viewfinder-frame" aria-hidden="true">
+          <div className="viewfinder-corner top-left" />
+          <div className="viewfinder-corner top-right" />
+          <div className="viewfinder-corner bottom-left" />
+          <div className="viewfinder-corner bottom-right" />
+
+          {/* Central QR Glyph Matrix */}
+          <div className="viewfinder-qr-glyph">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="14" height="14" rx="3" stroke="currentColor" strokeWidth="3" />
+              <rect x="8" y="8" width="6" height="6" rx="1.5" fill="currentColor" />
+              <rect x="30" y="4" width="14" height="14" rx="3" stroke="currentColor" strokeWidth="3" />
+              <rect x="34" y="8" width="6" height="6" rx="1.5" fill="currentColor" />
+              <rect x="4" y="30" width="14" height="14" rx="3" stroke="currentColor" strokeWidth="3" />
+              <rect x="8" y="34" width="6" height="6" rx="1.5" fill="currentColor" />
+              <circle cx="34" cy="34" r="3" fill="currentColor" />
+              <circle cx="43" cy="34" r="2" fill="currentColor" />
+              <circle cx="34" cy="43" r="2" fill="currentColor" />
+              <circle cx="24" cy="24" r="2.5" fill="currentColor" />
+              <circle cx="24" cy="11" r="2" fill="currentColor" />
+              <circle cx="11" cy="24" r="2" fill="currentColor" />
+              <circle cx="43" cy="24" r="2" fill="currentColor" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Card Copy */}
+        <div className="scanner-hero-copy">
+          <h2>Scan to pay</h2>
+          <p>Pay instantly at merchants, billers, and stores nationwide.</p>
+        </div>
       </button>
 
-      <section className="money-field">
-        <span className="field-label">Move money</span>
-        <div className="move-money-tiles">
-          <MoveMoneyTile
-            icon="send"
-            title="Send money"
-            detail="To anyone, instantly"
-            onClick={() => vm.goTo("transfer")}
-          />
-          <MoveMoneyTile
-            icon="arrow-down"
-            title="Add money"
-            detail="Bank, card, or counter"
-            onClick={() => vm.goTo("deposit")}
-          />
-        </div>
-      </section>
-
-      <section className="money-field">
-        <span className="field-label">Buy load</span>
-        <div className="control-list">
-          {vm.loadOperators.map((operator) => (
-            <LinkRow
-              key={operator.id}
-              icon={operator.icon}
-              title={operator.name}
-              detail={operator.detail}
-              onClick={() => vm.buyLoad(operator.id)}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className="money-field">
-        <span className="field-label">Pay a bill</span>
-
-        <label className="money-note biller-search">
-          <span className="input-shell">
-            <Icon name="search" />
-            <input
-              type="search"
-              placeholder="Search billers"
-              aria-label="Search billers"
-              value={vm.searchQuery}
-              onChange={(event) => vm.setSearchQuery(event.target.value)}
-            />
+      {/* Action Controls Below Card */}
+      <div className="pay-bottom-action-panel">
+        <button
+          className={`pay-action-pill-btn ${vm.flashOn ? "is-active" : ""}`}
+          type="button"
+          onClick={vm.toggleFlash}
+          aria-pressed={vm.flashOn}
+        >
+          <span className="action-circle-icon">
+            <Icon name="bolt" />
           </span>
-        </label>
+          <span className="action-circle-label">{vm.flashOn ? "Turn off flash" : "Turn on flash"}</span>
+        </button>
 
-        {vm.emptySearch && <StateBlock tone="empty" message="No billers match that search." />}
+        <div className="pay-action-divider" aria-hidden="true" />
 
-        {vm.showFavorites && (
-          <div className="biller-group">
-            <span className="field-label">Favorites</span>
+        <button className="pay-action-pill-btn" type="button" onClick={vm.uploadQr}>
+          <span className="action-circle-icon">
+            <Icon name="image" />
+          </span>
+          <span className="action-circle-label">Upload QR</span>
+        </button>
+      </div>
+
+      {/* Frame Guidance Caption */}
+      <p className="scanner-frame-guidance">Position the QR code within the frame</p>
+
+      {/* Payment Options Bottom Sheet */}
+      {optionsOpen && (
+        <div className="sheet-backdrop" role="presentation" onClick={() => setOptionsOpen(false)}>
+          <section
+            className="action-sheet pay-options-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Payment options"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="sheet-handle" />
+            <h2 id="options-sheet-title">Payment options</h2>
             <div className="control-list">
-              {vm.favorites.map((biller) => (
-                <BillerRow
-                  key={biller.id}
-                  biller={biller}
-                  favorited={biller.favorited}
-                  onPress={() => vm.payBill(biller.id)}
-                  onToggleFavorite={() => vm.toggleFavorite(biller.id)}
-                />
-              ))}
+              <LinkRow
+                icon="receipt"
+                title="Pay a bill"
+                detail="Utilities, telecom, government"
+                onClick={() => {
+                  setOptionsOpen(false);
+                  vm.goTo("bill-entry");
+                }}
+              />
+              <LinkRow
+                icon="phone"
+                title="Buy load"
+                detail="Smart, Globe, DITO prepaid"
+                onClick={() => {
+                  setOptionsOpen(false);
+                  vm.goTo("load-entry");
+                }}
+              />
+              <LinkRow
+                icon="qr"
+                title="Show my QR code"
+                detail="Receive payments to wallet"
+                onClick={() => {
+                  setOptionsOpen(false);
+                  vm.showMyQr();
+                }}
+              />
+              <LinkRow
+                icon="plus"
+                title="Add money"
+                detail="Top up from banks or cash-in"
+                onClick={() => {
+                  setOptionsOpen(false);
+                  vm.goTo("deposit");
+                }}
+              />
+              <LinkRow
+                icon="send"
+                title="Send money"
+                detail="Transfer to bank or wallet"
+                onClick={() => {
+                  setOptionsOpen(false);
+                  vm.goTo("transfer");
+                }}
+              />
             </div>
-          </div>
-        )}
-
-        {vm.catalog.map((group) => (
-          <div className="biller-group" key={group.category}>
-            <span className="field-label">{group.label}</span>
-            <div className="control-list">
-              {group.billers.map((biller) => (
-                <BillerRow
-                  key={biller.id}
-                  biller={biller}
-                  favorited={biller.favorited}
-                  onPress={() => vm.payBill(biller.id)}
-                  onToggleFavorite={() => vm.toggleFavorite(biller.id)}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
-      </section>
-
-      <section className="home-section">
-        <h2>Scheduled</h2>
-        <div className="transaction-list">
-          {vm.scheduledLabels.map((payment) => (
-            <TransactionRow key={payment.id} row={payment} onPress={() => vm.openAutopay(payment.id)} />
-          ))}
+            <button className="secondary-button" type="button" onClick={() => setOptionsOpen(false)}>
+              Close
+            </button>
+          </section>
         </div>
-      </section>
-
-      <p className="prototype-note">{vm.simulatedNote}</p>
+      )}
     </div>
   );
 }

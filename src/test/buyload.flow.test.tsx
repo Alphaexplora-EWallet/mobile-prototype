@@ -31,6 +31,8 @@ const openPayTab = async (user: ReturnType<typeof userEvent.setup>) => {
   await press(user, /Build my plan/i);
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user.click(within(nav).getByRole("button", { name: /^Pay$/ }));
+  await press(user, /Payment options/i);
+  await press(user, /Buy load/i);
 };
 
 describe("buy load flow", () => {

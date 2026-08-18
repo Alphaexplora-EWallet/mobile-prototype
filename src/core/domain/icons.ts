@@ -23,6 +23,7 @@ export type IconName =
   | "globe"
   | "heart"
   | "home"
+  | "image"
   | "landmark"
   | "limit"
   | "lock"

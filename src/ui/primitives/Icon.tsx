@@ -87,6 +87,13 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
       <path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1v-9z" />
     </>
   ),
+  image: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="2.5" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <polyline points="21 15 16 10 5 21" />
+    </>
+  ),
   limit: (
     <>
       <path d="M4 19a8 8 0 1116 0" />
