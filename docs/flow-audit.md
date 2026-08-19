@@ -60,7 +60,7 @@ timeline inline when the transaction is still settling. That deletes `payment-co
 ## 5. Three answers to "how do I get money in"
 
 `FundWalletScreen` and `AccountDetailsScreen` both call `gateway.accounts.list()` and both render a
-`DetailCard` of account name, account number and bank. Fund-wallet is reached *from* account-details
+`DetailCard` of account name, account number and bank. Fund-wallet is reached _from_ account-details
 (`useAccountViewModel.ts:51`), so the user is shown the same three fields on two consecutive screens.
 `QrReceiveScreen` answers the same question with a QR code and has three separate entry points.
 
@@ -82,10 +82,13 @@ Wallet card. `AccountDetailsScreen`, per the point above, is a pass-through whos
 
 ## 7. Screens and controls that make no sense as they stand
 
-`sign-in-otp` is unreachable. The only thing that navigates to it is `signInWithCredentials`
-(`useOnboardingViewModel.ts:36`), and that has no call sites anywhere; `SignInScreen` destructures
-only `back`, `submit` and `forgotPassword`, and `submit` goes straight to `resetTo("home")`. The app
-therefore has a documented OTP step that the sign-in form silently bypasses. Wire it or delete it.
+~~`sign-in-otp` is unreachable.~~ **Closed.** The whole auth journey is real now, on the credential
+model a Philippine wallet uses: a mobile number as the account key, a one-time code to prove it, and
+a 6-digit MPIN for every login after. `sign-in-otp` became `auth-otp` and serves registration, and
+MPIN reset; `forgot-password` became `forgot-pin`, since there is no password left to reset. Signing
+in is no longer a form nothing reads — `session.store` holds the session, `app/bridges/SessionBridge`
+persists the token through `StoragePort`, and `useAppShellViewModel` gates the tab shell on it, so a
+signed-out visitor cannot reach Home and a reload does not sign you out. See `src/test/auth.flow.test.tsx`.
 
 `result` has two actions, "Build my plan" and the close ×, and both call `resetTo("home")`. Two
 buttons, one behaviour, and no plan is built. The screen also hardcodes "The Free Spirit" while its
@@ -116,19 +119,19 @@ button. That gives every tab a durable data surface behind it rather than one ca
 
 ## Net effect
 
-| Action | Screens |
-|---|---|
-| Merge `send-mobile` into `transfer-destination` | −1 |
-| `payment-confirm` → sheet | −1 |
-| `payment-receipt`, `payment-status` → `transaction-detail` | −2 |
-| `recipients` → sheet on transfer | −1 |
-| `fund-wallet` + `qr-receive` → one Receive screen | −1 |
-| `account-details` → `personal-details` | −1 |
-| `settings` → inline on Profile | −1 |
-| `statements` → `statement-month` | −1 |
-| `card-add`, `card-detail` → Wallet sheet / inline | −2 |
-| `result` → sheet | −1 |
-| `sign-in-otp` — wire or delete | −1 |
+| Action                                                     | Screens |
+| ---------------------------------------------------------- | ------- |
+| Merge `send-mobile` into `transfer-destination`            | −1      |
+| `payment-confirm` → sheet                                  | −1      |
+| `payment-receipt`, `payment-status` → `transaction-detail` | −2      |
+| `recipients` → sheet on transfer                           | −1      |
+| `fund-wallet` + `qr-receive` → one Receive screen          | −1      |
+| `account-details` → `personal-details`                     | −1      |
+| `settings` → inline on Profile                             | −1      |
+| `statements` → `statement-month`                           | −1      |
+| `card-add`, `card-detail` → Wallet sheet / inline          | −2      |
+| `result` → sheet                                           | −1      |
+| ~~`sign-in-otp` — wire or delete~~ (done: `auth-otp`)      | −1      |
 
 47 → roughly 34, and the happy path for a bank transfer drops from six screens to four.
 
@@ -138,7 +141,7 @@ The golden snapshot in `src/test/app.flow.test.tsx` pins all 12 original screens
 flow, so any of these changes will turn it red. Work in one merge per commit, state in the commit
 message that the snapshot change is intended, and never run `vitest -u` to clear it wholesale.
 
-The cheapest wins first, since they touch no flow logic: delete or wire `sign-in-otp`, fix `result`'s
+The cheapest wins first, since they touch no flow logic: ~~delete or wire `sign-in-otp`~~ (done), fix `result`'s
 duplicate actions, remove the dead Home affordances, and fold `settings` into Profile. The
 payment-tail collapse in point 4 is the highest-value and the most invasive; do it last, after the
 `PaymentIntent` union is the single source of truth for what the detail screen renders.

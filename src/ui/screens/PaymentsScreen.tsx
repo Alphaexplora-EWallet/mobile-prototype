@@ -8,10 +8,15 @@ export function PaymentsScreen() {
   const [optionsOpen, setOptionsOpen] = useState(false);
 
   return (
-    <div className="tab-page money-page pay-tab-screen">
-      {/* Screen Header */}
+    <div className="onboarding-page money-page pay-scan-screen">
+      {/* Reached from Home's Scan action rather than a tab, so it needs a way
+          out — as a tab it had no back control and needed none. */}
       <header className="pay-clean-header">
-        <h1 className="pay-clean-title">Pay</h1>
+        <button className="icon-button" type="button" onClick={vm.back} aria-label="Back to home">
+          <Icon name="arrow-left" />
+        </button>
+        {/* "Scan", not "Scan to pay" — the hero card below already says that. */}
+        <h1 className="pay-clean-title">Scan</h1>
         <button
           className="pay-clean-options-btn"
           type="button"

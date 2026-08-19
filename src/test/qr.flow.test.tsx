@@ -1,39 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { PlatformProvider } from "@/core/platform/PlatformContext";
-import { noopPlatform } from "@/core/platform/noopPlatform";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen, within } from "@testing-library/react";
 import { QR_MATRIX_SIZE, qrMatrix } from "@/core/domain/qrMatrix";
-import { createMockNetBankGateway } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
 
 /**
  * QR PH, both directions. Paying replaces a simulated action sheet; receiving is
  * new outright — the app previously had no way to ask anyone for money.
  */
 
-const start = () => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway()}>
-      <PlatformProvider platform={noopPlatform}>
-        <App />
-      </PlatformProvider>
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
-const openScan = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
-  const nav = screen.getByRole("navigation", { name: /primary navigation/i });
-  await user.click(within(nav).getByRole("button", { name: /^Pay$/ }));
+const openScan = async (user: TestUser) => {
+  // Scan is a Home quick action now; the Pay tab it replaced offered the same
+  // four actions Home already had, and Activity has the tab slot.
+  await press(user, /^Scan$/);
   await press(user, /Scan to pay/i);
 };
 

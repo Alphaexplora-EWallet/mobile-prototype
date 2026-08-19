@@ -3,7 +3,7 @@
  * nothing between the review screen and the rail; these types describe the step
  * that belongs there.
  */
-export type OtpPurpose = "sign-in" | "payment" | "password-reset" | "device-binding" | "profile-change";
+export type OtpPurpose = "sign-up" | "sign-in" | "payment" | "password-reset" | "device-binding" | "profile-change";
 
 export type OtpChallenge = {
   /** e.g. "0917 ••• 2288" — what the code was sent to. */

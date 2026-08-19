@@ -9,7 +9,7 @@ export function ActivityScreen() {
   const vm = useActivityViewModel();
 
   return (
-    <div className="onboarding-page activity-page">
+    <div className="tab-page activity-page">
       <PageBar title={vm.title} onBack={vm.back} optionsLabel="Activity options" />
 
       <section className="activity-intro">

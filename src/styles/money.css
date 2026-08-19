@@ -794,26 +794,29 @@
 }
 
 /* ==========================================================================
-   Pay Screen: Dedicated Scan-to-Pay Mockup Experience
+   Scan Screen: Dedicated Scan-to-Pay Mockup Experience
    ========================================================================== */
 
-.pay-tab-screen {
+/* Was `.pay-tab-screen`, with 96px of bottom padding to clear a tab bar. It is
+   reached from Home now, so there is no tab bar under it to clear. */
+.pay-scan-screen {
   display: flex;
   flex-direction: column;
-  padding: 12px 18px 96px 18px;
+  padding: 12px 18px 28px 18px;
   min-height: 100%;
   box-sizing: border-box;
 }
 
-/* Header */
+/* Header: back arrow, title, options. */
 .pay-clean-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 22px;
   padding: 4px 2px;
 }
 .pay-clean-title {
+  flex: 1;
   margin: 0;
   font-size: 28px;
   font-weight: 800;

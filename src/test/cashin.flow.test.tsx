@@ -1,12 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { PlatformProvider } from "@/core/platform/PlatformContext";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
 import { noopPlatform } from "@/core/platform/noopPlatform";
 import type { Platform } from "@/core/platform/ports";
-import { createMockNetBankGateway, type MockGatewayOptions } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
+import { screen, within } from "@testing-library/react";
 
 /**
  * Cash-in, which never reached the gateway: "Add money" opened a simulated
@@ -15,25 +11,7 @@ import App from "../App";
  * settles through the pipeline, and the virtual account other banks push to.
  */
 
-const start = (options: MockGatewayOptions = {}, platform: Platform = noopPlatform) => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway(options)}>
-      <PlatformProvider platform={platform}>
-        <App />
-      </PlatformProvider>
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
-const openDeposit = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
+const openDeposit = async (user: TestUser) => {
   await press(user, /Add money/i);
 };
 
@@ -128,7 +106,7 @@ describe("cash-in flow", () => {
     const platform: Platform = {
       ...noopPlatform,
       clipboard: {
-        setString: async (value) => {
+        setString: async (value: string) => {
           copied.push(value);
           return true;
         },

@@ -355,10 +355,17 @@
   letter-spacing: -0.3px;
   color: #0f172a;
 }
-.cashflow-dropdown-btn {
+/* Static: the period is what the newest statement covers, not a choice. */
+.cashflow-period {
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+}
+.cashflow-breakdown-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  margin-top: 14px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -367,7 +374,7 @@
   font-weight: 700;
   cursor: pointer;
 }
-.cashflow-dropdown-btn svg {
+.cashflow-breakdown-btn svg {
   width: 14px;
   height: 14px;
 }
@@ -427,11 +434,25 @@
   transform: rotate(90deg);
   transform-origin: 50px 50px;
 }
+/* Arc colours match the legend dots above them: income green, expenses red. */
+.cashflow-arc-income {
+  stroke: #10b981;
+}
+.cashflow-arc-expenses {
+  stroke: #f87171;
+}
+.cashflow-donut-glyph {
+  fill: var(--ink);
+  font-size: 18px;
+  font-weight: 800;
+}
 
-/* Tip for you (Subtle Inline Accent Strip) */
+/* Tip for you (Subtle Inline Accent Strip)
+   Not interactive: it used to carry a chevron and a hover lift while having no
+   handler at all. It is a message, so it now looks like one. */
 .home-tip-card {
   display: grid;
-  grid-template-columns: 42px 1fr auto;
+  grid-template-columns: 42px 1fr;
   align-items: center;
   gap: 14px;
   margin-top: 16px;
@@ -440,11 +461,6 @@
   border-radius: 18px;
   background: #fffdf5;
   box-shadow: 0 2px 10px rgba(245, 158, 11, 0.04);
-  cursor: pointer;
-  transition: transform 0.15s ease;
-}
-.home-tip-card:hover {
-  transform: translateY(-2px);
 }
 .tip-icon-badge {
   display: grid;
@@ -475,12 +491,6 @@
   line-height: 1.35;
   font-weight: 500;
 }
-.home-tip-card > svg {
-  width: 16px;
-  height: 16px;
-  color: #94a3b8;
-}
-
 /* Recent Transactions (Edge-to-Edge Borderless Feed) */
 .transactions-section {
   margin-top: 24px;

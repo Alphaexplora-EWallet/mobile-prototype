@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen, within } from "@testing-library/react";
 import { MOCK_TRANSACTION_PIN } from "@/core/data/mock/security.mock";
-import { createMockNetBankGateway, type MockGatewayOptions } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
 
 /**
  * Cash-out / withdraw to bank (GAP-01): a verified wallet moves money out to a
@@ -13,24 +10,8 @@ import App from "../App";
  * the per-tier daily cap — surfacing through the existing error surface.
  */
 
-const start = (options: MockGatewayOptions = {}) => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway(options)}>
-      <App />
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
 /** Onboards to Home, opens the Wallet tab, then the Cash out row. */
-const openCashOut = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
+const openCashOut = async (user: TestUser) => {
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user.click(within(nav).getByRole("button", { name: /^Wallet$/ }));
   await press(user, /^Cash out/);

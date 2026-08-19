@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { isValidMobileNumber, maskMobileNumber, mobileNumberFormatMessage, normalizeMobileNumber } from "./mobile";
+import {
+  isValidMobileNumber,
+  maskMobileNumber,
+  mobileNumberFormatMessage,
+  normalizeMobileNumber,
+  toNationalMobile,
+} from "./mobile";
 
 describe("mobile number rules", () => {
   it("accepts an 11-digit number starting with 09", () => {
@@ -25,6 +31,20 @@ describe("mobile number rules", () => {
   it("masks to the first four and last four digits", () => {
     expect(maskMobileNumber("09174562288")).toBe("0917 ••• 2288");
     expect(maskMobileNumber("0917 456 2288")).toBe("0917 ••• 2288");
+  });
+
+  it("folds every written form of one number to the national form", () => {
+    expect(toNationalMobile("+63 917 555 2288")).toBe("09175552288");
+    expect(toNationalMobile("639175552288")).toBe("09175552288");
+    expect(toNationalMobile("9175552288")).toBe("09175552288");
+    expect(toNationalMobile("0917 555 2288")).toBe("09175552288");
+    // Every folded form is then something isValidMobileNumber accepts.
+    expect(isValidMobileNumber(toNationalMobile("+63 917 555 2288"))).toBe(true);
+  });
+
+  it("leaves a number it cannot recognise alone rather than mangling it", () => {
+    expect(toNationalMobile("12345")).toBe("12345");
+    expect(toNationalMobile("")).toBe("");
   });
 
   it("offers a single, human message for the invalid case", () => {

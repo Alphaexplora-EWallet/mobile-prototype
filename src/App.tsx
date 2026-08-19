@@ -5,12 +5,21 @@ import { preferencesActions } from "@/core/stores/preferences.store";
 import { useAppShellViewModel } from "@/core/viewmodels/useAppShellViewModel";
 
 import { ThemeBridge } from "@/app/bridges/ThemeBridge";
+import { SessionBridge } from "@/app/bridges/SessionBridge";
 import { ThemeProvider } from "@/ui/theme/ThemeContext";
 import { StatusBar } from "@/ui/layout/StatusBar";
 import { BottomNav } from "@/ui/layout/BottomNav";
 import { ActionSheet } from "@/ui/overlays/ActionSheet";
+import { StateBlock } from "@/ui/primitives/StateBlock";
+import { BrandMark } from "@/ui/layout/BrandMark";
 import { WelcomeScreen } from "@/ui/screens/WelcomeScreen";
 import { SignInScreen } from "@/ui/screens/SignInScreen";
+import { SignUpScreen } from "@/ui/screens/SignUpScreen";
+import { SignUpProfileScreen } from "@/ui/screens/SignUpProfileScreen";
+import { SignUpPinScreen } from "@/ui/screens/SignUpPinScreen";
+import { AuthOtpScreen } from "@/ui/screens/AuthOtpScreen";
+import { ForgotPinScreen } from "@/ui/screens/ForgotPinScreen";
+import { VerifyIdentityScreen } from "@/ui/screens/VerifyIdentityScreen";
 import { QuizScreen } from "@/ui/screens/QuizScreen";
 import { ResultScreen } from "@/ui/screens/ResultScreen";
 import { HomeScreen } from "@/ui/screens/HomeScreen";
@@ -39,7 +48,6 @@ import { QrReceiveScreen } from "@/ui/screens/QrReceiveScreen";
 import { BillEntryScreen } from "@/ui/screens/BillEntryScreen";
 import { AutopayDetailScreen } from "@/ui/screens/AutopayDetailScreen";
 import { LoadEntryScreen } from "@/ui/screens/LoadEntryScreen";
-import { SettingsScreen } from "@/ui/screens/SettingsScreen";
 import { BankAccountsScreen } from "@/ui/screens/BankAccountsScreen";
 import { NotificationsScreen } from "@/ui/screens/NotificationsScreen";
 import { SecuritySettingsScreen } from "@/ui/screens/SecuritySettingsScreen";
@@ -53,8 +61,6 @@ import { StatementsScreen } from "@/ui/screens/StatementsScreen";
 import { StatementMonthScreen } from "@/ui/screens/StatementMonthScreen";
 import { HelpScreen } from "@/ui/screens/HelpScreen";
 import { DisputeScreen } from "@/ui/screens/DisputeScreen";
-import { SignInOtpScreen } from "@/ui/screens/SignInOtpScreen";
-import { ForgotPasswordScreen } from "@/ui/screens/ForgotPasswordScreen";
 import { SpendingInsightsScreen } from "@/ui/screens/SpendingInsightsScreen";
 
 /**
@@ -64,6 +70,12 @@ import { SpendingInsightsScreen } from "@/ui/screens/SpendingInsightsScreen";
 const SCREENS: Record<Screen, () => JSX.Element> = {
   welcome: WelcomeScreen,
   "sign-in": SignInScreen,
+  "sign-up": SignUpScreen,
+  "sign-up-profile": SignUpProfileScreen,
+  "sign-up-pin": SignUpPinScreen,
+  "auth-otp": AuthOtpScreen,
+  "forgot-pin": ForgotPinScreen,
+  "verify-identity": VerifyIdentityScreen,
   quiz: QuizScreen,
   result: ResultScreen,
   home: HomeScreen,
@@ -92,7 +104,6 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   reward: RewardScreen,
   profile: ProfileScreen,
   "personal-details": PersonalDetailsScreen,
-  settings: SettingsScreen,
   "bank-accounts": BankAccountsScreen,
   notifications: NotificationsScreen,
   "security-settings": SecuritySettingsScreen,
@@ -106,25 +117,39 @@ const SCREENS: Record<Screen, () => JSX.Element> = {
   "statement-month": StatementMonthScreen,
   help: HelpScreen,
   dispute: DisputeScreen,
-  "sign-in-otp": SignInOtpScreen,
-  "forgot-password": ForgotPasswordScreen,
   insights: SpendingInsightsScreen,
 };
 
+/**
+ * What the shell shows while storage is still answering "is anyone signed in?".
+ * Not a routed screen: it belongs to no stack and cannot be navigated to.
+ */
+function SessionSplash() {
+  return (
+    <div className="onboarding-page session-splash">
+      <BrandMark tagline />
+      <StateBlock tone="loading" message="Opening your wallet…" />
+    </div>
+  );
+}
+
 function App() {
-  const { theme, screen, activeTab, sheet, selectTab, dismissSheet, confirmSheet } = useAppShellViewModel();
+  const { theme, status, token, hydrated, screen, activeTab, sheet, selectTab, dismissSheet, confirmSheet } =
+    useAppShellViewModel();
   const CurrentScreen = SCREENS[screen];
+  const settled = status !== "unknown";
 
   return (
     <ThemeProvider value={theme}>
       <ThemeBridge theme={theme} onThemeChange={preferencesActions.setTheme} />
+      <SessionBridge status={status} token={token} onHydrated={hydrated} />
       <main className="app-stage">
         <section className="phone-shell" aria-label="FIN-A mobile app prototype">
           <StatusBar />
-          <div className={`screen screen-${screen}`}>
-            <CurrentScreen />
+          <div className={`screen screen-${settled ? screen : "splash"}`}>
+            {settled ? <CurrentScreen /> : <SessionSplash />}
           </div>
-          {activeTab && <BottomNav active={activeTab} onNavigate={selectTab} />}
+          {settled && activeTab && <BottomNav active={activeTab} onNavigate={selectTab} />}
           {sheet && <ActionSheet result={sheet} onClose={dismissSheet} onConfirm={confirmSheet} />}
         </section>
       </main>

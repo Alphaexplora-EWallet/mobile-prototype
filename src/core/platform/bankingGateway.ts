@@ -7,6 +7,7 @@ import type { PaymentIntent } from "../domain/paymentIntent";
 import type { Biller } from "../domain/payments";
 import type { Bank, BankCode } from "../domain/rails";
 import type { ConfirmationToken, DeviceSession, OtpChallenge, OtpPurpose } from "../domain/security";
+import type { AuthSession, SessionToken } from "../domain/session";
 import type { Money } from "../money/money";
 
 /**
@@ -27,6 +28,7 @@ import type { Money } from "../money/money";
  * was no account number, bank code, rail, or idempotency key to send.
  */
 export interface BankingGateway {
+  readonly auth: AuthPort;
   readonly accounts: AccountsPort;
   readonly activity: ActivityPort;
   readonly directory: DirectoryPort;
@@ -120,6 +122,62 @@ export interface CompliancePort {
   /** Limits depend on the KYC tier, so this is the same fact as `kycStatus`. */
   limits(): Promise<GatewayResult<TierLimits>>;
 }
+
+/**
+ * Establishing a session, as opposed to stepping one up.
+ *
+ * Deliberately not folded into `SecurityPort`: that port answers "prove it is
+ * still you" for a payment or a profile edit, which presupposes a session. This
+ * one creates and ends them, and it is the only port callable while signed out.
+ *
+ * The credential model is the one a Philippine wallet actually uses — a mobile
+ * number as the account key, a one-time code to prove the number, and a 6-digit
+ * MPIN for every login after that. No password anywhere.
+ */
+export interface AuthPort {
+  /**
+   * Whether this mobile already has an account, so the entry screen can send a
+   * returning user to the MPIN and a new one to the code. The masked
+   * destination comes back either way — the caller must not be able to tell
+   * "not registered" from "registered" by *which* fields are present.
+   */
+  lookupMobile(mobile: string): Promise<GatewayResult<MobileLookupResult>>;
+  /** Begins registration by sending the code that proves the number. */
+  startSignUp(mobile: string): Promise<GatewayResult<OtpChallenge>>;
+  /**
+   * Creates the account and its first session. `confirmation` is the token
+   * `security.verifyOtp` issued for the `sign-up` purpose, and is spent here —
+   * one code, one account.
+   */
+  completeSignUp(input: SignUpInput): Promise<GatewayResult<AuthSession>>;
+  signIn(input: SignInInput): Promise<GatewayResult<AuthSession>>;
+  /** Forgot the MPIN: an OTP-gated replacement, which also signs you in. */
+  resetPin(input: ResetPinInput): Promise<GatewayResult<AuthSession>>;
+  signOut(): Promise<GatewayResult<null>>;
+  /**
+   * Re-establishes a session from a persisted token, and rejects one it does not
+   * recognise. This is what makes a reload keep you signed in without the app
+   * ever storing the MPIN.
+   */
+  resume(token: SessionToken): Promise<GatewayResult<AuthSession>>;
+}
+
+export type MobileLookupResult = {
+  registered: boolean;
+  /** e.g. "0917 ••• 2288" — where a code would be sent. */
+  maskedDestination: string;
+};
+
+export type SignUpInput = {
+  mobile: string;
+  fullName: string;
+  pin: string;
+  confirmation: ConfirmationToken;
+};
+
+export type SignInInput = { mobile: string; pin: string };
+
+export type ResetPinInput = { mobile: string; pin: string; confirmation: ConfirmationToken };
 
 export interface SecurityPort {
   requestOtp(purpose: OtpPurpose): Promise<GatewayResult<OtpChallenge>>;

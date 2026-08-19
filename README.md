@@ -120,6 +120,16 @@ Stores are module singletons, so `src/test/setup.ts` resets them between tests a
 
 These are deliberate, and each would need a real decision before changing:
 
+- **The auth credentials are fixed sandbox constants.** `MOCK_MPIN` (`271828`) and `MOCK_OTP_CODE`
+  (`135790`) live in `core/data/mock/security.mock.ts` and are printed on the screens that ask for
+  them, because a prototype nobody can sign into is not a prototype. The session token is opaque but
+  unsigned and never expires on a clock, only when the mock gateway forgets it; the MPIN is compared
+  in plaintext where a server would hold an argon2id hash. Only the token is persisted — through
+  `StoragePort`, in `app/bridges/SessionBridge` — and the MPIN reaches no store and no storage.
+- **The MPIN guards sign-in only, not resume.** There is no lock screen when the app returns from
+  the background, so `AppStatePort` stays unused by the auth flow and `settings.biometricsEnabled`
+  has no port behind it: the fingerprint button on Sign in does what the MPIN does.
+
 - **The quest ring's 41% is hardcoded in three places** — `progressPercent: 41` in
   `core/stores/quest.store.ts` (drives the ring's percentage label and the progress-track width)
   and the `41%` stops in the `conic-gradient` in both `styles/quest.css` and `styles/dark.css`.

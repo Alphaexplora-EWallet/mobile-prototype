@@ -17,6 +17,7 @@ import { INITIAL_KYC, useKycStore } from "../stores/kyc.store";
 import { INITIAL_QR, useQrStore } from "../stores/qr.store";
 import { INITIAL_SETTINGS, useSettingsStore } from "../stores/settings.store";
 import { INITIAL_RECIPIENTS, useRecipientsStore } from "../stores/recipients.store";
+import { INITIAL_SESSION, useSessionStore } from "../stores/session.store";
 import { INITIAL_TRANSFER_DRAFT, useTransferStore } from "../stores/transfer.store";
 import { INITIAL_USER, useUserStore } from "../stores/user.store";
 import { useWalletStore } from "../stores/wallet.store";
@@ -37,6 +38,12 @@ import { pesos } from "../money/money";
  */
 export function resetStores(): void {
   useNavigationStore.setState({ stack: [INITIAL_SCREEN] });
+  /**
+   * Back to `unknown`, not `signed-out`: this is the state a fresh app has, and
+   * the bridge is what resolves it by asking storage. Signing out sets
+   * `signed-out` itself before calling this, so the answer is not asked twice.
+   */
+  useSessionStore.setState(INITIAL_SESSION);
   usePreferencesStore.setState({ theme: "light", balanceVisible: true });
   useQuestStore.setState({
     phase: "available",

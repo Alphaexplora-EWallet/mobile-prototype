@@ -1,36 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { createMockNetBankGateway } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen } from "@testing-library/react";
 
 /**
- * Buy load / mobile top-up (GAP-02): pick an operator on the Pay tab, type the
+ * Buy load / mobile top-up (GAP-02): pick an operator on the Scan screen, type the
  * mobile number, choose an amount preset, then ride the shared review →
  * confirm → receipt pipeline. The operator→prefix rules block invalid numbers
  * inline, and the receipt only ever shows the masked form.
  */
 
-const start = () => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway()}>
-      <App />
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
-const openPayTab = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
-  const nav = screen.getByRole("navigation", { name: /primary navigation/i });
-  await user.click(within(nav).getByRole("button", { name: /^Pay$/ }));
+const openScan = async (user: TestUser) => {
+  // Scan is a Home quick action now; the Pay tab it replaced offered the same
+  // four actions Home already had, and Activity has the tab slot.
+  await press(user, /^Scan$/);
   await press(user, /Payment options/i);
   await press(user, /Buy load/i);
 };
@@ -38,9 +20,9 @@ const openPayTab = async (user: ReturnType<typeof userEvent.setup>) => {
 describe("buy load flow", () => {
   it("buys load through the pipeline and masks the number on the receipt", async () => {
     const user = start();
-    await openPayTab(user);
+    await openScan(user);
 
-    // The Pay tab gains a Buy load section with the operators.
+    // The options sheet leads to a Buy load screen with the operators.
     await press(user, /SmartSmart, TNT & Sun numbers/i);
     expect(await screen.findByRole("heading", { name: "Smart" })).toBeTruthy();
 
@@ -77,7 +59,7 @@ describe("buy load flow", () => {
 
   it("blocks an incomplete number with an inline error", async () => {
     const user = start();
-    await openPayTab(user);
+    await openScan(user);
     await press(user, /GlobeGlobe & TM numbers/i);
 
     await user.type(screen.getByRole("textbox", { name: /Mobile number to load/i }), "0917");
@@ -91,7 +73,7 @@ describe("buy load flow", () => {
 
   it("files a load purchase in activity", async () => {
     const user = start();
-    await openPayTab(user);
+    await openScan(user);
     await press(user, /DITODITO numbers/i);
 
     await user.type(screen.getByRole("textbox", { name: /Mobile number to load/i }), "09911234567");
@@ -109,7 +91,7 @@ describe("buy load flow", () => {
 
   it("keeps the draft when going back from review", async () => {
     const user = start();
-    await openPayTab(user);
+    await openScan(user);
     await press(user, /SmartSmart, TNT & Sun numbers/i);
 
     await user.type(screen.getByRole("textbox", { name: /Mobile number to load/i }), "09991234567");

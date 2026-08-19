@@ -1,4 +1,5 @@
 import { formatMoney, formatSignedMoney, maskMoney } from "../money/format";
+import { addMoney, ratio } from "../money/money";
 import type { IconName } from "../domain/icons";
 import { levelFromXp } from "../domain/progress";
 import { isIncoming } from "../domain/transaction";
@@ -15,15 +16,22 @@ import type { Theme } from "@/ui/theme/ThemeContext";
 import type { CardPresentation } from "./useCardViews";
 import { useSelectedCard } from "./useCardViews";
 
-export type QuickActionId = "send" | "receive" | "deposit" | "pay";
+export type QuickActionId = "send" | "receive" | "deposit" | "scan";
 
 export type QuickActionVM = { id: QuickActionId; label: string; icon: IconName };
 
+/**
+ * The four actions, and the only surface that offers them. "Pay" used to sit
+ * here *and* be a tab *and* be the first row of a bottom sheet on that tab; it
+ * is now Scan, named for what the screen it opens actually does, and the tab
+ * that duplicated it is Activity. Receive takes the arrow rather than the QR
+ * glyph so Scan can have it — two QR icons side by side said nothing.
+ */
 const QUICK_ACTIONS: readonly QuickActionVM[] = [
   { id: "send", label: "Send", icon: "send" },
-  { id: "receive", label: "Receive", icon: "qr" },
+  { id: "receive", label: "Receive", icon: "arrow-down" },
   { id: "deposit", label: "Add money", icon: "plus" },
-  { id: "pay", label: "Pay", icon: "card" },
+  { id: "scan", label: "Scan", icon: "qr" },
 ];
 
 /** Arrow glyph per direction — "flat" still needs one, never a blank chip. */
@@ -61,6 +69,15 @@ export type HomeViewModel = {
     expensesLabel: string;
     incomeChange: PercentChangeVM | null;
     expensesChange: PercentChangeVM | null;
+    /**
+     * The two halves of the ring, as whole percents summing to 100. The card's
+     * own legend is Income and Expenses, so the ring is that split and nothing
+     * else; it used to be four hardcoded arcs of no stated meaning. Both shares
+     * are given rather than one plus `100 - x` so the view does no arithmetic on
+     * figures it is not allowed to read.
+     */
+    incomeSharePercent: number;
+    expenseSharePercent: number;
   } | null;
   transactions: readonly {
     id: string;
@@ -77,6 +94,8 @@ export type HomeViewModel = {
   pressQuest(): void;
   pressTransaction(id: string): void;
   goToActivity(): void;
+  /** The cash-flow card and the tip card both lead here — the full breakdown. */
+  openInsights(): void;
   openProfile(): void;
   goTo(screen: Screen): void;
 };
@@ -97,6 +116,17 @@ export function useHomeViewModel(): HomeViewModel {
     selected.id === "main" ? formatPercentChange(balanceDeltaFromLastMonth(selected.balance, MOCK_STATEMENTS)) : null;
   const cashFlowSummary = buildCashFlowSummary(MOCK_STATEMENTS);
 
+  // `ratio` is zero-safe on a zero base, so a period with no movement at all
+  // yields 0/0 rather than NaN and the ring simply renders empty.
+  const expenseShare = cashFlowSummary
+    ? Math.round(
+        ratio(
+          cashFlowSummary.current.expenses,
+          addMoney(cashFlowSummary.current.income, cashFlowSummary.current.expenses),
+        ) * 100,
+      )
+    : 0;
+
   return {
     theme,
     themeToggleLabel: `Switch to ${theme === "dark" ? "light" : "dark"} mode`,
@@ -116,6 +146,8 @@ export function useHomeViewModel(): HomeViewModel {
           expensesLabel: formatMoney(cashFlowSummary.current.expenses, { fractionDigits: 0 }),
           incomeChange: formatPercentChange(cashFlowSummary.incomeChange),
           expensesChange: formatPercentChange(cashFlowSummary.expensesChange),
+          incomeSharePercent: 100 - expenseShare,
+          expenseSharePercent: expenseShare,
         }
       : null,
     quest: {
@@ -149,7 +181,9 @@ export function useHomeViewModel(): HomeViewModel {
       activityActions.selectTransaction(id);
       navigation.navigate("transaction-detail");
     },
-    goToActivity: () => navigation.navigate("activity"),
+    /** Activity is a tab now, so "See all" switches to it rather than pushing. */
+    goToActivity: () => navigation.switchTab("activity"),
+    openInsights: () => navigation.navigate("insights"),
     /** The avatar was rendered with no handler; Profile was tab-only. */
     openProfile: () => navigation.navigate("profile"),
     goTo: navigation.navigate,

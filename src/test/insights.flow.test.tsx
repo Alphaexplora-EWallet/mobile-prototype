@@ -1,11 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { createMockNetBankGateway, type MockGatewayOptions } from "@/platform/web/createMockNetBankGateway";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen, within } from "@testing-library/react";
 import type { BankingTransaction } from "@/core/domain/banking";
 import { pesos } from "@/core/money/money";
-import App from "../App";
 
 /**
  * GAP-06: spending insights. The screen must derive the monthly breakdown
@@ -13,28 +10,8 @@ import App from "../App";
  * state — never a "₱0.00" total or an empty list masquerading as data.
  */
 
-const start = (options: MockGatewayOptions = {}) => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway(options)}>
-      <App />
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
-const openHome = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
-};
-
 /** Home → Recent transactions → View all → Activity → Spending insights. */
-const openInsights = async (user: ReturnType<typeof userEvent.setup>) => {
-  await openHome(user);
+const openInsights = async (user: TestUser) => {
   await press(user, /View all/i);
   await press(user, /Monthly totals/i);
 };

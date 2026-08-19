@@ -202,3 +202,64 @@
 .demo-auth .secondary-button {
   min-height: 52px;
 }
+
+/*
+ * The registration and recovery screens. They use the flow-screen shell
+ * (`PageBar` + `.money-note` fields + `.money-actions`) rather than the
+ * `.auth-form` grid, because a step in a wizard is shaped like every other flow
+ * step in the app — only Sign in keeps the one-page form look.
+ */
+.auth-page .control-list {
+  margin-top: 4px;
+}
+.auth-page .confirm-hero {
+  margin-bottom: 26px;
+}
+.auth-page .pin-field + .pin-field {
+  margin-top: 18px;
+}
+
+.verify-benefits {
+  display: grid;
+  gap: 14px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.verify-benefits li {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+  font-size: var(--text-body);
+}
+.verify-benefits svg {
+  width: 20px;
+  color: var(--teal);
+}
+
+/* Sits under the primary button inside `.auth-form`, so it inherits the grid. */
+.biometric-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+}
+.biometric-button svg {
+  width: 18px;
+}
+
+/*
+ * Shown only while storage is answering whether anyone is signed in. Centred
+ * because it is a held breath, not a screen — nothing here is interactive.
+ */
+.session-splash {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 26px;
+  min-height: 100%;
+  text-align: center;
+}

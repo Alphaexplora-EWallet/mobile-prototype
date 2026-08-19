@@ -119,7 +119,12 @@ export function useActivityViewModel() {
       navigation.navigate("transaction-detail");
     },
     openInsights: () => navigation.navigate("insights"),
-    back: navigation.goBack,
+    /**
+     * Activity is a tab now, so it is usually the root of the stack and there is
+     * nowhere to go back to — the arrow is offered only when something is
+     * actually beneath it, rather than rendered as a no-op.
+     */
+    back: navigation.canGoBack ? navigation.goBack : undefined,
   };
 }
 

@@ -30,3 +30,19 @@ export const maskMobileNumber = (value: string): string => {
 
 /** Inline message for a value that failed `isValidMobileNumber`. */
 export const mobileNumberFormatMessage = (): string => "Enter an 11-digit Philippine mobile number starting with 09.";
+
+/**
+ * Folds the shapes a person might type — `+63 917 555 2288`, `63…`, `917…` —
+ * into the national form `isValidMobileNumber` accepts.
+ *
+ * `normalizeMobileNumber` deliberately does not do this: it only strips
+ * punctuation, and its output is what an input field shows while being typed.
+ * This is the canonical form, used as the account key when signing in or up —
+ * one number must not be two accounts because of how it was written.
+ */
+export const toNationalMobile = (value: string): string => {
+  const digits = normalizeMobileNumber(value);
+  if (digits.startsWith("63") && digits.length === 12) return `0${digits.slice(2)}`;
+  if (digits.startsWith("9") && digits.length === 10) return `0${digits}`;
+  return digits;
+};

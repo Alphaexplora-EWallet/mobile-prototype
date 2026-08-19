@@ -5,6 +5,7 @@ import { BrandMark } from "../layout/BrandMark";
 import { Icon } from "../primitives/Icon";
 import { QuickAction } from "../primitives/QuickAction";
 import { TransactionRow } from "../money/TransactionRow";
+import { CashFlowRing } from "../money/CashFlowRing";
 
 export function HomeScreen() {
   const vm = useHomeViewModel();
@@ -132,94 +133,59 @@ export function HomeScreen() {
         </button>
       </section>
 
-      <section className="home-cashflow-card">
-        <div className="cashflow-header">
-          <h2>Cash flow</h2>
-          <button type="button" className="cashflow-dropdown-btn">
-            This month <Icon name="chevron-down" />
+      {cashFlow && (
+        <section className="home-cashflow-card">
+          <div className="cashflow-header">
+            <h2>Cash flow</h2>
+            {/* The period is whatever the newest statement covers. This was a
+                dropdown with no handler, promising a picker that never existed. */}
+            <span className="cashflow-period">{cashFlow.periodLabel}</span>
+          </div>
+          <div className="cashflow-body">
+            <div className="cashflow-stats">
+              <div className="cashflow-stat-col">
+                <span className="cashflow-label">
+                  <span className="dot dot-income" /> Income
+                </span>
+                <strong className="cashflow-amount">{cashFlow.incomeLabel}</strong>
+                {cashFlow.incomeChange && (
+                  <span
+                    className={`trend-pill ${cashFlow.incomeChange.direction === "down" ? "negative" : "positive"}`}
+                  >
+                    {cashFlow.incomeChange.label}
+                  </span>
+                )}
+              </div>
+
+              <div className="cashflow-stat-col">
+                <span className="cashflow-label">
+                  <span className="dot dot-expenses" /> Expenses
+                </span>
+                <strong className="cashflow-amount">{cashFlow.expensesLabel}</strong>
+                {cashFlow.expensesChange && (
+                  <span
+                    className={`trend-pill ${cashFlow.expensesChange.direction === "down" ? "positive" : "negative"}`}
+                  >
+                    {cashFlow.expensesChange.label}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="cashflow-donut-container">
+              <CashFlowRing
+                incomePercent={cashFlow.incomeSharePercent}
+                expensePercent={cashFlow.expenseSharePercent}
+                label={`Income ${cashFlow.incomeSharePercent}%, expenses ${cashFlow.expenseSharePercent}%`}
+              />
+            </div>
+          </div>
+
+          <button type="button" className="cashflow-breakdown-btn" onClick={vm.openInsights}>
+            See the full breakdown <Icon name="chevron-right" />
           </button>
-        </div>
-        <div className="cashflow-body">
-          <div className="cashflow-stats">
-            <div className="cashflow-stat-col">
-              <span className="cashflow-label">
-                <span className="dot dot-income" /> Income
-              </span>
-              <strong className="cashflow-amount">
-                {cashFlow
-                  ? cashFlow.incomeLabel.startsWith("₱")
-                    ? cashFlow.incomeLabel
-                    : `₱${cashFlow.incomeLabel}`
-                  : "₱25,750.00"}
-              </strong>
-              <span className="trend-pill positive">{cashFlow?.incomeChange?.label ?? "↑ 12%"}</span>
-            </div>
-
-            <div className="cashflow-stat-col">
-              <span className="cashflow-label">
-                <span className="dot dot-expenses" /> Expenses
-              </span>
-              <strong className="cashflow-amount">
-                {cashFlow
-                  ? cashFlow.expensesLabel.startsWith("₱")
-                    ? cashFlow.expensesLabel
-                    : `₱${cashFlow.expensesLabel}`
-                  : "₱8,320.00"}
-              </strong>
-              <span className="trend-pill negative">{cashFlow?.expensesChange?.label ?? "↓ 8%"}</span>
-            </div>
-          </div>
-
-          <div className="cashflow-donut-container">
-            <svg viewBox="0 0 100 100" className="cashflow-donut" aria-hidden="true">
-              <circle
-                cx="50"
-                cy="50"
-                r="38"
-                fill="none"
-                stroke="#10b981"
-                strokeWidth="14"
-                strokeDasharray="95 240"
-                strokeDashoffset="0"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="38"
-                fill="none"
-                stroke="#06b6d4"
-                strokeWidth="14"
-                strokeDasharray="50 240"
-                strokeDashoffset="-95"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="38"
-                fill="none"
-                stroke="#3b82f6"
-                strokeWidth="14"
-                strokeDasharray="45 240"
-                strokeDashoffset="-145"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="38"
-                fill="none"
-                stroke="#f87171"
-                strokeWidth="14"
-                strokeDasharray="50 240"
-                strokeDashoffset="-190"
-              />
-              <circle cx="50" cy="50" r="31" fill="var(--surface, #ffffff)" />
-              <text x="50" y="56" textAnchor="middle" fill="var(--ink)" fontSize="18" fontWeight="800">
-                ₱
-              </text>
-            </svg>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="home-tip-card">
         <div className="tip-icon-badge">
@@ -229,7 +195,6 @@ export function HomeScreen() {
           <strong>Tip for you</strong>
           <p>You're on track! Keep going to reach your goals faster.</p>
         </div>
-        <Icon name="chevron-right" />
       </section>
 
       <section className="home-section transactions-section">

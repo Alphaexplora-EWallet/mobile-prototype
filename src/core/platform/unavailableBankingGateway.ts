@@ -11,6 +11,15 @@ const offline = async () => failed("network", OFFLINE);
  * looked exactly like an empty wallet.
  */
 export const unavailableBankingGateway: BankingGateway = {
+  auth: {
+    lookupMobile: offline,
+    startSignUp: offline,
+    completeSignUp: offline,
+    signIn: offline,
+    resetPin: offline,
+    signOut: offline,
+    resume: offline,
+  },
   accounts: { list: offline, virtualAccount: offline, statements: offline },
   activity: { list: offline, get: offline, dispute: offline },
   directory: {
