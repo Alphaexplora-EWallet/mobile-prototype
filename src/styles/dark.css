@@ -41,26 +41,35 @@
 :root[data-theme="dark"] .brand-mark-lockup {
   filter: brightness(0) invert(1);
 }
-:root[data-theme="dark"] .welcome-copy h1,
+:root[data-theme="dark"] .welcome-page {
+  background: var(--cream);
+}
+:root[data-theme="dark"] .welcome-brand-name,
+:root[data-theme="dark"] .brand-letter-i .brand-stem,
+:root[data-theme="dark"] .welcome-title,
 :root[data-theme="dark"] .sign-in-copy h1 {
   color: var(--ink);
 }
-:root[data-theme="dark"] .welcome-copy p,
+:root[data-theme="dark"] .welcome-brand-sub,
+:root[data-theme="dark"] .welcome-subtitle,
 :root[data-theme="dark"] .sign-in-copy > p:last-child {
   color: var(--muted);
 }
-:root[data-theme="dark"] .welcome-visual-fade {
-  background: linear-gradient(var(--cream) 0%, transparent 18%, transparent 68%, var(--cream) 100%);
+:root[data-theme="dark"] .canvas-indigo-blob {
+  fill: #172439;
 }
-:root[data-theme="dark"] .welcome-actions {
-  background: linear-gradient(transparent, var(--cream) 40%);
+:root[data-theme="dark"] .canvas-left-arc {
+  fill: #131d2e;
 }
-:root[data-theme="dark"] .welcome-actions .secondary-button,
-:root[data-theme="dark"] .demo-auth .secondary-button {
+:root[data-theme="dark"] .welcome-secondary {
   background: rgba(20, 33, 30, 0.9);
+  color: var(--teal);
 }
 :root[data-theme="dark"] .welcome-dots span {
   background: #34433f;
+}
+:root[data-theme="dark"] .welcome-dots span.is-active {
+  background: var(--teal);
 }
 :root[data-theme="dark"] .auth-form label {
   color: #cbd6d2;

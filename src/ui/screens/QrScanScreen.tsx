@@ -2,7 +2,6 @@ import { useQrScanViewModel } from "@/core/viewmodels/useQrViewModel";
 import { PageBar } from "../layout/PageBar";
 import { AmountField } from "../money/AmountField";
 import { Icon } from "../primitives/Icon";
-import { LinkRow } from "../primitives/LinkRow";
 
 export function QrScanScreen() {
   const vm = useQrScanViewModel();
@@ -11,52 +10,74 @@ export function QrScanScreen() {
     <div className="onboarding-page money-page qr-scan-page">
       <PageBar title={vm.title} onBack={vm.back} optionsLabel="Scan options" />
 
-      <section className="viewfinder" aria-label="Camera viewfinder">
-        <span className="viewfinder-frame" aria-hidden="true">
-          <Icon name="qr" />
-        </span>
-        <p>{vm.cameraNote}</p>
+      {/* Main Camera Viewfinder Viewport */}
+      <section className="camera-viewfinder-stage" aria-label="Camera viewfinder">
+        {/* Animated Laser Scanning Line */}
+        <div className="camera-laser-beam" aria-hidden="true" />
+
+        {/* Viewfinder Reticle Frame */}
+        <div className="camera-reticle-frame" aria-hidden="true">
+          <div className="reticle-corner top-left" />
+          <div className="reticle-corner top-right" />
+          <div className="reticle-corner bottom-left" />
+          <div className="reticle-corner bottom-right" />
+
+          <div className="camera-qr-glyph">
+            <Icon name="qr" />
+          </div>
+        </div>
+
+        <p className="camera-viewfinder-caption">Position the QR code within the frame</p>
       </section>
 
-      <p className="activity-intro">{vm.intro}</p>
-
-      <label className="money-note">
-        <span className="field-label">Paste a QR PH code</span>
-        <span className="input-shell">
-          <Icon name="qr" />
-          <input
-            type="text"
-            placeholder="Payload or reference"
-            aria-label="QR PH code"
-            value={vm.scanInput}
-            onChange={(event) => vm.setScanInput(event.target.value)}
-          />
-        </span>
-      </label>
-
-      <button
-        className="secondary-button verify-button"
-        type="button"
-        disabled={!vm.canDecode}
-        onClick={() => void vm.decode()}
-      >
-        {vm.isDecoding ? "Reading the code…" : "Read this code"}
-      </button>
-
-      <section className="money-field">
-        <span className="field-label">Codes in this sandbox</span>
-        <div className="control-list">
+      {/* Sleek Sandbox Quick Scan Chips */}
+      <section className="sandbox-quick-section" aria-label="Codes in this sandbox">
+        <span className="sandbox-quick-label">Tap code to scan:</span>
+        <div className="sandbox-chips-row">
           {vm.sampleCodes.map((sample) => (
-            <LinkRow
+            <button
               key={sample.id}
-              icon="qr"
-              title={sample.title}
-              detail={sample.detail}
+              type="button"
+              className="sandbox-chip-btn"
               onClick={() => void vm.useSample(sample.id)}
-            />
+            >
+              <span className="chip-icon-wrap">
+                <Icon name="qr" />
+              </span>
+              <span className="chip-content">
+                <strong>{sample.title}</strong>
+                <small>{sample.detail}</small>
+              </span>
+            </button>
           ))}
         </div>
       </section>
+
+      {/* Compact Manual Paste Input */}
+      <div className="scan-manual-paste-box">
+        <label className="money-note">
+          <span className="field-label">Paste a QR PH code</span>
+          <span className="input-shell">
+            <Icon name="qr" />
+            <input
+              type="text"
+              placeholder="Payload or reference"
+              aria-label="QR PH code"
+              value={vm.scanInput}
+              onChange={(event) => vm.setScanInput(event.target.value)}
+            />
+          </span>
+        </label>
+
+        <button
+          className="secondary-button verify-button"
+          type="button"
+          disabled={!vm.canDecode}
+          onClick={() => void vm.decode()}
+        >
+          {vm.isDecoding ? "Reading the code…" : "Read this code"}
+        </button>
+      </div>
 
       {vm.error && (
         <p className="transfer-error" role="alert">

@@ -141,13 +141,16 @@ export function TransferScreen() {
       )}
 
       {vm.step === 2 && (
-        <>
-          {/* Pure Typographic Recipient Header (0 cards, 0 pills) */}
+        <div className="transfer-step-two-container">
+          {/* Ambient Top Background Glow */}
+          <div className="transfer-ambient-glow" aria-hidden="true" />
+
+          {/* Recipient Hero */}
           {selectedRecipientDetails && (
             <div className="transfer-recipient-hero">
               <span className="transfer-hero-avatar">{selectedRecipientDetails.initials}</span>
               <div className="transfer-hero-copy">
-                <small>Sending to</small>
+                <small>SENDING TO</small>
                 <strong>{selectedRecipientDetails.name}</strong>
                 <p>
                   <span>{selectedRecipientDetails.handle}</span>
@@ -164,10 +167,12 @@ export function TransferScreen() {
             </div>
           )}
 
-          {/* Floating Amount Hero (0 box, 0 card) */}
+          {/* Amount Hero */}
           <div className="transfer-amount-hero">
             <div className="transfer-amount-input-row">
-              <span className="transfer-currency-sign">₱</span>
+              <span className="transfer-peso-circle" aria-hidden="true">
+                <span className="transfer-peso-char">₱</span>
+              </span>
               <input
                 inputMode="decimal"
                 placeholder="0.00"
@@ -178,37 +183,53 @@ export function TransferScreen() {
               />
             </div>
             <div className="transfer-amount-balance-row">
-              <span>Available {source.balanceLabel}</span>
-              <button type="button" className="transfer-max-link" onClick={vm.setMaxAmount}>
-                Use max
-              </button>
-            </div>
-          </div>
-
-          {/* Source Account (Clean borderless inline row) */}
-          <div className="transfer-source-line">
-            <small>Pay with</small>
-            <div className="transfer-source-options">
-              {cards.map((card) => (
-                <button
-                  key={card.id}
-                  type="button"
-                  className={`transfer-source-btn ${source.id === card.id ? "is-active" : ""}`}
-                  onClick={() => vm.selectCard(card.id)}
-                  aria-pressed={source.id === card.id}
-                >
-                  <Icon name="card" />
-                  <strong>{card.displayLabel}</strong>
-                  <span>({card.balanceLabel})</span>
+              <span className="balance-label">Available balance</span>
+              <div className="balance-value-row">
+                <strong>{source.balanceLabel}</strong>
+                <button type="button" className="transfer-max-link" onClick={vm.setMaxAmount}>
+                  Use max
                 </button>
-              ))}
+              </div>
             </div>
           </div>
 
-          {/* Fee preview caption */}
+          {/* Pay With Card Group */}
+          <div className="transfer-pay-with-card">
+            <span className="pay-with-heading">PAY WITH</span>
+            <div className="transfer-source-options">
+              {cards.map((card) => {
+                const isSelected = source.id === card.id;
+                const isJar = card.id !== "main";
+                return (
+                  <button
+                    key={card.id}
+                    type="button"
+                    className={`transfer-source-row ${isSelected ? "is-active" : ""}`}
+                    onClick={() => vm.selectCard(card.id)}
+                    aria-pressed={isSelected}
+                  >
+                    <span className={`source-icon-badge ${isJar ? "is-jar" : "is-wallet"}`}>
+                      <Icon name={isJar ? "card" : "wallet"} />
+                    </span>
+                    <span className="source-info">
+                      <strong>{card.displayLabel}</strong>
+                      <small>{card.balanceLabel}</small>
+                    </span>
+                    <span className={`source-radio-indicator ${isSelected ? "is-selected" : ""}`}>
+                      {isSelected && <Icon name="check" />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Fee Preview Banner */}
           {vm.feePreview && (
-            <div className="transfer-fee-line">
-              <Icon name="bolt" />
+            <div className="transfer-fee-banner">
+              <span className="fee-icon-wrap">
+                <Icon name="bolt" />
+              </span>
               <span>
                 <strong>{vm.feePreview.feeLabel}</strong> · {vm.feePreview.arrivalLabel}
               </span>
@@ -221,8 +242,8 @@ export function TransferScreen() {
             </p>
           )}
 
-          {/* Borderless Note Field */}
-          <div className="transfer-note-line">
+          {/* Note Input Card */}
+          <div className="transfer-note-card">
             <Icon name="mail" />
             <input
               type="text"
@@ -231,14 +252,30 @@ export function TransferScreen() {
               onChange={(event) => vm.setNote(event.target.value)}
             />
           </div>
-        </>
+        </div>
       )}
 
       <div className="money-actions">
-        <button className="primary-button" type="button" disabled={!vm.canAdvance} onClick={vm.advance}>
-          {vm.step === 1 ? "Continue" : "Continue and review"}
-        </button>
-        {vm.step === 2 && <p className="prototype-note">{vm.simulatedNote}</p>}
+        {vm.step === 1 ? (
+          <button className="primary-button" type="button" disabled={!vm.canAdvance} onClick={vm.advance}>
+            Continue
+          </button>
+        ) : (
+          <button
+            className="primary-button transfer-submit-btn"
+            type="button"
+            disabled={!vm.canAdvance}
+            onClick={vm.advance}
+          >
+            <span>Continue and review</span>
+            <Icon name="chevron-right" />
+          </button>
+        )}
+        {vm.step === 2 && (
+          <p className="prototype-note transfer-security-note">
+            <Icon name="lock" /> {vm.simulatedNote}
+          </p>
+        )}
       </div>
     </div>
   );

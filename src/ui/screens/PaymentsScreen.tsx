@@ -34,6 +34,9 @@ export function PaymentsScreen() {
         onClick={vm.scanToPay}
         aria-label="Scan to pay: Point camera at any QR Ph code"
       >
+        {/* Animated Laser Scanning Line */}
+        <div className="scanner-laser-beam" aria-hidden="true" />
+
         {/* Decorative Wave Vector Background */}
         <svg className="scanner-hero-waves" viewBox="0 0 340 180" preserveAspectRatio="none" aria-hidden="true">
           <path
