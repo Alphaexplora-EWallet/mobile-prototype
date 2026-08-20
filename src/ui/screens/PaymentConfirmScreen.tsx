@@ -1,6 +1,7 @@
 import { usePaymentConfirmViewModel } from "@/core/viewmodels/usePaymentFlowViewModel";
 import { PageBar } from "../layout/PageBar";
 import { Icon } from "../primitives/Icon";
+import { PinField } from "../primitives/PinField";
 import { StateBlock } from "../primitives/StateBlock";
 
 export function PaymentConfirmScreen() {
@@ -27,18 +28,7 @@ export function PaymentConfirmScreen() {
             <p>{vm.intro}</p>
           </section>
 
-          <label className="pin-field">
-            <span className="field-label">Transaction PIN</span>
-            <input
-              type="password"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder={"•".repeat(vm.pinLength)}
-              aria-label="Transaction PIN"
-              value={vm.pin}
-              onChange={(event) => vm.setPin(event.target.value)}
-            />
-          </label>
+          <PinField label="Transaction PIN" value={vm.pin} onChange={vm.setPin} digits={vm.pinLength} secret />
 
           {vm.error && (
             <p className="transfer-error" role="alert">

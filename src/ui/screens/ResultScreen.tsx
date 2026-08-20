@@ -4,7 +4,7 @@ import { Trait } from "../primitives/Trait";
 import { useResultViewModel } from "@/core/viewmodels/useOnboardingViewModel";
 
 export function ResultScreen() {
-  const { continue: proceed, close } = useResultViewModel();
+  const { styleName, continue: proceed, close } = useResultViewModel();
 
   return (
     <div className="onboarding-page result-page">
@@ -17,7 +17,7 @@ export function ResultScreen() {
 
       <section className="result-content">
         <p className="eyebrow">Meet your money style</p>
-        <h1>The Free Spirit</h1>
+        <h1>{styleName}</h1>
         <p className="result-label">Spender profile</p>
 
         <div className="wallet-character" aria-hidden="true">

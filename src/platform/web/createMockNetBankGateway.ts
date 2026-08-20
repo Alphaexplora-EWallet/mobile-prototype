@@ -25,6 +25,7 @@ import {
 import type { Biller } from "@/core/domain/payments";
 import type { Bank } from "@/core/domain/rails";
 import type { ConfirmationToken, DeviceSession, OtpChallenge, OtpPurpose } from "@/core/domain/security";
+import type { AuthSession, SessionToken } from "@/core/domain/session";
 import { NO_CONFIRMATION_REQUIRED } from "@/core/domain/security";
 import { MOCK_ACCOUNTS, MOCK_QR_INSTRUCTIONS, MOCK_VIRTUAL_ACCOUNT } from "@/core/data/mock/accounts.mock";
 import { MOCK_BANKS, RAIL_PRICING } from "@/core/data/mock/banks.mock";
@@ -32,23 +33,35 @@ import { MOCK_CARDS } from "@/core/data/mock/cards.mock";
 import { INITIAL_KYC_STATUS, limitsForTier, MOCK_STATEMENTS } from "@/core/data/mock/compliance.mock";
 import { MOCK_BILLERS, MOCK_RECIPIENTS, MOCK_TRANSACTIONS } from "@/core/data/mock/payments.mock";
 import {
+  MOCK_MPIN,
   MOCK_OTP_CODE,
   MOCK_OTP_DESTINATION,
   MOCK_SESSIONS,
   MOCK_TRANSACTION_PIN,
+  MPIN_ATTEMPT_LIMIT,
 } from "@/core/data/mock/security.mock";
+import { MOCK_USER } from "@/core/data/mock/user.mock";
+import { pinIssue, pinIssueMessage } from "@/core/domain/pin";
+import { monthIdOf, monthLabel } from "@/core/domain/spendingInsights";
 import { formatMoney } from "@/core/money/format";
-import { isValidMobileNumber } from "@/core/domain/mobile";
+import {
+  isValidMobileNumber,
+  maskMobileNumber as maskNationalMobile,
+  mobileNumberFormatMessage,
+  toNationalMobile,
+} from "@/core/domain/mobile";
 import { addMoney, compareMoney, type Money, money, pesos, subtractMoney } from "@/core/money/money";
 import { maskMobileNumber } from "@/core/domain/load";
 import type {
   AccountNameResult,
   AccountsPort,
+  AuthPort,
   ActivityPort,
   BankingGateway,
   BillAccountResult,
   CompliancePort,
   DirectoryPort,
+  MobileLookupResult,
   MobileNameResult,
   JarState,
   PaymentsPort,
@@ -78,6 +91,13 @@ export type MockGatewayCall =
   | "compliance.kycStatus"
   | "compliance.submitKyc"
   | "compliance.limits"
+  | "auth.lookupMobile"
+  | "auth.startSignUp"
+  | "auth.completeSignUp"
+  | "auth.signIn"
+  | "auth.resetPin"
+  | "auth.signOut"
+  | "auth.resume"
   | "security.requestOtp"
   | "security.verifyOtp"
   | "security.verifyPin"
@@ -115,6 +135,12 @@ export type MockGatewayOptions = {
    * the same timeline ("Today, 8:23 AM" → 2026-08-11).
    */
   todayIso?: string;
+  /**
+   * Seeds an already-established session, so the "reload keeps you signed in"
+   * path is reachable: `auth.resume` accepts this token and no other. Pass
+   * `null` (the default) for a gateway nobody is signed into yet.
+   */
+  session?: AuthSession | null;
 };
 
 /**
@@ -162,7 +188,6 @@ const REFERENCE_PREFIX: Readonly<Record<PaymentIntent["kind"], string>> = {
   bill: "NBK-BIL",
   qr: "NBK-QRP",
   buyload: "NBK-LOD",
-  request: "NBK-RQS",
   "jar-in": "NBK-JIN",
   "jar-out": "NBK-JOT",
 };
@@ -174,7 +199,6 @@ const RECEIPT_GLYPH: Readonly<Record<PaymentIntent["kind"], string>> = {
   bill: "⚡",
   qr: "◫",
   buyload: "☎",
-  request: "↙",
   "jar-in": "↓",
   "jar-out": "↑",
 };
@@ -206,7 +230,6 @@ const nonRailArrivalLabel = (intent: PaymentIntent): string => {
   if (intent.kind === "cash-in") return intent.method.arrivalLabel;
   if (intent.kind === "bill") return "Posted to the biller within one banking day";
   if (intent.kind === "buyload") return "Credited to the number instantly";
-  if (intent.kind === "request") return "Credited to your wallet instantly";
   if (intent.kind === "jar-in" || intent.kind === "jar-out") return "Moved instantly";
   return "Paid instantly";
 };
@@ -225,8 +248,6 @@ const receiptName = (intent: PaymentIntent): string => {
       return `Withdrawn to ${intent.account.name}`;
     case "buyload":
       return `Bought ${intent.operator.name} load`;
-    case "request":
-      return `Received from ${intent.payer.name}`;
     case "jar-in":
     case "jar-out":
       return JAR_LABEL;
@@ -248,8 +269,6 @@ const receiptDescription = (intent: PaymentIntent): string => {
     case "buyload":
       // The number is masked even inside the receipt copy; it never renders raw.
       return `${intent.operator.name} load for ${maskMobileNumber(intent.phoneNumber)}.`;
-    case "request":
-      return intent.note.trim() || `Payment for your money request from ${intent.payer.name}.`;
     case "jar-in":
       return `Moved into the ${JAR_LABEL}.`;
     case "jar-out":
@@ -268,6 +287,30 @@ const receiptDescription = (intent: PaymentIntent): string => {
 /** The simulated "now" the seed fixtures' "Today"/"Yesterday" labels point at. */
 const DEFAULT_TODAY_ISO = "2026-08-11";
 
+/**
+ * The seeded account's key. `MOCK_USER.mobile` is stored in display form
+ * (`"+63 917 555 2288"`), which is not a key — fold it once, here, rather than
+ * at every call site.
+ */
+const MOCK_USER_MOBILE = toNationalMobile(MOCK_USER.mobile);
+
+/** `"09175552288"` -> `"0917 555 2288"`, the display form a new account gets. */
+/** Shown once the attempt counter is spent, and by the screen that offers a reset. */
+const LOCKOUT_MESSAGE = "Too many wrong attempts. Reset your MPIN to continue.";
+
+const displayMobile = (national: string): string =>
+  `${national.slice(0, 4)} ${national.slice(4, 7)} ${national.slice(7)}`;
+
+/** One row of the mock account directory: what signing in has to check against. */
+type MockAccount = {
+  /** National form, and the map key. */
+  mobile: string;
+  fullName: string;
+  pin: string;
+  displayMobile: string;
+  memberSinceLabel: string;
+};
+
 export function createMockNetBankGateway(options: MockGatewayOptions = {}): BankingGateway {
   const {
     latencyMs = 0,
@@ -277,6 +320,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
     settleAfterPolls = 2,
     seedActivity: seed = undefined,
     todayIso = DEFAULT_TODAY_ISO,
+    session: seededSession = null,
   } = options;
 
   let activityLog: BankingTransaction[] = seed ? [...seed] : seedActivity();
@@ -299,6 +343,32 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
   const submitted = new Map<string, PaymentReceipt>();
   const issuedTokens = new Set<ConfirmationToken>();
   const pollCounts = new Map<string, number>();
+
+  /**
+   * The account directory, keyed by national mobile. One entry to start with —
+   * the seeded user — because a prototype nobody can sign in to is not a
+   * prototype. `completeSignUp` adds to it, so a number registered in one
+   * session can then sign in during the same one.
+   */
+  const accountsByMobile = new Map<string, MockAccount>([
+    [
+      MOCK_USER_MOBILE,
+      {
+        mobile: MOCK_USER_MOBILE,
+        fullName: MOCK_USER.fullName,
+        pin: MOCK_MPIN,
+        // The display form stays exactly as the fixture writes it, so Profile
+        // and Personal details keep rendering the string they always have.
+        displayMobile: MOCK_USER.mobile,
+        memberSinceLabel: MOCK_USER.memberSinceLabel,
+      },
+    ],
+  ]);
+  /** Live session tokens. The seeded one is what makes `resume` succeed. */
+  const liveSessions = new Map<SessionToken, AuthSession>(seededSession ? [[seededSession.token, seededSession]] : []);
+  let sessionCounter = liveSessions.size;
+  /** Wrong-MPIN attempts per number, so a lockout survives leaving the screen. */
+  const failedPinAttempts = new Map<string, number>();
 
   const settle = <T>(call: MockGatewayCall, produce: () => GatewayResult<T>): Promise<GatewayResult<T>> => {
     const forced = failures[call];
@@ -372,7 +442,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
       }
     }
 
-    if (intent.kind !== "cash-in" && intent.kind !== "request" && intent.kind !== "jar-out") {
+    if (intent.kind !== "cash-in" && intent.kind !== "jar-out") {
       const available = balances[intent.sourceCardId];
       if (available && compareMoney(quote.total, available) > 0) {
         return failed(
@@ -561,13 +631,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
           description: receiptDescription(intent),
           sourceLabel,
           recipient:
-            intent.kind === "transfer"
-              ? intent.recipient
-              : intent.kind === "cash-out"
-                ? intent.account
-                : intent.kind === "request"
-                  ? intent.payer
-                  : undefined,
+            intent.kind === "transfer" ? intent.recipient : intent.kind === "cash-out" ? intent.account : undefined,
           fee: quote.fee,
           rail: quote.rail ?? undefined,
           arrivalLabel: quote.arrivalLabel,
@@ -671,6 +735,173 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
     },
   };
 
+  const createSession = (account: MockAccount): AuthSession => {
+    sessionCounter += 1;
+    const authSession: AuthSession = {
+      token: `sess-${sessionCounter}`,
+      user: {
+        ...MOCK_USER,
+        fullName: account.fullName,
+        mobile: account.displayMobile,
+        memberSinceLabel: account.memberSinceLabel,
+      },
+      deviceName: MOCK_SESSIONS[0].deviceName,
+    };
+    liveSessions.set(authSession.token, authSession);
+    failedPinAttempts.delete(account.mobile);
+    return authSession;
+  };
+
+  /**
+   * Every auth call starts here, because a number that is not a number cannot be
+   * a key, a destination, or a lookup. Returns the folded form on success so no
+   * caller has to remember to fold it twice.
+   */
+  const asAccountKey = (mobile: string): GatewayResult<string> => {
+    const national = toNationalMobile(mobile);
+    return isValidMobileNumber(national) ? ok(national) : failed("invalid-account", mobileNumberFormatMessage());
+  };
+
+  /** Spends the OTP token, so one code cannot register two accounts. */
+  const spendConfirmation = (confirmation: ConfirmationToken): GatewayResult<null> => {
+    if (!issuedTokens.has(confirmation)) {
+      return failed("confirmation-required", "That code has expired. Ask for a new one.");
+    }
+    issuedTokens.delete(confirmation);
+    return ok(null);
+  };
+
+  const auth: AuthPort = {
+    async lookupMobile(mobile) {
+      return settle<MobileLookupResult>("auth.lookupMobile", () => {
+        const key = asAccountKey(mobile);
+        if (!key.ok) return key;
+        return ok({
+          registered: accountsByMobile.has(key.value),
+          /**
+           * Returned whether or not the number is registered. A response whose
+           * *shape* differs between the two cases discloses which numbers have
+           * accounts just as plainly as saying so would.
+           */
+          maskedDestination: maskNationalMobile(key.value),
+        });
+      });
+    },
+
+    async startSignUp(mobile) {
+      return settle<OtpChallenge>("auth.startSignUp", () => {
+        const key = asAccountKey(mobile);
+        if (!key.ok) return key;
+        if (accountsByMobile.has(key.value)) {
+          return failed("duplicate-request", "That number already has a FIN-A wallet. Sign in instead.");
+        }
+        return ok({
+          maskedDestination: maskNationalMobile(key.value),
+          expiresInLabel: "Expires in 5 minutes",
+          digits: 6,
+        });
+      });
+    },
+
+    async completeSignUp({ mobile, fullName, pin, confirmation }) {
+      return settle<AuthSession>("auth.completeSignUp", () => {
+        const key = asAccountKey(mobile);
+        if (!key.ok) return key;
+        if (accountsByMobile.has(key.value)) {
+          return failed("duplicate-request", "That number already has a FIN-A wallet. Sign in instead.");
+        }
+        const name = fullName.trim();
+        if (name.length < 2) return failed("invalid-account", "Enter the full name on your ID.");
+        /**
+         * The adapter re-checks the MPIN rules the screen already checked.
+         * Neither side trusts the other — the same reason the mobile rules live
+         * in the domain rather than in the screen.
+         */
+        const weak = pinIssue(pin);
+        if (weak) return failed("invalid-account", pinIssueMessage(weak));
+        const spent = spendConfirmation(confirmation);
+        if (!spent.ok) return spent;
+
+        const account: MockAccount = {
+          mobile: key.value,
+          fullName: name,
+          pin,
+          displayMobile: displayMobile(key.value),
+          memberSinceLabel: `Member since ${monthLabel(monthIdOf(todayIso))}`,
+        };
+        accountsByMobile.set(account.mobile, account);
+        return ok(createSession(account));
+      });
+    },
+
+    async signIn({ mobile, pin }) {
+      return settle<AuthSession>("auth.signIn", () => {
+        const key = asAccountKey(mobile);
+        if (!key.ok) return key;
+        const account = accountsByMobile.get(key.value);
+        /**
+         * Sign-in does say when a number has no wallet, unlike the MPIN reset.
+         * The trade is deliberate and it is the one every wallet makes: someone
+         * mistyping their own number needs to be told, and the number is already
+         * something a stranger would have to guess in full.
+         */
+        if (!account) return failed("not-found", "No FIN-A wallet uses that number yet.");
+
+        const attempts = failedPinAttempts.get(key.value) ?? 0;
+        if (attempts >= MPIN_ATTEMPT_LIMIT) {
+          return failed("limit-exceeded", LOCKOUT_MESSAGE);
+        }
+        if (pin !== account.pin) {
+          const used = attempts + 1;
+          failedPinAttempts.set(key.value, used);
+          const left = MPIN_ATTEMPT_LIMIT - used;
+          return failed(
+            "invalid-account",
+            left > 0 ? `That MPIN is not right. ${left} ${left === 1 ? "try" : "tries"} left.` : LOCKOUT_MESSAGE,
+          );
+        }
+        return ok(createSession(account));
+      });
+    },
+
+    async resetPin({ mobile, pin, confirmation }) {
+      return settle<AuthSession>("auth.resetPin", () => {
+        const key = asAccountKey(mobile);
+        if (!key.ok) return key;
+        const weak = pinIssue(pin);
+        if (weak) return failed("invalid-account", pinIssueMessage(weak));
+        const spent = spendConfirmation(confirmation);
+        if (!spent.ok) return spent;
+        const account = accountsByMobile.get(key.value);
+        /**
+         * Reaching here means the code that was sent to this number came back,
+         * so naming the outcome discloses nothing new. The non-disclosure that
+         * matters happens earlier, when a code is *requested* for any number.
+         */
+        if (!account) return failed("not-found", "No FIN-A wallet uses that number yet.");
+        const updated: MockAccount = { ...account, pin };
+        accountsByMobile.set(updated.mobile, updated);
+        return ok(createSession(updated));
+      });
+    },
+
+    async signOut() {
+      return settle<null>("auth.signOut", () => {
+        // One device in the mock, so ending this session ends all of them.
+        liveSessions.clear();
+        return ok(null);
+      });
+    },
+
+    async resume(token) {
+      return settle<AuthSession>("auth.resume", () => {
+        const existing = liveSessions.get(token);
+        if (!existing) return failed("not-found", "Your session has expired. Sign in again.");
+        return ok(existing);
+      });
+    },
+  };
+
   const security: SecurityPort = {
     async requestOtp(_purpose: OtpPurpose) {
       return settle<OtpChallenge>("security.requestOtp", () =>
@@ -710,6 +941,7 @@ export function createMockNetBankGateway(options: MockGatewayOptions = {}): Bank
   };
 
   return {
+    auth,
     accounts,
     activity,
     directory,

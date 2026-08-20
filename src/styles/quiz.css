@@ -44,7 +44,7 @@
   top: 24px;
   width: 150px;
   height: 74px;
-  border-top: 3px dotted rgba(8, 126, 121, 0.42);
+  border-top: 3px dotted rgba(10, 111, 184, 0.42);
   border-radius: 50%;
   transform: rotate(-8deg);
 }
@@ -81,7 +81,8 @@
   border: 1px solid var(--line);
   border-radius: 18px;
   text-align: left;
-  background: rgba(255, 253, 248, 0.7);
+  background: var(--surface);
+  box-shadow: var(--shadow-surface);
   font-size: 17px;
   line-height: 1.25;
   font-weight: 700;
@@ -90,7 +91,7 @@
 .answer-option.is-selected {
   border-color: var(--teal);
   background: var(--teal-soft);
-  box-shadow: inset 0 0 0 1px rgba(8, 126, 121, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(10, 111, 184, 0.2);
 }
 .answer-icon,
 .answer-check {

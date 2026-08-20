@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { createMockNetBankGateway } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
+import { renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen, within } from "@testing-library/react";
 
 /**
  * The simulated action sheet is the app's only modal dialog, and it is also
@@ -13,25 +10,10 @@ import App from "../App";
  * is tested as behaviour, not assumed.
  */
 
-const start = () => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway()}>
-      <App />
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const click = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
+const click = async (user: TestUser, name: RegExp | string) => user.click(screen.getByRole("button", { name }));
 
 /** Onboards and pays a transfer so the receipt screen with "Share receipt" is visible. */
-const openReceipt = async (user: ReturnType<typeof userEvent.setup>) => {
-  await click(user, /Start my journey/i);
-  await click(user, /^Continue$/);
-  await click(user, /Build my plan/i);
-
+const openReceipt = async (user: TestUser) => {
   await click(user, /^Send$/);
   // Step 1 "Send to": the default recipient is already selected.
   await click(user, /^Continue$/);

@@ -1,35 +1,203 @@
-/* QR PH: the scan screen and the code you show to be paid. */
-
-.viewfinder {
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-  margin: 10px 0 22px;
-  padding: 26px 20px;
-  border: 1.5px dashed var(--line);
-  border-radius: 24px;
-  text-align: center;
-  background: var(--cream-deep);
+/* Camera Viewfinder Hero Stage */
+.camera-viewfinder-stage {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 290px;
+  margin: 6px 0 20px;
+  border-radius: 28px;
+  background: radial-gradient(circle at 50% 35%, #1e293b 0%, #0f172a 65%, #020617 100%);
+  color: #ffffff;
+  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.5);
+  box-sizing: border-box;
 }
-.viewfinder-frame {
+
+/* Animated Laser Beam in Viewfinder */
+.camera-laser-beam {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #38bdf8 20%, #ffffff 50%, #38bdf8 80%, transparent);
+  box-shadow:
+    0 0 12px 2px rgba(56, 189, 248, 0.85),
+    0 0 24px 4px rgba(56, 189, 248, 0.45);
+  border-radius: 9999px;
+  animation: cameraLaser 2.4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes cameraLaser {
+  0%,
+  100% {
+    top: 18%;
+    opacity: 0.2;
+  }
+  50% {
+    top: 70%;
+    opacity: 0.95;
+  }
+}
+
+/* Central Illuminated Reticle Frame */
+.camera-reticle-frame {
+  position: relative;
+  width: 140px;
+  height: 140px;
   display: grid;
   place-items: center;
-  width: 84px;
-  height: 84px;
-  border: 2px solid var(--teal);
-  border-radius: 20px;
-  color: var(--teal);
-  background: var(--cream);
+  margin-bottom: 12px;
+  z-index: 1;
 }
-.viewfinder-frame svg {
-  width: 38px;
-  height: 38px;
+
+.reticle-corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border: 4px solid #ffffff;
 }
-.viewfinder p {
+.reticle-corner.top-left {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+  border-top-left-radius: 16px;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+}
+.reticle-corner.top-right {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+  border-top-right-radius: 16px;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+}
+.reticle-corner.bottom-left {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+  border-bottom-left-radius: 16px;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+}
+.reticle-corner.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+  border-bottom-right-radius: 16px;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+}
+
+.camera-qr-glyph {
+  width: 52px;
+  height: 52px;
+  color: rgba(255, 255, 255, 0.65);
+}
+.camera-qr-glyph svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
+}
+
+.camera-viewfinder-caption {
+  position: absolute;
+  bottom: 14px;
   margin: 0;
-  color: var(--muted);
   font-size: 12px;
-  line-height: 1.5;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: -0.01em;
+  z-index: 1;
+}
+
+/* Sandbox Quick Scan Section */
+.sandbox-quick-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.sandbox-quick-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.sandbox-chips-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.sandbox-chip-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+.sandbox-chip-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--teal);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+.sandbox-chip-btn:active {
+  transform: translateY(0);
+}
+.chip-icon-wrap {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--teal-soft);
+  color: var(--teal);
+  flex-shrink: 0;
+}
+.chip-icon-wrap svg {
+  width: 18px;
+  height: 18px;
+}
+.chip-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.chip-content strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chip-content small {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Manual Paste Box */
+.scan-manual-paste-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .decoded-code {

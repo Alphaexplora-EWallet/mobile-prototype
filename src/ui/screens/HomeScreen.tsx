@@ -1,13 +1,15 @@
 import { Fragment } from "react";
 import { useHomeViewModel } from "@/core/viewmodels/useHomeViewModel";
+import { HomeSkyline } from "../assets/HomeSkyline";
 import { BrandMark } from "../layout/BrandMark";
 import { Icon } from "../primitives/Icon";
 import { QuickAction } from "../primitives/QuickAction";
 import { TransactionRow } from "../money/TransactionRow";
+import { CashFlowRing } from "../money/CashFlowRing";
 
 export function HomeScreen() {
   const vm = useHomeViewModel();
-  const { balance, quest, styleProgress } = vm;
+  const { balance, quest, cashFlow } = vm;
 
   return (
     <div className="tab-page home-page">
@@ -24,6 +26,14 @@ export function HomeScreen() {
           >
             <Icon name="contrast" />
           </button>
+          <button
+            className="bell-button"
+            type="button"
+            aria-label="Open notifications"
+            onClick={() => vm.goTo("notifications")}
+          >
+            <Icon name="bell" />
+          </button>
           <button className="avatar-button" type="button" aria-label="Open profile" onClick={vm.openProfile}>
             <Icon name="user" />
           </button>
@@ -31,14 +41,27 @@ export function HomeScreen() {
       </header>
 
       <section className="home-wallet-block">
+        <HomeSkyline />
         <div className="home-balance-heading">
-          <span>{balance.heading}</span>
-          <div>
-            <strong aria-live="polite">{balance.label}</strong>
-            <button type="button" onClick={vm.toggleBalance} aria-label={balance.toggleLabel}>
+          <div className="home-balance-title-row">
+            <span>{balance.heading}</span>
+            <button
+              type="button"
+              className="balance-eye-btn"
+              onClick={vm.toggleBalance}
+              aria-label={balance.toggleLabel}
+            >
               <Icon name={balance.visible ? "eye" : "eye-off"} />
             </button>
           </div>
+          <strong aria-live="polite">{balance.label}</strong>
+          {balance.delta && (
+            <div className="home-balance-delta">
+              <span className={`trend-pill ${balance.delta.direction === "up" ? "positive" : "negative"}`}>
+                {balance.delta.label}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="quick-actions home-card-actions">
@@ -53,23 +76,47 @@ export function HomeScreen() {
         </div>
       </section>
 
-      <section className="home-section">
-        <h2>Today's goal</h2>
-        <button className="quest-card" type="button" onClick={vm.pressQuest}>
+      <section className="home-section goal-section">
+        <button className="quest-card" type="button" onClick={vm.pressQuest} aria-label="View goal details">
+          <svg className="quest-card-bg" viewBox="0 0 340 180" aria-hidden="true" preserveAspectRatio="none">
+            {/* Mountains background */}
+            <path d="M160 180 L240 65 L320 180 Z" fill="#1d6fdc" opacity="0.85" />
+            <path d="M190 180 L260 40 L340 180 Z" fill="#1558b8" opacity="0.9" />
+            {/* Summit Flag */}
+            <line x1="260" y1="40" x2="260" y2="22" stroke="#ffffff" strokeWidth="1.5" />
+            <polygon points="260,22 274,28 260,34" fill="#fbbf24" />
+            {/* Winding Trail */}
+            <path
+              d="M170 180 C200 160, 240 145, 230 115 C220 90, 255 70, 260 42"
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth="5"
+              strokeLinecap="round"
+              opacity="0.8"
+            />
+            {/* Soft Clouds */}
+            <ellipse cx="210" cy="75" rx="20" ry="6" fill="#ffffff" opacity="0.2" />
+            <ellipse cx="305" cy="80" rx="16" ry="5" fill="#ffffff" opacity="0.2" />
+          </svg>
+
           <span className="quest-card-content">
             <span className="quest-heading">
               <span className="quest-icon">
                 <Icon name="target" />
               </span>
-              <strong>
-                {quest.titleLines.map((line, index) => (
-                  <Fragment key={line}>
-                    {index > 0 && <br />}
-                    {line}
-                  </Fragment>
-                ))}
-              </strong>
+              <span className="quest-title-block">
+                <small className="quest-eyebrow">Today's goal</small>
+                <strong>
+                  {quest.titleLines.map((line, index) => (
+                    <Fragment key={line}>
+                      {index > 0 && <br />}
+                      {line}
+                    </Fragment>
+                  ))}
+                </strong>
+              </span>
             </span>
+
             <span className="quest-spend">{quest.spendLabel}</span>
             <span className="progress-track quest-progress">
               <span style={{ width: `${quest.progressPercent}%` }} />
@@ -78,32 +125,87 @@ export function HomeScreen() {
               <span>
                 <Icon name="clock" /> {quest.hoursLeftLabel}
               </span>
-              <span className="mini-cta">View goal details</span>
+              <span className="quest-cta-pill">
+                View goal details <Icon name="chevron-right" />
+              </span>
             </span>
           </span>
         </button>
       </section>
 
-      <section className="style-progress">
-        <span className="style-avatar">☀</span>
-        <span className="style-copy">
-          <strong>{styleProgress.title}</strong>
-          <span className="progress-track">
-            <span style={{ width: `${styleProgress.percent}%` }} />
-          </span>
-        </span>
-        <span className="mini-ring">{styleProgress.percentLabel}</span>
+      {cashFlow && (
+        <section className="home-cashflow-card">
+          <div className="cashflow-header">
+            <h2>Cash flow</h2>
+            {/* The period is whatever the newest statement covers. This was a
+                dropdown with no handler, promising a picker that never existed. */}
+            <span className="cashflow-period">{cashFlow.periodLabel}</span>
+          </div>
+          <div className="cashflow-body">
+            <div className="cashflow-stats">
+              <div className="cashflow-stat-col">
+                <span className="cashflow-label">
+                  <span className="dot dot-income" /> Income
+                </span>
+                <strong className="cashflow-amount">{cashFlow.incomeLabel}</strong>
+                {cashFlow.incomeChange && (
+                  <span
+                    className={`trend-pill ${cashFlow.incomeChange.direction === "down" ? "negative" : "positive"}`}
+                  >
+                    {cashFlow.incomeChange.label}
+                  </span>
+                )}
+              </div>
+
+              <div className="cashflow-stat-col">
+                <span className="cashflow-label">
+                  <span className="dot dot-expenses" /> Expenses
+                </span>
+                <strong className="cashflow-amount">{cashFlow.expensesLabel}</strong>
+                {cashFlow.expensesChange && (
+                  <span
+                    className={`trend-pill ${cashFlow.expensesChange.direction === "down" ? "positive" : "negative"}`}
+                  >
+                    {cashFlow.expensesChange.label}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="cashflow-donut-container">
+              <CashFlowRing
+                incomePercent={cashFlow.incomeSharePercent}
+                expensePercent={cashFlow.expenseSharePercent}
+                label={`Income ${cashFlow.incomeSharePercent}%, expenses ${cashFlow.expenseSharePercent}%`}
+              />
+            </div>
+          </div>
+
+          <button type="button" className="cashflow-breakdown-btn" onClick={vm.openInsights}>
+            See the full breakdown <Icon name="chevron-right" />
+          </button>
+        </section>
+      )}
+
+      <section className="home-tip-card">
+        <div className="tip-icon-badge">
+          <Icon name="bulb" />
+        </div>
+        <div className="tip-content">
+          <strong>Tip for you</strong>
+          <p>You're on track! Keep going to reach your goals faster.</p>
+        </div>
       </section>
 
       <section className="home-section transactions-section">
         <div className="home-section-heading">
           <h2>Recent transactions</h2>
-          <button type="button" onClick={vm.goToActivity}>
-            View all
+          <button type="button" onClick={vm.goToActivity} aria-label="View all">
+            See all
           </button>
         </div>
         <div className="transaction-list">
-          {vm.transactions.map((transaction) => (
+          {vm.transactions.slice(0, 2).map((transaction) => (
             <TransactionRow
               key={transaction.id}
               row={transaction}

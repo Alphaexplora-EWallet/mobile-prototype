@@ -186,7 +186,8 @@ CREATE TABLE identity.users (
 CREATE TABLE identity.otp_challenges (
   id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id             UUID NOT NULL,
-  purpose             TEXT NOT NULL,                       -- sign-in | payment | password-reset | device-binding
+  purpose             TEXT NOT NULL,                       -- sign-up | sign-in | payment | password-reset
+                                                           -- | device-binding | profile-change
   masked_destination  TEXT NOT NULL,                       -- "0917 ••• 2288"
   code_hash           TEXT NOT NULL,                       -- never the plaintext code
   expires_at          TIMESTAMPTZ NOT NULL,
@@ -526,6 +527,9 @@ for server-to-server calls, short-lived user tokens for app calls.
 | `payments.createInboundQr` / `decodeQr`         | QR PH codes                                | QRPH generation / decode                                                                                                       |
 | `payments.openJar` / `jarState`                 | Savings jar lifecycle                      | A2A moves to/from a separate balance (GAP-07); the jar's balance is the bank's answer, cached in `wallet.store.jar`            |
 | `compliance.kycStatus` / `submitKyc` / `limits` | Tier + limits                              | KYC/onboarding API; limits computed server-side                                                                                |
+| `auth.lookupMobile` / `startSignUp`             | Is this number taken; send its code        | Local `identity.users` lookup + the OTP provider below                                                                         |
+| `auth.completeSignUp` / `signIn` / `resetPin`   | Create, open and recover a session         | Local `identity.users` (`pin_hash`, argon2id) + `identity.device_sessions`; issues the short-lived user token from §10         |
+| `auth.resume` / `signOut`                       | Restore or end a session from its token    | Local `identity.device_sessions`; `signOut` emits the `session.revoked` outbox event                                           |
 | `security.requestOtp` / `verifyOtp`             | OTP challenge                              | Own OTP provider or NetBank (see §10)                                                                                          |
 | `security.verifyPin`                            | Transaction PIN                            | **Local only** — the PIN never leaves FIN-A                                                                                    |
 | `security.sessions` / `revokeSession`           | Device sessions                            | Local `device_sessions` table                                                                                                  |

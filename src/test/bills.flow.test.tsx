@@ -1,41 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { createMockNetBankGateway } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen, within } from "@testing-library/react";
 
 /**
- * Bills and autopay. The four biller rows and two scheduled rows on the Pay tab
+ * Bills and autopay. The four biller rows and two scheduled rows on bill-entry
  * all opened the same simulated sheet; now they validate an account with the
  * biller, pay through the pipeline, and let a schedule be paused or cancelled.
  */
 
-const start = () => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway()}>
-      <App />
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
-const openPayTab = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
-  const nav = screen.getByRole("navigation", { name: /primary navigation/i });
-  await user.click(within(nav).getByRole("button", { name: /^Pay$/ }));
+const openBillers = async (user: TestUser) => {
+  // Scan is a Home quick action now; the Pay tab it replaced offered the same
+  // four actions Home already had, and Activity has the tab slot.
+  await press(user, /^Scan$/);
+  await press(user, /Payment options/i);
+  await press(user, /Pay a bill/i);
 };
 
 describe("bill payment flow", () => {
   it("validates the account and prefills what is due", async () => {
     const user = start();
-    await openPayTab(user);
+    await openBillers(user);
     // Scoped by the detail line: "Meralco" is also a scheduled-payment row.
     await press(user, /MeralcoElectricity/i);
 
@@ -55,7 +39,7 @@ describe("bill payment flow", () => {
 
   it("pays a bill through the pipeline", async () => {
     const user = start();
-    await openPayTab(user);
+    await openBillers(user);
     await press(user, /ConvergeHome internet/i);
 
     await user.type(screen.getByRole("textbox", { name: /Biller account number/i }), "8830012245");
@@ -79,7 +63,7 @@ describe("bill payment flow", () => {
 
   it("rejects a too-short biller account number", async () => {
     const user = start();
-    await openPayTab(user);
+    await openBillers(user);
     await press(user, /LandlordMonthly rent/i);
 
     await user.type(screen.getByRole("textbox", { name: /Biller account number/i }), "123");
@@ -90,9 +74,9 @@ describe("bill payment flow", () => {
 });
 
 describe("autopay management", () => {
-  it("pauses a schedule and the Pay tab remembers", async () => {
+  it("pauses a schedule and bill-entry remembers", async () => {
     const user = start();
-    await openPayTab(user);
+    await openBillers(user);
 
     await press(user, /Meralco.*Autopay · Aug 18/i);
     expect(await screen.findByRole("heading", { name: "Meralco" })).toBeTruthy();
@@ -102,14 +86,14 @@ describe("autopay management", () => {
     expect(await screen.findByText("Paused")).toBeTruthy();
     expect(screen.getByText(/will not run/i)).toBeTruthy();
 
-    // Back on the Pay tab the row says so, and it survives leaving the screen.
+    // Back on bill-entry the row says so, and it survives leaving the screen.
     await press(user, /Back to home/i);
     expect(await screen.findByText(/Paused · Aug 18/i)).toBeTruthy();
   });
 
   it("resumes a paused schedule", async () => {
     const user = start();
-    await openPayTab(user);
+    await openBillers(user);
     await press(user, /Converge.*Autopay · Aug 22/i);
 
     await press(user, /Pause autopay/i);
@@ -121,7 +105,7 @@ describe("autopay management", () => {
 
   it("cancels a schedule and removes it from the list", async () => {
     const user = start();
-    await openPayTab(user);
+    await openBillers(user);
     const scheduledConverge = /Converge.*Autopay · Aug 22/i;
     expect(screen.getByRole("button", { name: scheduledConverge })).toBeTruthy();
 

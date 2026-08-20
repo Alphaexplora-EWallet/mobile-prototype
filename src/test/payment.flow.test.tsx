@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen, within } from "@testing-library/react";
 import { MOCK_TRANSACTION_PIN } from "@/core/data/mock/security.mock";
-import { createMockNetBankGateway, type MockGatewayOptions } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
 
 /**
  * The interbank send flow, which had no screens at all: choosing a bank, an
@@ -16,24 +13,8 @@ import App from "../App";
  * pre-restructure app and must not grow.
  */
 
-const start = (options: MockGatewayOptions = {}) => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway(options)}>
-      <App />
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
 /** Onboards to Home, opens Send, and continues past Step 1 with an amount typed in. */
-const openTransfer = async (user: ReturnType<typeof userEvent.setup>, amount: string) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
+const openTransfer = async (user: TestUser, amount: string) => {
   await press(user, /^Send$/);
   // Step 1 "Send to": the default recipient is already selected.
   await press(user, /^Continue$/);
@@ -41,10 +22,7 @@ const openTransfer = async (user: ReturnType<typeof userEvent.setup>, amount: st
 };
 
 /** Onboards to Home and opens Send, stopping at Step 1 "Send to". */
-const openSendStep1 = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
+const openSendStep1 = async (user: TestUser) => {
   await press(user, /^Send$/);
 };
 
@@ -54,7 +32,7 @@ const openSendStep1 = async (user: ReturnType<typeof userEvent.setup>) => {
  * `transfer.store.ts` value the Step 2 field would edit, just entered before
  * ever reaching Step 2, since "add a new recipient" branches off Step 1.
  */
-const openBankDestination = async (user: ReturnType<typeof userEvent.setup>, amount: string, accountNumber: string) => {
+const openBankDestination = async (user: TestUser, amount: string, accountNumber: string) => {
   await openSendStep1(user);
   await press(user, /Add recipient/i);
   await press(user, /Send to a bank account/i);

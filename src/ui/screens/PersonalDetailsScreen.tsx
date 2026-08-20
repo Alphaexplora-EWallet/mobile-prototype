@@ -1,6 +1,7 @@
 import { usePersonalDetailsViewModel } from "@/core/viewmodels/useProfileViewModel";
 import { PageBar } from "../layout/PageBar";
 import { DetailCard } from "../primitives/DetailCard";
+import { PinField } from "../primitives/PinField";
 import { LinkRow } from "../primitives/LinkRow";
 
 export function PersonalDetailsScreen() {
@@ -47,18 +48,7 @@ export function PersonalDetailsScreen() {
             <small>{vm.expiresLabel}</small>
           </section>
 
-          <label className="pin-field">
-            <span className="field-label">One-time code</span>
-            <input
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder={"•".repeat(vm.digits)}
-              aria-label="One-time code"
-              value={vm.code}
-              onChange={(event) => vm.setCode(event.target.value)}
-            />
-          </label>
+          <PinField label="One-time code" value={vm.code} onChange={vm.setCode} digits={vm.digits} />
 
           {vm.error && (
             <p className="transfer-error" role="alert">

@@ -1,43 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { createMockNetBankGateway, type MockGatewayOptions } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import type { MockGatewayOptions } from "@/platform/web/createMockNetBankGateway";
+import { screen, within } from "@testing-library/react";
 
 /**
  * The account layer: settings, verification, limits, statements, notifications,
- * disputes and the auth steps. None of this existed — the app had no settings
+ * disputes. None of this existed — the app had no settings
  * screen at all, and several controls were rendered with no handler.
  */
-
-const start = (options: MockGatewayOptions = {}) => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway(options)}>
-      <App />
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
-const openHome = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
-};
 
 /**
  * Profile is the account hub. It used to hide all of this behind an unlabelled
  * `⋯` button, so every one of these journeys began with a glyph nobody could
  * find; they now begin on a labelled row.
  */
-const openProfile = async (user: ReturnType<typeof userEvent.setup>, options?: MockGatewayOptions) => {
+const openProfile = async (user: TestUser, options?: MockGatewayOptions) => {
   const user2 = options ? start(options) : user;
-  await openHome(user2);
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user2.click(within(nav).getByRole("button", { name: /^Profile$/ }));
   return user2;
@@ -62,10 +40,9 @@ describe("profile hub", () => {
     expect(await screen.findByText(/Verified · one tier left/i)).toBeTruthy();
   });
 
-  it("toggles dark mode from settings rather than only from Home", async () => {
+  it("toggles dark mode from Profile rather than only from Home", async () => {
     const user = start();
     await openProfile(user);
-    await press(user, /SettingsAppearance and privacy/i);
 
     const darkMode = screen.getByRole("switch", { name: /Dark mode/i });
     expect(darkMode).toHaveAttribute("aria-checked", "false");
@@ -92,19 +69,19 @@ describe("sign out", () => {
     await openProfile(user);
 
     // Move a preference off its default so the reset has something to undo.
-    await press(user, /SettingsAppearance and privacy/i);
     await user.click(screen.getByRole("switch", { name: /Show balances/i }));
     expect(screen.getByRole("switch", { name: /Show balances/i })).toHaveAttribute("aria-checked", "false");
-    await press(user, /Back to home/i);
 
     await press(user, /^Sign out$/);
     await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: /^Sign out$/ }));
 
     expect(await screen.findByRole("button", { name: /Start my journey/i })).toBeTruthy();
 
-    // Signing back in finds the balance visible again, not still hidden.
-    await openHome(user);
-    expect(screen.getByText("₱24,680.50")).toBeTruthy();
+    // Signing back in is a real sign-in now, not a walk through onboarding —
+    // and it finds the balance visible again, not still hidden.
+    await press(user, /I already have an account/i);
+    await press(user, /Continue with demo account/i);
+    expect(await screen.findByText("₱24,680.50")).toBeTruthy();
   });
 });
 
@@ -290,7 +267,6 @@ describe("limits and statements", () => {
 
   it("lists statements once fully verified", async () => {
     const user = start({ kycTier: "full" });
-    await openHome(user);
     const nav = screen.getByRole("navigation", { name: /primary navigation/i });
     await user.click(within(nav).getByRole("button", { name: /^Profile$/ }));
     await press(user, /StatementsMonthly summaries/i);
@@ -316,7 +292,6 @@ describe("security settings", () => {
 describe("disputes", () => {
   it("files a dispute against an opened transaction", async () => {
     const user = start();
-    await openHome(user);
     await press(user, /View all/i);
     await press(user, /Daily Brew/i);
 
@@ -335,7 +310,6 @@ describe("disputes", () => {
 describe("activity depth", () => {
   it("filters and searches", async () => {
     const user = start();
-    await openHome(user);
     await press(user, /View all/i);
 
     expect(await screen.findByRole("button", { name: /FreshMart/i })).toBeTruthy();
@@ -352,7 +326,6 @@ describe("activity depth", () => {
 
   it("says when nothing matches rather than looking empty", async () => {
     const user = start();
-    await openHome(user);
     await press(user, /View all/i);
 
     await user.type(screen.getByRole("searchbox", { name: /Search activity/i }), "nothing matches this");
@@ -360,38 +333,15 @@ describe("activity depth", () => {
   });
 });
 
-describe("auth steps", () => {
-  it("sends a reset link without confirming the address exists", async () => {
-    const user = start();
-    await press(user, /I already have an account/i);
-    await press(user, /Forgot password/i);
-
-    await user.type(screen.getByRole("textbox", { name: /Email address/i }), "maya@example.com");
-    await press(user, /Send reset link/i);
-
-    // Deliberately non-committal: it must not disclose who has an account.
-    expect(await screen.findByText(/If maya@example.com has an account/i)).toBeTruthy();
-  });
-
-  it("verifies a one-time code before signing in", async () => {
-    const user = start();
-    await press(user, /I already have an account/i);
-    await press(user, /Continue with demo account/i);
-    expect(await screen.findByText("Recent transactions")).toBeTruthy();
-  });
-});
-
 describe("wired-up dead controls", () => {
   it("opens profile from the home avatar", async () => {
     const user = start();
-    await openHome(user);
     await press(user, /Open profile/i);
     expect(await screen.findByRole("button", { name: /Retake the quiz/i })).toBeTruthy();
   });
 
   it("opens the add-card screen from Wallet", async () => {
     const user = start();
-    await openHome(user);
     const nav = screen.getByRole("navigation", { name: /primary navigation/i });
     await user.click(within(nav).getByRole("button", { name: /^Wallet$/ }));
     await press(user, /Add card/i);
@@ -400,7 +350,6 @@ describe("wired-up dead controls", () => {
 
   it("opens account details from the wallet options button", async () => {
     const user = start();
-    await openHome(user);
     const nav = screen.getByRole("navigation", { name: /primary navigation/i });
     await user.click(within(nav).getByRole("button", { name: /^Wallet$/ }));
     await press(user, /Card options/i);

@@ -2,7 +2,7 @@ import { useLoadEntryViewModel } from "@/core/viewmodels/useLoadEntryViewModel";
 import { PageBar } from "../layout/PageBar";
 import { AmountField } from "../money/AmountField";
 import { Icon } from "../primitives/Icon";
-import { StateBlock } from "../primitives/StateBlock";
+import { LinkRow } from "../primitives/LinkRow";
 
 export function LoadEntryScreen() {
   const vm = useLoadEntryViewModel();
@@ -12,12 +12,20 @@ export function LoadEntryScreen() {
       <PageBar title={vm.title} onBack={vm.back} optionsLabel="Load options" />
 
       {!vm.isReady ? (
-        <StateBlock
-          tone="empty"
-          title="No operator chosen"
-          message="Pick a mobile network from the Pay tab to buy load."
-          action={{ label: "Go back", onPress: vm.back }}
-        />
+        <section className="money-field">
+          <span className="field-label">Choose a mobile network</span>
+          <div className="control-list">
+            {vm.operators.map((operator) => (
+              <LinkRow
+                key={operator.id}
+                icon={operator.icon}
+                title={operator.name}
+                detail={operator.detail}
+                onClick={() => vm.selectOperator(operator.id)}
+              />
+            ))}
+          </div>
+        </section>
       ) : (
         <>
           <section className="biller-hero">

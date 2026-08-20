@@ -1,34 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { createMockNetBankGateway } from "@/platform/web/createMockNetBankGateway";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen, within } from "@testing-library/react";
 import { ONLY_ACCOUNT_BLOCK_MESSAGE } from "@/core/stores/accounts.store";
-import App from "../App";
 
 /**
  * GAP-09 linked bank accounts: the manage screen reached from Settings, with
  * list / add / remove / set-default, and the only-account removal block.
  */
 
-const start = () => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway()}>
-      <App />
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
 /** Onboarding → home → Profile → Linked accounts. */
-const openLinkedAccounts = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
+const openLinkedAccounts = async (user: TestUser) => {
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user.click(within(nav).getByRole("button", { name: /^Profile$/ }));
   await press(user, /Linked accounts/i);

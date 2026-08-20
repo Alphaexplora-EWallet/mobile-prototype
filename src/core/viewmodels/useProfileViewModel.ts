@@ -11,6 +11,7 @@ import { MOCK_OTP_CODE } from "../data/mock/security.mock";
 import type { Screen } from "../navigation/screens";
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
+import { preferencesActions, usePreferencesStore } from "../stores/preferences.store";
 import { useQuestStore } from "../stores/quest.store";
 import { useSettingsStore } from "../stores/settings.store";
 import { uiActions } from "../stores/ui.store";
@@ -37,13 +38,17 @@ export type ProfileSection = {
  * behind an unlabelled `⋯` glyph that navigated to Settings. Thirteen built
  * screens sat two and three taps deep behind one icon with no name.
  *
- * So the rows live here now, and Settings keeps only what it is actually about:
- * appearance and privacy. Nothing is listed in both places.
+ * So the rows live here now. Settings was then a screen holding two switches
+ * reached through a row that named them ("Appearance and privacy") — a tap that
+ * bought nothing but a page transition, so the switches moved here too and the
+ * screen is gone.
  */
 export function useProfileViewModel() {
   const navigation = useNavigation();
   const gateway = useBankingGateway();
 
+  const theme = usePreferencesStore((state) => state.theme);
+  const balanceVisible = usePreferencesStore((state) => state.balanceVisible);
   const fullName = useUserStore((state) => state.fullName);
   const level = levelFromXp(useQuestStore((state) => state.xpTotal));
   // Counts what the Notifications screen will actually show. A badge promising
@@ -108,12 +113,9 @@ export function useProfileViewModel() {
       ],
     },
     {
-      id: "app",
-      label: "App",
-      rows: [
-        { id: "settings", icon: "contrast", title: "Settings", detail: "Appearance and privacy" },
-        { id: "help", icon: "heart", title: "Help and disputes", detail: "Common questions and how to dispute" },
-      ],
+      id: "support",
+      label: "Support",
+      rows: [{ id: "help", icon: "heart", title: "Help and disputes", detail: "Common questions and how to dispute" }],
     },
   ];
 
@@ -130,6 +132,15 @@ export function useProfileViewModel() {
      */
     verificationBadge: kyc ? (upcoming ? `${tierName} · one tier left` : tierName) : "",
     sections,
+    /** The two switches the deleted Settings screen existed to hold. */
+    preferences: {
+      darkMode: theme === "dark",
+      setDarkMode: (enabled: boolean) => preferencesActions.setTheme(enabled ? "dark" : "light"),
+      balanceVisible,
+      // The store exposes a toggle, not a setter; the Toggle hands back the value
+      // it wants, which for a two-state control is always the opposite of now.
+      setBalanceVisible: () => preferencesActions.toggleBalanceVisibility(),
+    },
     open: (id: Screen) => navigation.navigate(id),
     retakeQuiz: () => navigation.navigate("quiz"),
     /**

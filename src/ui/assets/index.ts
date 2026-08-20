@@ -1,6 +1,9 @@
 import finaLogoLockup from "./fina-logo-lockup.svg";
 import finaWordmark from "./fina-wordmark.svg";
 import finaWordmarkLight from "./fina-wordmark-light.svg";
+import finaLogoUpdated from "./fina-logo-updated.png";
+import finaWordmarkDarkPng from "./fina-wordmark-dark.png";
+import finaWordmarkLightPng from "./fina-wordmark-light.png";
 import sunsetJeepney from "./sunset-jeepney.webp";
 import welcomeManila from "./welcome-manila.webp";
 
@@ -22,6 +25,9 @@ export const BRAND = {
   lockup: finaLogoLockup,
   wordmark: finaWordmark,
   wordmarkLight: finaWordmarkLight,
+  logoPng: finaLogoUpdated,
+  wordmarkDarkPng: finaWordmarkDarkPng,
+  wordmarkLightPng: finaWordmarkLightPng,
 } as const;
 
 export const IMAGERY = {

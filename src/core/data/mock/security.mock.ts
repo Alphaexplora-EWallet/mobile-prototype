@@ -7,6 +7,19 @@ import type { DeviceSession } from "../../domain/security";
 export const MOCK_TRANSACTION_PIN = "246810";
 export const MOCK_OTP_CODE = "135790";
 
+/**
+ * The MPIN that gets you into the app, as distinct from the transaction PIN that
+ * releases a payment. Two different values on purpose: one credential opening
+ * both doors is exactly what the split is there to prevent.
+ *
+ * Passes the weak-PIN rules in `domain/pin.ts`, so the sandbox hint is also a
+ * legal example.
+ */
+export const MOCK_MPIN = "271828";
+
+/** How many wrong MPINs the mock accepts before it makes you reset it. */
+export const MPIN_ATTEMPT_LIMIT = 3;
+
 export const MOCK_OTP_DESTINATION = "0917 ••• 2288";
 
 export const MOCK_SESSIONS: readonly DeviceSession[] = [

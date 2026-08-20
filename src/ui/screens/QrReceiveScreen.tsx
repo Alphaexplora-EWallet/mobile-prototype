@@ -1,6 +1,5 @@
 import { useQrReceiveViewModel } from "@/core/viewmodels/useQrViewModel";
 import { PageBar } from "../layout/PageBar";
-import { AmountField } from "../money/AmountField";
 import { Icon } from "../primitives/Icon";
 import { StateBlock } from "../primitives/StateBlock";
 import { QrCode } from "../money/QrCode";
@@ -13,8 +12,8 @@ export function QrReceiveScreen() {
       <PageBar title={vm.title} onBack={vm.back} optionsLabel="QR options" />
 
       <section className="activity-intro">
-        <p className="eyebrow">Get paid</p>
-        <h1>Ask for money</h1>
+        <p className="eyebrow">QR Ph · InstaPay</p>
+        <h1>Show QR to receive</h1>
         <p>{vm.intro}</p>
       </section>
 
@@ -35,29 +34,6 @@ export function QrReceiveScreen() {
           </button>
         </section>
       )}
-
-      <AmountField
-        label="Amount to request"
-        value={vm.amount}
-        onChange={vm.setAmount}
-        available={vm.walletLabel}
-        presets={[]}
-        selectedPresetId={null}
-        onSelectPreset={vm.setAmount}
-      />
-
-      <label className="money-note">
-        <span className="field-label">Note (optional)</span>
-        <span className="input-shell">
-          <Icon name="mail" />
-          <input
-            type="text"
-            placeholder="What is this for?"
-            value={vm.note}
-            onChange={(event) => vm.setNote(event.target.value)}
-          />
-        </span>
-      </label>
     </div>
   );
 }

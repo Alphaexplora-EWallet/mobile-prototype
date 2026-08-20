@@ -1,40 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { createMockNetBankGateway } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen } from "@testing-library/react";
 
 /**
  * GAP-08 biller catalog: search, favorites, and the new telecom / water /
- * government categories on the Pay tab.
+ * government categories on the bill-entry screen.
  */
 
-const start = () => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway()}>
-      <App />
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
-const openPayTab = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
-  const nav = screen.getByRole("navigation", { name: /primary navigation/i });
-  await user.click(within(nav).getByRole("button", { name: /^Pay$/ }));
+const openBillers = async (user: TestUser) => {
+  // Scan is a Home quick action now; the Pay tab it replaced offered the same
+  // four actions Home already had, and Activity has the tab slot.
+  await press(user, /^Scan$/);
+  await press(user, /Payment options/i);
+  await press(user, /Pay a bill/i);
 };
 
 describe("biller catalog", () => {
   it("renders the new telecom, water, and government categories", async () => {
     const user = start();
-    await openPayTab(user);
+    await openBillers(user);
 
     expect(screen.getByRole("button", { name: /GlobePostpaid mobile/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /SmartMobile & broadband/i })).toBeTruthy();
@@ -51,7 +35,7 @@ describe("biller catalog", () => {
 
   it("filters billers by substring and prefix on name", async () => {
     const user = start();
-    await openPayTab(user);
+    await openBillers(user);
     const search = screen.getByRole("searchbox", { name: /Search billers/i });
 
     // Substring: only Manila Water contains "water" in its name.
@@ -77,7 +61,7 @@ describe("biller catalog", () => {
 
   it("toggles favorites and keeps them across navigation within the session", async () => {
     const user = start();
-    await openPayTab(user);
+    await openBillers(user);
 
     // No favorites section until something is starred.
     expect(screen.queryByText("Favorites")).toBeNull();
@@ -91,9 +75,13 @@ describe("biller catalog", () => {
     expect(stars[0]).toHaveAttribute("aria-pressed", "true");
 
     // Leave the tab and come back: the favorite persists within the session.
-    const nav = screen.getByRole("navigation", { name: /primary navigation/i });
-    await user.click(within(nav).getByRole("button", { name: /^Home$/ }));
-    await user.click(within(nav).getByRole("button", { name: /^Pay$/ }));
+    // Out and back in the way the screens stack now: bill entry backs onto
+    // Scan, Scan backs onto Home. Scan is no longer a tab to switch away from.
+    await press(user, /Back to home/i);
+    await press(user, /Back to home/i);
+    await press(user, /^Scan$/);
+    await press(user, /Payment options/i);
+    await press(user, /Pay a bill/i);
     expect(screen.getByText("Favorites")).toBeTruthy();
     expect(screen.getAllByRole("button", { name: "Remove Meralco from favorites" }).length).toBe(2);
 
@@ -105,7 +93,7 @@ describe("biller catalog", () => {
 
   it("hides the favorites section while searching and keeps the query in-session", async () => {
     const user = start();
-    await openPayTab(user);
+    await openBillers(user);
     await user.click(screen.getByRole("button", { name: "Add Meralco to favorites" }));
 
     const search = screen.getByRole("searchbox", { name: /Search billers/i });
@@ -119,9 +107,13 @@ describe("biller catalog", () => {
     expect(stars[0]).toHaveAttribute("aria-pressed", "true");
 
     // Like favorites, the query is session state: it survives a tab switch.
-    const nav = screen.getByRole("navigation", { name: /primary navigation/i });
-    await user.click(within(nav).getByRole("button", { name: /^Home$/ }));
-    await user.click(within(nav).getByRole("button", { name: /^Pay$/ }));
+    // Out and back in the way the screens stack now: bill entry backs onto
+    // Scan, Scan backs onto Home. Scan is no longer a tab to switch away from.
+    await press(user, /Back to home/i);
+    await press(user, /Back to home/i);
+    await press(user, /^Scan$/);
+    await press(user, /Payment options/i);
+    await press(user, /Pay a bill/i);
     expect(screen.getByRole("searchbox", { name: /Search billers/i })).toHaveValue("mer");
     expect(screen.queryByRole("button", { name: /GlobePostpaid mobile/i })).toBeNull();
   });

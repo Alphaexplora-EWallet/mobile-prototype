@@ -125,15 +125,7 @@ export type JarOutIntent = {
 };
 
 export type PaymentIntent =
-  | TransferIntent
-  | CashInIntent
-  | BillIntent
-  | QrIntent
-  | CashOutIntent
-  | LoadIntent
-  | RequestIntent
-  | JarInIntent
-  | JarOutIntent;
+  TransferIntent | CashInIntent | BillIntent | QrIntent | CashOutIntent | LoadIntent | JarInIntent | JarOutIntent;
 
 export type PaymentIntentKind = PaymentIntent["kind"];
 
@@ -155,8 +147,6 @@ export const intentTransactionKind = (intent: PaymentIntent): TransactionKind =>
       return "cash-out";
     case "buyload":
       return "load-purchase";
-    case "request":
-      return "request-in";
     case "jar-in":
       return "jar-in";
     case "jar-out":
@@ -166,14 +156,12 @@ export const intentTransactionKind = (intent: PaymentIntent): TransactionKind =>
 
 /** Which card the money moves through, whichever direction it is going. */
 export const intentCardId = (intent: PaymentIntent): CardId => {
-  if (intent.kind === "cash-in" || intent.kind === "request" || intent.kind === "jar-out")
-    return intent.destinationCardId;
+  if (intent.kind === "cash-in" || intent.kind === "jar-out") return intent.destinationCardId;
   return intent.sourceCardId;
 };
 
 export const intentCardLabel = (intent: PaymentIntent): string => {
-  if (intent.kind === "cash-in" || intent.kind === "request" || intent.kind === "jar-out")
-    return intent.destinationLabel;
+  if (intent.kind === "cash-in" || intent.kind === "jar-out") return intent.destinationLabel;
   return intent.sourceLabel;
 };
 
@@ -182,7 +170,7 @@ export const intentCardLabel = (intent: PaymentIntent): string => {
  * down. Money coming back out of the jar lands on the card, so it is incoming.
  */
 export const isIncomingIntent = (intent: PaymentIntent): boolean =>
-  intent.kind === "cash-in" || intent.kind === "request" || intent.kind === "jar-out";
+  intent.kind === "cash-in" || intent.kind === "jar-out";
 
 /** Who or what is on the other side, for receipt and activity copy. */
 export const intentCounterparty = (intent: PaymentIntent): string => {
@@ -199,8 +187,6 @@ export const intentCounterparty = (intent: PaymentIntent): string => {
       return intent.account.name;
     case "buyload":
       return intent.operator.name;
-    case "request":
-      return intent.payer.name;
     case "jar-in":
     case "jar-out":
       return JAR_LABEL;
@@ -225,8 +211,6 @@ export const intentCounterpartyDetail = (intent: PaymentIntent): string => {
       return intent.account.handle;
     case "buyload":
       return maskMobileNumber(intent.phoneNumber);
-    case "request":
-      return intent.payer.handle;
     case "jar-in":
       return "Set aside for a goal";
     case "jar-out":
@@ -236,7 +220,7 @@ export const intentCounterpartyDetail = (intent: PaymentIntent): string => {
 
 /** Only two kinds carry a user-written note; the others have nothing to show. */
 export const intentNote = (intent: PaymentIntent): string =>
-  intent.kind === "transfer" || intent.kind === "qr" || intent.kind === "request" ? intent.note.trim() : "";
+  intent.kind === "transfer" || intent.kind === "qr" ? intent.note.trim() : "";
 
 /** Above this, any outgoing payment asks for a PIN or an OTP. */
 export const STEP_UP_THRESHOLD = pesos(10_000);
@@ -249,7 +233,6 @@ export const STEP_UP_THRESHOLD = pesos(10_000);
  * reversibility.
  *
  * - Cash-in adds money. Nothing to protect.
- * - An accepted request adds money too, so it never steps up either.
  * - An internal move stays on the FIN-A ledger and can be unwound by support,
  *   so it never steps up — which is also the behaviour the app already had.
  * - A transfer to another bank is irreversible the moment the rail accepts it,
@@ -258,7 +241,7 @@ export const STEP_UP_THRESHOLD = pesos(10_000);
  *   only once the amount is large.
  */
 export const requiresStepUp = (intent: PaymentIntent): boolean => {
-  if (intent.kind === "cash-in" || intent.kind === "request") return false;
+  if (intent.kind === "cash-in") return false;
   if (intent.kind === "jar-in" || intent.kind === "jar-out") return false;
   if (intent.kind === "transfer") return intent.rail !== "internal";
   // A withdrawal is irreversible the moment the rail accepts it, like any

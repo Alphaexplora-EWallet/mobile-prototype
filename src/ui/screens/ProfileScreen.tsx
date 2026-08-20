@@ -1,6 +1,8 @@
 import { useProfileViewModel } from "@/core/viewmodels/useProfileViewModel";
+import { ControlRow } from "../primitives/ControlRow";
 import { Icon } from "../primitives/Icon";
 import { LinkRow } from "../primitives/LinkRow";
+import { Toggle } from "../primitives/Toggle";
 
 export function ProfileScreen() {
   const {
@@ -12,6 +14,7 @@ export function ProfileScreen() {
     levelLabel,
     verificationBadge,
     sections,
+    preferences,
     open,
     retakeQuiz,
     signOut,
@@ -69,6 +72,32 @@ export function ProfileScreen() {
           </div>
         </section>
       ))}
+
+      {/* Two switches, inline. They used to be a whole screen behind a row that
+          already named them, so the tap only ever bought a page transition. */}
+      <section className="money-field">
+        <span className="field-label">Preferences</span>
+        <div className="control-list">
+          <ControlRow
+            icon="contrast"
+            title="Dark mode"
+            detail="Follows your choice, not the system"
+            trailing={<Toggle checked={preferences.darkMode} onChange={preferences.setDarkMode} label="Dark mode" />}
+          />
+          <ControlRow
+            icon="eye"
+            title="Show balances"
+            detail="Hide amounts on the home screen"
+            trailing={
+              <Toggle
+                checked={preferences.balanceVisible}
+                onChange={preferences.setBalanceVisible}
+                label="Show balances"
+              />
+            }
+          />
+        </div>
+      </section>
 
       <section className="profile-signout">
         <button className="secondary-button is-destructive" type="button" onClick={signOut}>

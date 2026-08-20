@@ -4,34 +4,16 @@ import { NOTIFICATION_PREFERENCES, unreadCount, visibleNotifications } from "../
 import { useNavigation } from "../navigation/useNavigation";
 import { useBankingGateway } from "../platform/BankingGatewayContext";
 import { activityActions } from "../stores/activity.store";
-import { preferencesActions, usePreferencesStore } from "../stores/preferences.store";
 import { settingsActions, useSettingsStore } from "../stores/settings.store";
 import { uiActions } from "../stores/ui.store";
 
 /**
- * App preferences, and only those.
+ * Notifications and security preferences.
  *
- * This screen used to be the whole account hub, because Profile offered no way
- * in and something had to. Profile now carries the account and security rows
- * directly, so what is left here is what the title actually promises: how the
- * app looks and what it shows.
+ * `useSettingsViewModel` used to live here too. Settings had already shrunk to
+ * two switches once Profile took over the account rows, and two switches do not
+ * need a screen: they are on Profile now, in `useProfileViewModel`.
  */
-export function useSettingsViewModel() {
-  const navigation = useNavigation();
-  const theme = usePreferencesStore((state) => state.theme);
-  const balanceVisible = usePreferencesStore((state) => state.balanceVisible);
-
-  return {
-    title: "Settings",
-    darkMode: theme === "dark",
-    setDarkMode: (enabled: boolean) => preferencesActions.setTheme(enabled ? "dark" : "light"),
-    balanceVisible,
-    // The store exposes a toggle, not a setter; the Toggle hands back the value
-    // it wants, which for a two-state control is always the opposite of now.
-    setBalanceVisible: () => preferencesActions.toggleBalanceVisibility(),
-    back: navigation.goBack,
-  };
-}
 
 export function useNotificationsViewModel() {
   const navigation = useNavigation();

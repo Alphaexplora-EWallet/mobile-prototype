@@ -18,23 +18,13 @@ import { walletActions } from "../stores/wallet.store";
 export function useWelcomeViewModel() {
   const navigation = useNavigation();
   return {
-    start: () => navigation.navigate("quiz"),
-    signIn: () => navigation.navigate("sign-in"),
-  };
-}
-
-export function useSignInViewModel() {
-  const navigation = useNavigation();
-  return {
-    back: () => navigation.navigate("welcome"),
     /**
-     * The demo button still lands straight on Home. The credential form now goes
-     * through a one-time code instead, which is what the email and password were
-     * always implying and never doing.
+     * Used to open the quiz, which meant the primary action of the app created
+     * nothing. It starts registration now; the quiz follows once there is an
+     * account to attach an answer to. Sign-in lives in `useAuthViewModel`.
      */
-    submit: () => navigation.resetTo("home"),
-    signInWithCredentials: () => navigation.navigate("sign-in-otp"),
-    forgotPassword: () => navigation.navigate("forgot-password"),
+    start: () => navigation.navigate("sign-up"),
+    signIn: () => navigation.navigate("sign-in"),
   };
 }
 
@@ -62,12 +52,25 @@ export function useQuizViewModel(): {
   };
 }
 
+/**
+ * "Build my plan" and the close × used to run the same `resetTo("home")`: two
+ * controls, one behaviour, and no plan. The plan the copy is promising is the
+ * quest — a spending limit to set and track — so the primary action goes there.
+ * Quest is a tab, so `navigate` roots the stack on it and onboarding does not
+ * stay behind the back button.
+ */
 export function useResultViewModel() {
   const navigation = useNavigation();
   return {
     styleName: MOCK_MONEY_STYLE.name,
-    continue: () => navigation.resetTo("home"),
-    close: () => navigation.resetTo("home"),
+    continue: () => navigation.navigate("quest"),
+    /**
+     * The × now offers verification rather than dropping straight to Home: a new
+     * wallet is unverified, and this is the one moment in onboarding where the
+     * user has finished something and is not mid-task. Someone who takes "Build
+     * my plan" instead meets the same prompt on Profile.
+     */
+    close: () => navigation.navigate("verify-identity"),
   };
 }
 

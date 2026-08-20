@@ -26,7 +26,7 @@ export type ControlToggleVM = {
 };
 
 export type MoveMoneyRowVM = {
-  id: Extract<Screen, "transfer" | "deposit" | "cash-out" | "payments">;
+  id: Extract<Screen, "transfer" | "deposit" | "cash-out" | "bill-entry">;
   icon: IconName;
   title: string;
   detail: string;
@@ -149,7 +149,9 @@ export function useWalletViewModel(): WalletViewModel {
         { id: "transfer", icon: "send", title: "Send money", detail: `From •••• ${frontCard.last4}` },
         { id: "deposit", icon: "arrow-down", title: "Add money", detail: "Top up this card" },
         { id: "cash-out", icon: "bank", title: "Cash out", detail: "To a linked bank account" },
-        { id: "payments", icon: "receipt", title: "Pay a bill", detail: "Billers and QR payments" },
+        // Was `payments`, the QR scanner — a row saying "Pay a bill" that opened a
+        // camera and left the biller list one more tap away inside a sheet.
+        { id: "bill-entry", icon: "receipt", title: "Pay a bill", detail: "Utilities, telecom, government" },
       ],
     },
     jar: {

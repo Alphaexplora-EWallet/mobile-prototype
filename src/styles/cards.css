@@ -38,7 +38,7 @@
   border: 2px solid rgba(255, 255, 255, 0.85);
   border-radius: 22px;
   text-align: left;
-  box-shadow: 0 10px 24px rgba(18, 71, 68, 0.18);
+  box-shadow: 0 10px 24px rgba(7, 80, 138, 0.18);
   cursor: pointer;
   transform-origin: center center;
   will-change: transform, opacity;
@@ -106,7 +106,7 @@
   border-radius: 50%;
   color: white;
   background: var(--teal);
-  box-shadow: 0 7px 18px rgba(0, 75, 71, 0.28);
+  box-shadow: 0 7px 18px rgba(7, 80, 138, 0.28);
   cursor: pointer;
   transform: translateY(-50%);
   transition:
@@ -117,7 +117,7 @@
 }
 .deck-next:hover {
   background: var(--teal-dark);
-  box-shadow: 0 9px 22px rgba(0, 75, 71, 0.34);
+  box-shadow: 0 9px 22px rgba(7, 80, 138, 0.34);
   transform: translate(2px, -50%);
 }
 .deck-next:active {
@@ -144,17 +144,17 @@
   34% {
     opacity: 0.88;
     transform: translate3d(26px, 12px, 0) scale(0.97) rotateZ(1.5deg);
-    box-shadow: 12px 16px 28px rgba(0, 75, 71, 0.17);
+    box-shadow: 12px 16px 28px rgba(7, 80, 138, 0.17);
   }
   72% {
     opacity: 1;
     transform: translate3d(-3px, -5px, 0) scale(1.012) rotateZ(-0.5deg);
-    box-shadow: -5px 20px 34px rgba(0, 75, 71, 0.2);
+    box-shadow: -5px 20px 34px rgba(7, 80, 138, 0.2);
   }
   100% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1) rotateZ(0);
-    box-shadow: 0 15px 30px rgba(0, 75, 71, 0.22);
+    box-shadow: 0 15px 30px rgba(7, 80, 138, 0.22);
   }
 }
 .payment-card-flipper {
@@ -199,7 +199,7 @@
 }
 .payment-card-teal {
   color: white;
-  background: repeating-linear-gradient(45deg, #057b75 0 7px, #03736e 7px 10px);
+  background: repeating-linear-gradient(45deg, #0b75c1 0 7px, #0966a9 7px 10px);
 }
 .payment-card-sunset {
   color: var(--ink);
@@ -219,7 +219,7 @@
   background: linear-gradient(90deg, rgba(255, 245, 219, 0.93), rgba(255, 245, 219, 0.22));
 }
 .payment-card-teal .card-overlay {
-  background: linear-gradient(90deg, rgba(0, 92, 88, 0.2), transparent);
+  background: linear-gradient(90deg, rgba(7, 80, 138, 0.2), transparent);
 }
 .card-front-content {
   position: absolute;
@@ -327,7 +327,7 @@
   padding: 5px 11px;
   border-radius: 99px;
   color: white;
-  background: rgba(0, 143, 136, 0.92);
+  background: rgba(10, 111, 184, 0.92);
   font-size: 9.5px;
   font-weight: 900;
   letter-spacing: 0.6px;
@@ -375,7 +375,7 @@
   background: rgba(255, 255, 255, 0.12);
 }
 .payment-card-sunset .card-utility-rail button:hover {
-  background: rgba(8, 126, 121, 0.08);
+  background: rgba(10, 111, 184, 0.08);
 }
 .card-utility-rail button:active {
   transform: scale(0.96);
@@ -459,8 +459,8 @@
 .card-back-brand > span {
   padding: 4px 8px;
   border-radius: 10px;
-  color: #bce1dc;
-  background: #063d3a;
+  color: #c0d9ec;
+  background: #0a3a5c;
   font-size: 9px;
   font-weight: 800;
 }
@@ -568,7 +568,7 @@
   height: 44px;
   border-radius: var(--radius-sm);
   color: #7a5200;
-  background: rgba(255, 253, 248, 0.55);
+  background: rgba(255, 255, 255, 0.7);
 }
 .jar-card-icon svg {
   width: 22px;
@@ -602,24 +602,25 @@
   border: 1.5px solid rgba(122, 82, 0, 0.35);
   border-radius: var(--radius-sm);
   color: #6b4a08;
-  background: rgba(255, 253, 248, 0.5);
+  background: rgba(255, 255, 255, 0.6);
   font-weight: 800;
   cursor: pointer;
 }
 .jar-card-actions button:hover {
-  background: rgba(255, 253, 248, 0.85);
+  background: rgba(255, 255, 255, 0.9);
 }
 .controls-section.is-highlighted {
   padding: 15px;
   margin: 0 -4px;
   border: 2px solid var(--amber);
   border-radius: var(--radius-lg);
-  background: #fff9ec;
+  background: #fffdf5;
 }
 .control-list {
   overflow: hidden;
+  border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  background: rgba(255, 253, 248, 0.78);
+  background: var(--surface);
   box-shadow: var(--shadow-surface);
 }
 .control-row {

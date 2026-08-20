@@ -41,10 +41,10 @@
   place-items: center;
   width: 150px;
   height: 120px;
-  border: 6px double #075d59;
+  border: 6px double #0a5e9e;
   border-radius: 22px;
-  color: #022f2d;
-  background: repeating-linear-gradient(45deg, #087d77, #087d77 6px, #04716c 6px, #04716c 8px);
+  color: #052c4a;
+  background: repeating-linear-gradient(45deg, #0b6fb8, #0b6fb8 6px, #0a5c9c 6px, #0a5c9c 8px);
   box-shadow: var(--shadow);
   transform: rotate(-3deg);
 }

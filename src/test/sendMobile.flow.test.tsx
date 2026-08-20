@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { createMockNetBankGateway } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen } from "@testing-library/react";
 
 /**
  * Send to a mobile number (GAP-04): address a FIN-A wallet by phone, see whose
@@ -13,34 +10,14 @@ import App from "../App";
  * message, never guessed.
  */
 
-const start = () => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway()}>
-      <App />
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
-const openHome = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
-};
-
-const openSendMobile = async (user: ReturnType<typeof userEvent.setup>) => {
-  await openHome(user);
+const openSendMobile = async (user: TestUser) => {
   await press(user, /^Send$/);
   await press(user, /Add recipient/i);
   await press(user, /Send to a mobile number/i);
 };
 
 /** Fills amount + number on the send-to-mobile screen and runs the name check. */
-const fillAndCheck = async (user: ReturnType<typeof userEvent.setup>, number: string, amount = "500") => {
+const fillAndCheck = async (user: TestUser, number: string, amount = "500") => {
   await user.type(screen.getByRole("textbox", { name: /Amount to send/i }), amount);
   await user.type(screen.getByRole("textbox", { name: /Mobile number/i }), number);
   await press(user, /^Check name$/);

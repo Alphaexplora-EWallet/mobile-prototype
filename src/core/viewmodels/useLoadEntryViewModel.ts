@@ -46,6 +46,8 @@ export function useLoadEntryViewModel() {
     ...createAmountDraft(amountInput, buyloadActions.setAmount, MOCK_LOAD_PRESETS),
     availableLabel: source.balanceLabel,
     canContinue: Boolean(operator && phoneNumber.trim() !== "" && issue === null && amount && amount.amount > 0),
+    operators: MOCK_LOAD_OPERATORS,
+    selectOperator: (id: string) => buyloadActions.startLoad(id),
     review: () => {
       if (!operator || phoneNumber.trim() === "" || !amount || amount.amount <= 0 || issue) return;
       paymentActions.start(
@@ -61,6 +63,9 @@ export function useLoadEntryViewModel() {
       );
       navigation.navigate("payment-review");
     },
-    back: navigation.goBack,
+    back: () => {
+      if (operator) buyloadActions.startLoad("");
+      else navigation.goBack();
+    },
   };
 }

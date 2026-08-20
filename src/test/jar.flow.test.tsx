@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { PlatformProvider } from "@/core/platform/PlatformContext";
-import { noopPlatform } from "@/core/platform/noopPlatform";
-import { createMockNetBankGateway, type MockGatewayOptions } from "@/platform/web/createMockNetBankGateway";
-import App from "../App";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
+import { screen, within } from "@testing-library/react";
 
 /**
  * GAP-07 — the savings jar. The "Open a savings jar card" option used to end in
@@ -14,34 +9,12 @@ import App from "../App";
  * moving in and out through the shared review/confirm/receipt pipeline.
  */
 
-const start = (options: MockGatewayOptions = {}) => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway(options)}>
-      <PlatformProvider platform={noopPlatform}>
-        <App />
-      </PlatformProvider>
-    </BankingGatewayProvider>,
-  );
-  return user;
-};
-
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
-const onHome = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
-};
-
-const openWalletTab = async (user: ReturnType<typeof userEvent.setup>) => {
+const openWalletTab = async (user: TestUser) => {
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user.click(within(nav).getByRole("button", { name: /^Wallet$/ }));
 };
 
-const openJar = async (user: ReturnType<typeof userEvent.setup>) => {
-  await onHome(user);
+const openJar = async (user: TestUser) => {
   await openWalletTab(user);
   await press(user, /Add card/);
   await press(user, /Savings jar/);

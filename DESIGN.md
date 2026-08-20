@@ -1,4 +1,4 @@
-# EasyPay --- UI Layout & Visual Design Guide
+# FIN-A --- UI Layout & Visual Design Guide
 
 > This document defines the **layout style, composition, spacing,
 > hierarchy, and interaction patterns** of the EasyPay e-wallet UI.
@@ -775,7 +775,91 @@ rather than hierarchy through lots of containers.
 
 ---
 
-# 26. Design Rule of Thumb
+# 26. Money Movement: Container-Free Typographic Flow
+
+The money movement experience (Send Money, Transfers, Peer-to-Peer Payments) follows a **100% container-free, pill-free typographic flow**.
+
+Rather than enclosing the search bar, destinations, recipient details, and amount inputs inside nested boxes or cards, the workflow relies on **scale, subtle separator rules, and focused typography**.
+
+## 26.1 Two-Step Progressive Flow
+
+```text
+STEP 1: RECIPIENT DISCOVERY            STEP 2: AMOUNT & SOURCE ENTRY
+┌──────────────────────────────┐       ┌──────────────────────────────┐
+│  ←      Send money       ⋮   │       │  ←      Send money       ⋮   │
+│                              │       │                              │
+│  🔍 Search name, phone, bank │       │            ( JD )            │
+│  ─────────────────────────── │       │          SENDING TO          │
+│                              │       │           Jomar D.           │
+│  (🏦) Bank transfer        > │       │     •••• 4471 · Change       │
+│  (📱) Send to mobile       > │       │                              │
+│  (📷) Scan QR code         > │       │           ₱ 500.00           │
+│  ─────────────────────────── │       │     Available ₱24,680 · Max  │
+│                              │       │                              │
+│  SAVED RECIPIENTS     Manage │       │  PAY WITH                    │
+│  (JD) Jomar D.             ✓ │       │  [💳 Fin-A Card (₱24,680)]   │
+│  (MS) Mira S.                │       │                              │
+│  (+)  Add new recipient    > │       │  ⚡ ₱0.00 fee · Instant       │
+│                              │       │  ✉️ Add a note (optional)    │
+│                              │       │  ─────────────────────────── │
+│  ┌────────────────────────┐  │       │  ┌────────────────────────┐  │
+│  │        Continue        │  │       │  │  Continue and review   │  │
+│  └────────────────────────┘  │       │  └────────────────────────┘  │
+└──────────────────────────────┘       └──────────────────────────────┘
+```
+
+## 26.2 Step 1: Destination & Recipient Discovery Guidelines
+
+### 1. Borderless Search Line
+
+- Use a flat, single bottom-line border (`border-bottom: 1.5px solid var(--line)`) instead of an enclosed search box.
+- Active focus smoothly highlights the bottom accent color (`var(--teal)`).
+- Keep background transparent to maintain canvas continuity.
+
+### 2. Flat Quick Destination Rows
+
+- Provide 1-tap entry points (Bank Transfer, Mobile, QR Scan) as clean list rows.
+- Each row uses a circular icon container (`36px` circle with soft background), clear bold title, and subtle metadata subtitle.
+- Separate rows with ultra-light borderless rules (`#f8fafc` or `var(--line)` at low opacity).
+
+### 3. Borderless Contact List
+
+- Avatar bubbles: `42px` rounded circle with high-contrast initials or profile glyph.
+- Selected state uses an inline checkmark mark rather than wrapping the whole contact in a thick card border.
+- Include a dedicated "Add new recipient" row with a subtle plus icon.
+
+## 26.3 Step 2: Floating Amount Hero & Contextual Inputs
+
+### 1. Recipient Typographic Hero
+
+- Position a prominent avatar (`58px` circle with soft depth/glow) at the visual top.
+- Uppercase metadata eyebrow (`SENDING TO`) in `--muted` text.
+- Large recipient name (`20px`, bold, `--ink`) with handle and inline `"Change"` text link to step back.
+
+### 2. Floating Hero Amount
+
+- Amount input is completely borderless and floats on the canvas.
+- Display a large currency symbol (`₱`, ~`32px`) alongside oversized numeric typography (`46px`, bold, tabular numerals, tight letter spacing).
+- Place available balance and an inline `"Use max"` button directly beneath the numeric display.
+
+### 3. Inline Payment Source & Note Line
+
+- Display payment source options as compact, borderless inline selections.
+- Fee and arrival guarantees use a quiet summary caption with an accent icon (e.g., `⚡ No fee · Instant arrival`).
+- Optional note input uses a single bottom-line divider with a leading mail icon.
+
+## 26.4 Do's and Don'ts for Money Movement
+
+| Do                                                                             | Don't                                                         |
+| :----------------------------------------------------------------------------- | :------------------------------------------------------------ |
+| Use large numeric typography that feels like a natural extension of the screen | Place the amount input inside a heavy, gray-bordered form box |
+| Float the selected recipient avatar and name as a clean header hero            | Trap recipient details inside nested dashboard cards          |
+| Use single-line bottom borders for search and note inputs                      | Stack multiple boxed text inputs on top of each other         |
+| Provide quick inline actions (`Change`, `Use max`) as text links               | Clutter the screen with extra secondary buttons               |
+
+---
+
+# 27. Design Rule of Thumb
 
 When designing a new screen, ask:
 
@@ -790,13 +874,15 @@ around objects and actions**, not a collection of dashboard widgets.
 
 ---
 
-# 27. Keywords
+# 28. Keywords
 
 `mobile-first`
 
 `minimal fintech`
 
 `large financial hero`
+
+`container-free flow`
 
 `floating objects`
 

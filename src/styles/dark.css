@@ -1,7 +1,7 @@
 /* Dark theme */
 :root[data-theme="dark"] body {
   background:
-    radial-gradient(circle at 15% 12%, rgba(60, 183, 170, 0.1), transparent 30%),
+    radial-gradient(circle at 15% 12%, rgba(88, 166, 232, 0.1), transparent 30%),
     radial-gradient(circle at 88% 82%, rgba(232, 178, 77, 0.07), transparent 25%), #0a0f0d;
 }
 :root[data-theme="dark"] .phone-shell {
@@ -19,7 +19,7 @@
 }
 :root[data-theme="dark"] .screen {
   background:
-    radial-gradient(circle at 82% 10%, rgba(60, 183, 170, 0.045), transparent 26%),
+    radial-gradient(circle at 82% 10%, rgba(88, 166, 232, 0.045), transparent 26%),
     linear-gradient(rgba(16, 22, 20, 0.965), rgba(16, 22, 20, 0.965)),
     repeating-linear-gradient(135deg, transparent, transparent 6px, rgba(193, 218, 209, 0.025) 7px);
 }
@@ -41,26 +41,35 @@
 :root[data-theme="dark"] .brand-mark-lockup {
   filter: brightness(0) invert(1);
 }
-:root[data-theme="dark"] .welcome-copy h1,
+:root[data-theme="dark"] .welcome-page {
+  background: var(--cream);
+}
+:root[data-theme="dark"] .welcome-brand-name,
+:root[data-theme="dark"] .brand-letter-i .brand-stem,
+:root[data-theme="dark"] .welcome-title,
 :root[data-theme="dark"] .sign-in-copy h1 {
   color: var(--ink);
 }
-:root[data-theme="dark"] .welcome-copy p,
+:root[data-theme="dark"] .welcome-brand-sub,
+:root[data-theme="dark"] .welcome-subtitle,
 :root[data-theme="dark"] .sign-in-copy > p:last-child {
   color: var(--muted);
 }
-:root[data-theme="dark"] .welcome-visual-fade {
-  background: linear-gradient(var(--cream) 0%, transparent 18%, transparent 68%, var(--cream) 100%);
+:root[data-theme="dark"] .canvas-indigo-blob {
+  fill: #172439;
 }
-:root[data-theme="dark"] .welcome-actions {
-  background: linear-gradient(transparent, var(--cream) 40%);
+:root[data-theme="dark"] .canvas-left-arc {
+  fill: #131d2e;
 }
-:root[data-theme="dark"] .welcome-actions .secondary-button,
-:root[data-theme="dark"] .demo-auth .secondary-button {
+:root[data-theme="dark"] .welcome-secondary {
   background: rgba(20, 33, 30, 0.9);
+  color: var(--teal);
 }
 :root[data-theme="dark"] .welcome-dots span {
   background: #34433f;
+}
+:root[data-theme="dark"] .welcome-dots span.is-active {
+  background: var(--teal);
 }
 :root[data-theme="dark"] .auth-form label {
   color: #cbd6d2;
@@ -87,6 +96,23 @@
 :root[data-theme="dark"] .recipient-chip.is-selected,
 :root[data-theme="dark"] .amount-preset.is-selected {
   background: var(--teal-soft);
+}
+:root[data-theme="dark"] .recipient-chip > span:first-child {
+  color: var(--teal);
+  background: rgba(88, 166, 232, 0.15);
+}
+:root[data-theme="dark"] .recipient-chip.is-selected > span:first-child {
+  color: #ffffff;
+  background: var(--teal);
+}
+:root[data-theme="dark"] .recipient-chip.recipient-add {
+  background: transparent;
+  border-color: var(--line);
+}
+:root[data-theme="dark"] .recipient-chip.recipient-add > span:first-child {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--line);
 }
 :root[data-theme="dark"] .input-shell input {
   color: var(--ink);
@@ -177,6 +203,32 @@
 :root[data-theme="dark"] .bottom-nav button.is-active {
   color: var(--teal);
 }
+:root[data-theme="dark"] .pay-clean-options-btn {
+  color: var(--ink);
+}
+:root[data-theme="dark"] .pay-clean-options-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+:root[data-theme="dark"] .pay-scanner-hero-card {
+  background: linear-gradient(160deg, #1e3a8a 0%, #1d4ed8 35%, #3730a3 70%, #581c87 100%);
+  box-shadow: 0 20px 44px -10px rgba(0, 0, 0, 0.65);
+}
+:root[data-theme="dark"] .pay-scanner-hero-card:hover {
+  box-shadow: 0 24px 50px -8px rgba(0, 0, 0, 0.75);
+}
+:root[data-theme="dark"] .action-circle-icon {
+  background: #1e293b;
+  color: #38bdf8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+:root[data-theme="dark"] .pay-action-pill-btn.is-active .action-circle-icon {
+  background: #451a03;
+  color: #fbbf24;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.5);
+}
+:root[data-theme="dark"] .action-circle-label {
+  color: var(--ink);
+}
 :root[data-theme="dark"] .action-sheet {
   background: var(--cream);
 }
@@ -194,4 +246,10 @@
     background-color 0.24s ease,
     border-color 0.24s ease,
     box-shadow 0.24s ease;
+}
+:root[data-theme="dark"] .verify-benefits li {
+  color: var(--ink);
+}
+:root[data-theme="dark"] .biometric-button {
+  background: rgba(20, 33, 30, 0.9);
 }

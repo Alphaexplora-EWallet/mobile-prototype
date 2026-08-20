@@ -9,7 +9,7 @@ export function ActivityScreen() {
   const vm = useActivityViewModel();
 
   return (
-    <div className="onboarding-page activity-page">
+    <div className="tab-page activity-page">
       <PageBar title={vm.title} onBack={vm.back} optionsLabel="Activity options" />
 
       <section className="activity-intro">
@@ -54,43 +54,6 @@ export function ActivityScreen() {
           </button>
         ))}
       </div>
-
-      {vm.filter === "all" && vm.requests.length > 0 && (
-        <section className="request-list" aria-label="Money requests">
-          <div className="request-list-heading">
-            <h2>Money requests</h2>
-            <small>Prototype: the recipient's reply is simulated here.</small>
-          </div>
-          {vm.requests.map((request) => (
-            <div
-              className={`request-row is-${request.isPending ? "pending" : request.statusLabel.toLowerCase()}`}
-              key={request.id}
-            >
-              <span className="request-avatar" aria-hidden="true">
-                {request.initials}
-              </span>
-              <span className="request-copy">
-                <strong>{request.name}</strong>
-                <small>
-                  {request.note} · {request.when}
-                </small>
-              </span>
-              <span className="request-amount">{request.amountLabel}</span>
-              <span className="status-chip">{request.statusLabel}</span>
-              {request.isPending && (
-                <span className="request-actions">
-                  <button type="button" onClick={() => vm.acceptRequest(request.id)}>
-                    Accept
-                  </button>
-                  <button type="button" onClick={() => vm.rejectRequest(request.id)}>
-                    Reject
-                  </button>
-                </span>
-              )}
-            </div>
-          ))}
-        </section>
-      )}
 
       {vm.isLoading && <StateBlock tone="loading" message="Loading your activity…" />}
       {vm.error && (

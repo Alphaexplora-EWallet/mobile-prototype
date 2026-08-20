@@ -1,12 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { BankingGatewayProvider } from "@/core/platform/BankingGatewayContext";
-import { PlatformProvider } from "@/core/platform/PlatformContext";
-import { noopPlatform } from "@/core/platform/noopPlatform";
-import { createMockNetBankGateway } from "@/platform/web/createMockNetBankGateway";
+import { screen, within } from "@testing-library/react";
+import { press, renderApp as start, type TestUser } from "@/test/helpers/renderApp";
 import { createWebPlatform } from "@/platform/web/createWebPlatform";
-import App from "../App";
 
 /**
  * Real statement export (GAP-05): the month list opens a real month view with
@@ -15,32 +10,10 @@ import App from "../App";
  * the empty-file state instead of crashing or shipping a header-only file.
  */
 
-const press = async (user: ReturnType<typeof userEvent.setup>, name: RegExp | string) =>
-  user.click(screen.getByRole("button", { name }));
-
-const openHome = async (user: ReturnType<typeof userEvent.setup>) => {
-  await press(user, /Start my journey/i);
-  await press(user, /^Continue$/);
-  await press(user, /Build my plan/i);
-};
-
-const openStatements = async (user: ReturnType<typeof userEvent.setup>) => {
-  await openHome(user);
+const openStatements = async (user: TestUser) => {
   const nav = screen.getByRole("navigation", { name: /primary navigation/i });
   await user.click(within(nav).getByRole("button", { name: /^Profile$/ }));
   await press(user, /^Statements/);
-};
-
-const start = (platform = noopPlatform, options: { kycTier?: "full" } = {}) => {
-  const user = userEvent.setup();
-  render(
-    <BankingGatewayProvider gateway={createMockNetBankGateway(options)}>
-      <PlatformProvider platform={platform}>
-        <App />
-      </PlatformProvider>
-    </BankingGatewayProvider>,
-  );
-  return user;
 };
 
 /** jsdom has no object URLs; give the web adapter a place to hand the blob. */
@@ -58,7 +31,7 @@ afterEach(() => {
 
 describe("statement month view", () => {
   it("renders a real month: balances, count, and dated entries", async () => {
-    const user = start(undefined, { kycTier: "full" });
+    const user = start({ kycTier: "full" });
     await openStatements(user);
 
     // The list shows every generated month with its closing balance.
@@ -88,7 +61,7 @@ describe("statement month view", () => {
   it("exports a CSV artifact through the platform port", async () => {
     const { createObjectURL } = stubObjectUrls();
     const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-    const user = start(createWebPlatform(), { kycTier: "full" });
+    const user = start({ kycTier: "full" }, createWebPlatform());
     await openStatements(user);
     await press(user, /July 2026/i);
 
@@ -111,7 +84,7 @@ describe("statement month view", () => {
   it("shows the empty-file state for a month with no transactions", async () => {
     const { createObjectURL } = stubObjectUrls();
     const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-    const user = start(createWebPlatform(), { kycTier: "full" });
+    const user = start({ kycTier: "full" }, createWebPlatform());
     await openStatements(user);
     await press(user, /April 2026/i);
 

@@ -1,5 +1,7 @@
+import { useState } from "react";
 import type { CardId } from "../domain/card";
-import type { Biller, BillerCategory, DepositMethod, Recipient } from "../domain/payments";
+import type { IconName } from "../domain/icons";
+import type { Biller, BillerCategory, DepositMethod, Recipient, ScheduledPaymentStatus } from "../domain/payments";
 import type { LoadOperator } from "../domain/load";
 import { BILLER_CATEGORY_LABELS, BILLER_CATEGORY_ORDER, searchBillers } from "../domain/payments";
 import {
@@ -14,7 +16,7 @@ import { SIMULATED_NOTE } from "../domain/simulation";
 import { formatMoney, parseMoneyInput } from "../money/format";
 import { isZero, type Money } from "../money/money";
 import { billsActions, useBillsStore } from "../stores/bills.store";
-import { billerCatalogActions, useBillerCatalogStore } from "../stores/billerCatalog.store";
+import { type BillerCategoryFilter, billerCatalogActions, useBillerCatalogStore } from "../stores/billerCatalog.store";
 import { buyloadActions } from "../stores/buyload.store";
 import { depositActions, useDepositStore } from "../stores/deposit.store";
 import type { Screen } from "../navigation/screens";
@@ -112,8 +114,16 @@ export type TransferViewModel = MoneyBase &
     note: string;
     setNote(value: string): void;
     recipients: readonly Recipient[];
+    filteredRecipients: readonly Recipient[];
+    searchQuery: string;
+    setSearchQuery(value: string): void;
     selectedRecipient: string;
+    selectedRecipientDetails: Recipient | null;
     selectRecipient(id: string): void;
+    setMaxAmount(): void;
+    sendToBank(): void;
+    sendToMobile(): void;
+    scanQr(): void;
     /** Local, non-authoritative — `gateway.payments.quote()` at payment-review is the source of truth. */
     feePreview: FeePreviewVM | null;
     amountError: string | null;
@@ -131,11 +141,23 @@ export function useTransferViewModel(): TransferViewModel {
   const note = useTransferStore((state) => state.note);
   const selectedRecipient = useTransferStore((state) => state.selectedRecipient);
   const recipients = useRecipientsStore((state) => state.saved);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const recipient = recipients.find((candidate) => candidate.id === selectedRecipient) ?? null;
   const bank = recipient ? findBank(recipient.bankCode) : null;
   const previewRail = bank ? defaultRailFor(bank) : null;
   const pricing = previewRail ? RAIL_PRICING[previewRail] : null;
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredRecipients =
+    normalizedQuery === ""
+      ? recipients
+      : recipients.filter(
+          (person) =>
+            person.name.toLowerCase().includes(normalizedQuery) ||
+            person.handle.toLowerCase().includes(normalizedQuery) ||
+            person.bankCode.toLowerCase().includes(normalizedQuery),
+        );
 
   const parsed = parseMoneyInput(amount);
   const canAdvance =
@@ -166,6 +188,11 @@ export function useTransferViewModel(): TransferViewModel {
     navigation.navigate("payment-review");
   };
 
+  const setMaxAmount = () => {
+    const rawMax = formatMoney(source.balance, { symbol: false, grouping: false });
+    transferActions.setAmount(rawMax);
+  };
+
   return {
     ...base,
     ...createAmountDraft(amount, transferActions.setAmount),
@@ -175,8 +202,16 @@ export function useTransferViewModel(): TransferViewModel {
     note,
     setNote: transferActions.setNote,
     recipients,
+    filteredRecipients,
+    searchQuery,
+    setSearchQuery,
     selectedRecipient,
+    selectedRecipientDetails: recipient,
     selectRecipient: transferActions.selectRecipient,
+    setMaxAmount,
+    sendToBank: () => navigation.navigate("transfer-destination"),
+    sendToMobile: () => navigation.navigate("send-mobile"),
+    scanQr: () => navigation.navigate("qr-scan"),
     feePreview: pricing
       ? { feeLabel: isZero(pricing.fee) ? "No fee" : formatMoney(pricing.fee), arrivalLabel: pricing.arrivalLabel }
       : null,
@@ -279,14 +314,35 @@ export function useDepositViewModel(): DepositViewModel {
   };
 }
 
+export type CategoryPillVM = {
+  id: BillerCategoryFilter;
+  label: string;
+  icon: IconName;
+};
+
 export type PaymentsViewModel = MoneyBase & {
-  scheduledLabels: readonly { id: string; glyph: string; name: string; when: string; amountLabel: string }[];
+  flashOn: boolean;
+  toggleFlash(): void;
+  uploadQr(): void;
+  openOptions(): void;
+  scheduledLabels: readonly {
+    id: string;
+    glyph: string;
+    name: string;
+    when: string;
+    amountLabel: string;
+    status: ScheduledPaymentStatus;
+  }[];
   billers: readonly Biller[];
   loadOperators: readonly LoadOperator[];
   /** Search box state, backed by the session store so it survives tab switches. */
   searchQuery: string;
   setSearchQuery(value: string): void;
-  /** Search-filtered catalog, grouped by category in `BILLER_CATEGORY_ORDER`. */
+  /** Active category filter tab. */
+  selectedCategory: BillerCategoryFilter;
+  setSelectedCategory(category: BillerCategoryFilter): void;
+  categoryPills: readonly CategoryPillVM[];
+  /** Search- and category-filtered catalog, grouped by category in `BILLER_CATEGORY_ORDER`. */
   catalog: readonly BillerGroup[];
   /** Favorited billers, for the pinned section above the grouped catalog. */
   favorites: readonly BillerRowVM[];
@@ -302,8 +358,11 @@ export type PaymentsViewModel = MoneyBase & {
   openAutopay(id: string): void;
 };
 
-/** A catalog row with its favorite state resolved, so the view renders, not derives. */
-export type BillerRowVM = Biller & { favorited: boolean };
+/** A catalog row with its favorite and autopay state resolved, so the view renders, not derives. */
+export type BillerRowVM = Biller & {
+  favorited: boolean;
+  autopayStatus?: ScheduledPaymentStatus;
+};
 
 export type BillerGroup = {
   category: BillerCategory;
@@ -311,32 +370,68 @@ export type BillerGroup = {
   billers: readonly BillerRowVM[];
 };
 
-const withFavoriteState = (billers: readonly Biller[], favoriteBillerIds: readonly string[]): readonly BillerRowVM[] =>
-  billers.map((biller) => ({ ...biller, favorited: favoriteBillerIds.includes(biller.id) }));
+const CATEGORY_PILL_CONFIG: readonly { id: BillerCategoryFilter; label: string; icon: IconName }[] = [
+  { id: "all", label: "All", icon: "globe" },
+  { id: "electric", label: "Electric", icon: "bolt" },
+  { id: "telecom", label: "Telco & WiFi", icon: "phone" },
+  { id: "water", label: "Water Supply", icon: "droplet" },
+  { id: "government", label: "Gov Agencies", icon: "landmark" },
+  { id: "other", label: "Other Bills", icon: "receipt" },
+];
+
+const withBillerState = (
+  billers: readonly Biller[],
+  favoriteBillerIds: readonly string[],
+  enrollments: readonly { billerId: string; status: ScheduledPaymentStatus }[],
+): readonly BillerRowVM[] =>
+  billers.map((biller) => {
+    const enrollment = enrollments.find((candidate) => candidate.billerId === biller.id);
+    return {
+      ...biller,
+      favorited: favoriteBillerIds.includes(biller.id),
+      autopayStatus: enrollment ? enrollment.status : undefined,
+    };
+  });
 
 export function usePaymentsViewModel(): PaymentsViewModel {
   const navigation = useNavigation();
+  const [flashOn, setFlashOn] = useState(false);
   const enrollments = useBillsStore((state) => state.enrollments);
   const searchQuery = useBillerCatalogStore((state) => state.searchQuery);
+  const selectedCategory = useBillerCatalogStore((state) => state.selectedCategory);
   const favoriteBillerIds = useBillerCatalogStore((state) => state.favoriteBillerIds);
 
   const matched = searchBillers(MOCK_BILLERS, searchQuery);
-  const favorites = withFavoriteState(MOCK_BILLERS, favoriteBillerIds).filter((biller) => biller.favorited);
+  const enrichedBillers = withBillerState(matched, favoriteBillerIds, enrollments);
+  const allEnriched = withBillerState(MOCK_BILLERS, favoriteBillerIds, enrollments);
+  const favorites = allEnriched.filter((biller) => biller.favorited);
+
+  const visibleCategories =
+    selectedCategory === "all"
+      ? BILLER_CATEGORY_ORDER
+      : BILLER_CATEGORY_ORDER.filter((cat) => cat === selectedCategory);
 
   return {
     ...useMoneyBase(),
+    flashOn,
+    toggleFlash: () => setFlashOn((prev) => !prev),
+    uploadQr: () => navigation.navigate("qr-scan"),
+    openOptions: () =>
+      uiActions.showSimulated("Payment options: QR Ph scanner, receive payments, and account actions."),
     scanToPay: () => navigation.navigate("qr-scan"),
     showMyQr: () => navigation.navigate("qr-receive"),
     billers: MOCK_BILLERS,
     loadOperators: MOCK_LOAD_OPERATORS,
     searchQuery,
     setSearchQuery: billerCatalogActions.setSearchQuery,
-    catalog: BILLER_CATEGORY_ORDER.flatMap((category) => {
-      const billers = withFavoriteState(
-        matched.filter((biller) => biller.category === category),
-        favoriteBillerIds,
-      );
-      return billers.length === 0 ? [] : [{ category, label: BILLER_CATEGORY_LABELS[category], billers }];
+    selectedCategory,
+    setSelectedCategory: billerCatalogActions.setSelectedCategory,
+    categoryPills: CATEGORY_PILL_CONFIG,
+    catalog: visibleCategories.flatMap((category) => {
+      const categoryBillers = enrichedBillers.filter((biller) => biller.category === category);
+      return categoryBillers.length === 0
+        ? []
+        : [{ category, label: BILLER_CATEGORY_LABELS[category], billers: categoryBillers }];
     }),
     favorites,
     showFavorites: favorites.length > 0 && searchQuery.trim() === "",
@@ -352,6 +447,7 @@ export function usePaymentsViewModel(): PaymentsViewModel {
       name: payment.name,
       when: payment.status === "paused" ? payment.when.replace("Autopay", "Paused") : payment.when,
       amountLabel: formatMoney(payment.amount),
+      status: payment.status,
     })),
     payBill: (billerId: string) => {
       billsActions.startBill(billerId);
